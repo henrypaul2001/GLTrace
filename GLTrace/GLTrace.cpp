@@ -1,6 +1,11 @@
-#include <iostream>
-
+#include "Renderer.h"
 int main()
 {
-    std::cout << "Hello World!\n";
+	Renderer renderer;
+	GLFWwindow* window = renderer.GetWindow();
+
+	while (!glfwWindowShouldClose(window))
+	{
+		renderer.Render();
+	}
 }
