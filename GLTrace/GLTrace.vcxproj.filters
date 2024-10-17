@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{78c22267-e387-4e6a-b42d-24c290cc8412}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shaders\FinalOutput">
+      <UniqueIdentifier>{fd04a385-297d-4d3b-997e-7bcdc282e5a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shaders\RTCompute">
+      <UniqueIdentifier>{f65bc317-50af-4daf-826e-41e3d4349c2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shaders\Generic">
+      <UniqueIdentifier>{efb986e4-3792-4fe7-b05a-58c6ba53422b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLTrace.cpp">
@@ -41,5 +53,16 @@
     <ClInclude Include="ComputeShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MeshData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\passthrough.vert">
+      <Filter>Source Files\Shaders\Generic</Filter>
+    </None>
+    <None Include="Shaders\screenQuad.frag">
+      <Filter>Source Files\Shaders\FinalOutput</Filter>
+    </None>
   </ItemGroup>
 </Project>

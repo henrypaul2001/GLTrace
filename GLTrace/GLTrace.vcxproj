@@ -145,8 +145,13 @@
   <ItemGroup>
     <ClInclude Include="AbstractShader.h" />
     <ClInclude Include="ComputeShader.h" />
+    <ClInclude Include="MeshData.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\passthrough.vert" />
+    <None Include="Shaders\screenQuad.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
