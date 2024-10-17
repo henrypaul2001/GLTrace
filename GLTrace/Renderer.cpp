@@ -3,8 +3,11 @@ void Renderer::Render()
 {
 	frameCount++;
 
-	// Render scene
-	//OnRenderFrame();
+	// Dispatch RT compute shader
+
+	// Render screen quad
+	screenQuadShader.Use();
+	screenQuad.DrawMeshData();
 
 	glfwSwapBuffers(window);
 

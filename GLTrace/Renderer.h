@@ -4,6 +4,7 @@
 #include <iostream>
 #include "ComputeShader.h"
 #include "Shader.h"
+#include "MeshData.h"
 
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
 	// ignore warning codes or insignificant errors
@@ -64,7 +65,40 @@ static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, 
 class Renderer
 {
 public:
-	Renderer(const unsigned int width = 600u, const unsigned int height = 600u) : SCR_WIDTH(width), SCR_HEIGHT(height) { Initialise(); }
+	Renderer(const unsigned int width = 600u, const unsigned int height = 600u) : SCR_WIDTH(width), SCR_HEIGHT(height) { 
+		Initialise(); 
+		
+		// Load shaders
+		screenQuadShader.LoadShader("Shaders/passthrough.vert", "Shaders/screenQuad.frag");
+
+		// Set up screen quad
+		std::vector<Vertex> vertices;
+		vertices.reserve(4);
+
+		Vertex vertex;
+		vertex.Position = glm::vec3(-1.0f, 1.0f, 0.0f);
+		vertex.TexCoords = glm::vec2(0.0f, 1.0f);
+		vertices.push_back(vertex); // top left
+
+		vertex.Position = glm::vec3(-1.0f, -1.0f, 0.0f);
+		vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+		vertices.push_back(vertex); // bottom left
+
+		vertex.Position = glm::vec3(1.0f, 1.0f, 0.0f);
+		vertex.TexCoords = glm::vec2(1.0f, 1.0f);
+		vertices.push_back(vertex); // top right
+
+		vertex.Position = glm::vec3(1.0f, -1.0f, 0.0f);
+		vertex.TexCoords = glm::vec2(1.0f, 0.0f);
+		vertices.push_back(vertex); // bottom right
+
+		std::vector<unsigned int> indices = {
+			0, 1, 3,
+			0, 3, 2
+		};
+
+		screenQuad.SetupMesh(vertices, indices);
+	}
 
 	~Renderer() {
 		glfwTerminate();
@@ -77,6 +111,7 @@ public:
 private:
 	bool Initialise();
 
+	MeshData screenQuad;
 	Shader screenQuadShader;
 	ComputeShader rtCompute;
 
