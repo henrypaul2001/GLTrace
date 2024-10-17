@@ -2,17 +2,6 @@
 void Renderer::Render()
 {
 	frameCount++;
-	currentFrame = static_cast<float>(glfwGetTime()) + 0.0001f;
-	dt = currentFrame - lastFrame;
-	lastFrame = currentFrame;
-
-	std::clog << "Delta time: " << dt << "										\r" << std::flush;
-
-	// Process inputs
-	//ProcessInputs();
-
-	// Update scene
-	//OnUpdateFrame();
 
 	// Render scene
 	//OnRenderFrame();
@@ -79,9 +68,6 @@ bool Renderer::Initialise()
 
 	std::cout << "OpenGL initialised" << std::endl;
 
-	float lastFrame = static_cast<float>(glfwGetTime());
-	float currentFrame;
-	dt = 0.0f;
 	frameCount = 0;
 
 	return true;

@@ -82,6 +82,4 @@ private:
 
 	GLFWwindow* window;
 	unsigned int SCR_WIDTH, SCR_HEIGHT, frameCount;
-	float lastFrame, currentFrame;
-	float dt;
 };
