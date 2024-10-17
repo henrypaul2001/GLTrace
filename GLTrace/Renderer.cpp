@@ -1,8 +1,6 @@
 #include "Renderer.h"
 void Renderer::Render()
 {
-	frameCount++;
-
 	glViewport(SCR_X_POS, SCR_Y_POS, SCR_WIDTH, SCR_HEIGHT);
 
 	// Dispatch RT compute shader
@@ -14,10 +12,6 @@ void Renderer::Render()
 	glfwSwapBuffers(window);
 
 	glfwPollEvents();
-
-	if (frameCount >= 1000) {
-		glfwSetWindowShouldClose(window, true);
-	}
 }
 
 bool Renderer::Initialise()
@@ -97,8 +91,6 @@ bool Renderer::Initialise()
 	ComputeShader::InitOpenGLConstants();
 
 	std::cout << "OpenGL initialised" << std::endl;
-
-	frameCount = 0;
 
 	return true;
 }

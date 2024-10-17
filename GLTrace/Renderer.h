@@ -116,7 +116,7 @@ public:
 	}
 
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		std::clog << "\r\nKey press: " << key << " | " << scancode << " | " << action << " | " << mods << "\r\n";
+		if (key == GLFW_KEY_ESCAPE) { glfwSetWindowShouldClose(window, true); }
 	}
 
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
@@ -140,5 +140,5 @@ private:
 	ComputeShader rtCompute;
 
 	GLFWwindow* window;
-	unsigned int SCR_WIDTH, SCR_HEIGHT, SCR_X_POS, SCR_Y_POS, frameCount;
+	unsigned int SCR_WIDTH, SCR_HEIGHT, SCR_X_POS, SCR_Y_POS;
 };
