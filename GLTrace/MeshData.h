@@ -14,10 +14,22 @@ struct Vertex {
 class MeshData
 {
 public:
+	MeshData() {
+		VAO = 0;
+		VBO = 0;
+		EBO = 0;
+		generated = false;
+	}
 	MeshData(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const GLenum bufferUsage = GL_STATIC_DRAW) {
-		this->vertices = vertices;
-		this->indices = indices;
-		SetupMesh(bufferUsage);
+		VAO = 0;
+		VBO = 0;
+		EBO = 0;
+		
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
+
+		SetupMesh(vertices, indices, bufferUsage);
 	}
 	~MeshData() {
 		glDeleteVertexArrays(1, &VAO);
@@ -25,25 +37,16 @@ public:
 		glDeleteBuffers(1, &EBO);
 	}
 
-	void DrawMeshData(const GLenum drawPrimitive = GL_TRIANGLES) {
-		glBindVertexArray(VAO);
-		glDrawElements(drawPrimitive, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
-	}
+	void SetupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const GLenum bufferUsage = GL_STATIC_DRAW) {
+		this->vertices = vertices;
+		this->indices = indices;
 
-	const std::vector<Vertex>& GetVertices() const { return vertices; }
-	const unsigned int GetVAO() const { return VAO; }
-	const unsigned int GetVBO() const { return VBO; }
-	const unsigned int GetEBO() const { return EBO; }
-private:
-	std::vector<Vertex> vertices;
-	std::vector<unsigned int> indices;
-	unsigned int VAO, VBO, EBO;
-
-	void SetupMesh(const GLenum bufferUsage) {
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glGenBuffers(1, &EBO);
+		if (!generated) {
+			glGenVertexArrays(1, &VAO);
+			glGenBuffers(1, &VBO);
+			glGenBuffers(1, &EBO);
+			generated = true;
+		}
 
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -60,6 +63,21 @@ private:
 		// texture coords
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-
 	}
+
+	void DrawMeshData(const GLenum drawPrimitive = GL_TRIANGLES) {
+		glBindVertexArray(VAO);
+		glDrawElements(drawPrimitive, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+	}
+
+	const std::vector<Vertex>& GetVertices() const { return vertices; }
+	const unsigned int GetVAO() const { return VAO; }
+	const unsigned int GetVBO() const { return VBO; }
+	const unsigned int GetEBO() const { return EBO; }
+private:
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+	unsigned int VAO, VBO, EBO;
+	bool generated;
 };
