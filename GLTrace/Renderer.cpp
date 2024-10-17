@@ -1,5 +1,4 @@
 #include "Renderer.h"
-
 void Renderer::Render()
 {
 	frameCount++;
@@ -19,7 +18,6 @@ void Renderer::Render()
 	//OnRenderFrame();
 
 	glfwSwapBuffers(window);
-
 
 	glfwPollEvents();
 
@@ -77,7 +75,7 @@ bool Renderer::Initialise()
 		//glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_MEDIUM, -1, "error message here"); // example of custom error message
 	}
 
-	//ComputeShader::InitOpenGLConstants();
+	ComputeShader::InitOpenGLConstants();
 
 	std::cout << "OpenGL initialised" << std::endl;
 

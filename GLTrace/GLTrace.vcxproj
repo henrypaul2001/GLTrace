@@ -137,12 +137,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLTrace.cpp" />
     <ClCompile Include="Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AbstractShader.h" />
+    <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

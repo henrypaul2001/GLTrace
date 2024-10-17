@@ -2,6 +2,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "ComputeShader.h"
+#include "Shader.h"
 
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
 	// ignore warning codes or insignificant errors
@@ -74,6 +76,9 @@ public:
 
 private:
 	bool Initialise();
+
+	Shader screenQuadShader;
+	ComputeShader rtCompute;
 
 	GLFWwindow* window;
 	unsigned int SCR_WIDTH, SCR_HEIGHT, frameCount;
