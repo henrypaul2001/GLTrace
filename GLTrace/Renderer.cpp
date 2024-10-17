@@ -3,6 +3,8 @@ void Renderer::Render()
 {
 	frameCount++;
 
+	glViewport(SCR_X_POS, SCR_Y_POS, SCR_WIDTH, SCR_HEIGHT);
+
 	// Dispatch RT compute shader
 
 	// Render screen quad
@@ -42,9 +44,34 @@ bool Renderer::Initialise()
 		glfwTerminate();
 		return false;
 	}
-	//glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	//glfwSetCursorPosCallback(window, mouse_callback);
-	//glfwSetScrollCallback(window, scroll_callback);
+
+	// Allow a C++ member function to be used by the C, OpenGl api callback for input callbacks
+	glfwSetWindowUserPointer(glfwGetCurrentContext(), this);
+	auto key = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+		static_cast<Renderer*>(glfwGetWindowUserPointer(window))->key_callback(window, key, scancode, action, mods);
+	};
+
+	auto scroll = [](GLFWwindow* window, double xoffset, double yoffset) {
+		static_cast<Renderer*>(glfwGetWindowUserPointer(window))->scroll_callback(window, xoffset, yoffset);
+	};
+
+	auto mouse = [](GLFWwindow* window, double xpos, double ypos) {
+		static_cast<Renderer*>(glfwGetWindowUserPointer(window))->mouse_callback(window, xpos, ypos);
+	};
+
+	auto mouse_button = [](GLFWwindow* window, int button, int action, int mods) {
+		static_cast<Renderer*>(glfwGetWindowUserPointer(window))->mouse_button_callback(window, button, action, mods);
+	};
+
+	auto frame_size = [](GLFWwindow* window, int width, int height) {
+		static_cast<Renderer*>(glfwGetWindowUserPointer(window))->framebuffer_size_callback(window, width, height);
+	};
+
+	glfwSetKeyCallback(window, key);
+	glfwSetScrollCallback(window, scroll);
+	glfwSetCursorPosCallback(window, mouse);
+	glfwSetMouseButtonCallback(window, mouse_button);
+	glfwSetFramebufferSizeCallback(window, frame_size);
 	//glfwSwapInterval(0); // disables v sync
 
 	// glad: load OpenGL function pointers

@@ -65,7 +65,7 @@ static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, 
 class Renderer
 {
 public:
-	Renderer(const unsigned int width = 600u, const unsigned int height = 600u) : SCR_WIDTH(width), SCR_HEIGHT(height) { 
+	Renderer(const unsigned int width = 600u, const unsigned int height = 600u, unsigned int xPos = 0u, unsigned int yPos = 0u) : SCR_WIDTH(width), SCR_HEIGHT(height), SCR_X_POS(xPos), SCR_Y_POS(yPos) {
 		Initialise(); 
 		
 		// Load shaders
@@ -106,8 +106,32 @@ public:
 
 	void Render();
 
-	GLFWwindow* GetWindow() { return window; }
+	void ResizeWindow(const unsigned int width, const unsigned int height) {
+		SCR_WIDTH = width;
+		SCR_HEIGHT = height;
+	}
 
+	void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+		ResizeWindow(width, height);
+	}
+
+	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+		std::clog << "\r\nKey press: " << key << " | " << scancode << " | " << action << " | " << mods << "\r\n";
+	}
+
+	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+		std::clog << "\r\nMouse scroll: " << xoffset << " | " << yoffset << "\r\n";
+	}
+
+	void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+		std::clog << "\r\nMouse move: " << xpos << " | " << ypos << "\r\n";
+	}
+
+	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+		std::clog << "\r\nMouse press: " << button << " | " << action << " | " << mods << "\r\n";
+	}
+
+	GLFWwindow* GetWindow() { return window; }
 private:
 	bool Initialise();
 
@@ -116,5 +140,5 @@ private:
 	ComputeShader rtCompute;
 
 	GLFWwindow* window;
-	unsigned int SCR_WIDTH, SCR_HEIGHT, frameCount;
+	unsigned int SCR_WIDTH, SCR_HEIGHT, SCR_X_POS, SCR_Y_POS, frameCount;
 };
