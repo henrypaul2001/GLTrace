@@ -98,6 +98,9 @@ public:
 		};
 
 		screenQuad.SetupMesh(vertices, indices);
+
+		screenTexture.GenerateTexture();
+		screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
 	}
 
 	~Renderer() {
@@ -109,6 +112,7 @@ public:
 	void ResizeWindow(const unsigned int width, const unsigned int height) {
 		SCR_WIDTH = width;
 		SCR_HEIGHT = height;
+		screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
 	}
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height) {

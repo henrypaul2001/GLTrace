@@ -5,7 +5,6 @@ class Texture2D {
 public:
 	Texture2D(GLint wrap_s = GL_CLAMP_TO_EDGE, GLint wrap_t = GL_CLAMP_TO_EDGE, GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR, GLint internalFormat = GL_RGBA32F, GLenum format = GL_RGBA, GLenum type = GL_FLOAT) : generated(false), wrap_s(wrap_s), wrap_t(wrap_t), minFilter(minFilter), magFilter(magFilter), internalFormat(internalFormat), format(format), type(type), texID(0), width(0), height(0) {}
 	Texture2D(const unsigned int width, const unsigned int height, GLint wrap_s = GL_CLAMP_TO_EDGE, GLint wrap_t = GL_CLAMP_TO_EDGE, GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR, GLint internalFormat = GL_RGBA32F, GLenum format = GL_RGBA, GLenum type = GL_FLOAT) : generated(false), wrap_s(wrap_s), wrap_t(wrap_t), minFilter(minFilter), magFilter(magFilter), internalFormat(internalFormat), format(format), type(type) {
-		generated = false;
 		GenerateTexture();
 		ResizeTexture(width, height);
 	}
