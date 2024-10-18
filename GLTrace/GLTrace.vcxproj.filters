@@ -67,5 +67,8 @@
     <None Include="Shaders\screenQuad.frag">
       <Filter>Source Files\Shaders\FinalOutput</Filter>
     </None>
+    <None Include="Shaders\RTCompute.comp">
+      <Filter>Source Files\Shaders\RTCompute</Filter>
+    </None>
   </ItemGroup>
 </Project>

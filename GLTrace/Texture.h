@@ -54,6 +54,13 @@ public:
 		}
 	}
 
+	void BindImage(const GLenum access = GL_READ_WRITE, const GLenum slot = GL_TEXTURE0) const {
+		if (generated) {
+			glActiveTexture(slot);
+			glBindImageTexture(0, texID, 0, GL_FALSE, 0, access, internalFormat);
+		}
+	}
+
 	void GenMipmaps() const {
 		if (generated) {
 			glActiveTexture(GL_TEXTURE0);

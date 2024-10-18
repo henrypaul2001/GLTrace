@@ -70,6 +70,7 @@ public:
 		
 		// Load shaders
 		screenQuadShader.LoadShader("Shaders/passthrough.vert", "Shaders/screenQuad.frag");
+		rtCompute.LoadShader("Shaders/RTCompute.comp");
 
 		// Set up screen quad
 		std::vector<Vertex> vertices;
