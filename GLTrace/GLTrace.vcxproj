@@ -148,6 +148,7 @@
     <ClInclude Include="MeshData.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\passthrough.vert" />
