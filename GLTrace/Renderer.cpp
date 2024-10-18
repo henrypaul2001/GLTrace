@@ -3,14 +3,16 @@ void Renderer::Render()
 {
 	glViewport(SCR_X_POS, SCR_Y_POS, SCR_WIDTH, SCR_HEIGHT);
 
-	// Dispatch RT compute shader
-	screenTexture.BindImage(GL_WRITE_ONLY);
-	rtCompute.DispatchCompute(SCR_WIDTH, SCR_HEIGHT, 1, GL_ALL_BARRIER_BITS);
+	if (SCR_WIDTH > 0 && SCR_HEIGHT > 0) {
+		// Dispatch RT compute shader
+		screenTexture.BindImage(GL_WRITE_ONLY);
+		rtCompute.DispatchCompute(SCR_WIDTH, SCR_HEIGHT, 1, GL_ALL_BARRIER_BITS);
 
-	// Render screen quad
-	screenQuadShader.Use();
-	screenTexture.Bind();
-	screenQuad.DrawMeshData();
+		// Render screen quad
+		screenQuadShader.Use();
+		screenTexture.Bind();
+		screenQuad.DrawMeshData();
+	}
 
 	glfwSwapBuffers(window);
 
