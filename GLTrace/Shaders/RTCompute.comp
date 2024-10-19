@@ -64,7 +64,7 @@ ray new_ray(vec3 origin, vec3 direction) {
 	return r;
 }
 vec3 at(ray r, float t) {
-	return r.origin + t * r.direction;
+	return r.origin + (t * r.direction);
 }
 
 struct interval {
@@ -106,6 +106,7 @@ struct hit_record {
 	float u;
 	float v;
 	bool front_face;
+	vec3 hit_colour;
 };
 void set_face_normal(inout hit_record self, ray r, vec3 outward_normal) {
 	self.front_face = dot(r.direction, outward_normal) < 0;
@@ -150,7 +151,7 @@ bool hit_sphere(inout sphere s, inout ray r, interval ray_t, inout hit_record re
 	vec3 outward_normal = (rec.p - s.center) / s.radius;
 	set_face_normal(rec, r, outward_normal);
 	//rec.mat = mat;
-
+	rec.hit_colour = vec3(0.0);
 	return true;
 }
 
@@ -248,11 +249,54 @@ void main() {
 	int j = pixel_coords.y;
 	int i = pixel_coords.x;
 
+	//ray r;
+	//vec3 sample_colour = vec3(0.0);
+	//for (int i = 0; i < cam.max_bounces; i++) {
+		// hit_record rec;
+		
+		// if (hit_sphere_list(r, new_interval(0.001, 100000.0), rec)) {
+		//		pixel_colour += rec.colour * (1 / (i + 1));
+		// }
+		// else {
+		//		vec3 unit_direction = normalize(r.direction);
+		//		float a = 0.5 * (unit_direction.y + 1.0);
+		//		vec3 sky_colour = (1.0 - a) * vec3(1.0) + a * vec3(0.5, 0.7, 1.0);
+		//		pixel_colour += sky_colour * (1 / (i + 1));
+		//		break;
+		// }
+		//
+		// vec3 direction = random_on_hemisphere(rec.normal); 
+		// r = new_ray(rec.p, direction);
+	//}
+
 	// Begin trace
 	for (int s_j = 0; s_j < Camera.sqrt_spp; s_j++) {
 		for (int s_i = 0; s_i < Camera.sqrt_spp; s_i++) {
+			vec3 sample_colour = vec3(0.0);
 			ray r = get_ray(Camera, i, j, s_i, s_j);
-			pixel_colour += ray_colour(Camera, r);
+			//pixel_colour += ray_colour(Camera, r);
+
+			for (int bounce = 0; bounce < Camera.max_bounces; bounce++) {
+				hit_record rec;
+
+				if (hit_sphere_list(r, new_interval(0.001, 1000000.0), rec)) {
+					vec3 direction = reflect(r.direction, rec.normal);
+					//r = new_ray(rec.p, direction);
+					sample_colour += rec.hit_colour / (bounce + 1);
+					//sample_colour += r.origin;
+					//vec3 direction = fast_random_on_hemisphere(rec.normal);
+					r = new_ray(rec.p, normalize(direction));
+				}
+				else {
+					vec3 unit_direction = normalize(r.direction);
+					float a = 0.5 * (unit_direction.y + 1.0);
+					vec3 sky_colour = (1.0 - a) * vec3(1.0) + a * vec3(0.5, 0.7, 1.0);
+					sample_colour += sky_colour / (bounce + 1);
+					//sample_colour += Camera.background_colour / (bounce + 1);
+					break;
+				}
+			}
+			pixel_colour += sample_colour;
 		}
 	}
 	pixel_colour = Camera.pixel_samples_scale * pixel_colour;
