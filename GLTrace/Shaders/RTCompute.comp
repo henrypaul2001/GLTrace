@@ -35,6 +35,23 @@ vec3 fast_random_in_unit_disk() {
 	// Return the point in the unit disk (z is always 0)
 	return vec3(x, y, 0.0f);
 }
+vec3 fast_random_unit_vector() {
+	float theta = fast_random(0.0, 2.0 * pi);
+	float phi = acos(fast_random(-1.0, 1.0));  // acos to sample evenly on a sphere
+	float x = sin(phi) * cos(theta);
+	float y = sin(phi) * sin(theta);
+	float z = cos(phi);
+	return vec3(x, y, z);
+}
+vec3 fast_random_on_hemisphere(vec3 normal) {
+	vec3 on_unit_sphere = fast_random_unit_vector();
+	if (dot(on_unit_sphere, normal) > 0.0) {
+		return on_unit_sphere;
+	}
+	else {
+		return -on_unit_sphere;
+	}
+}
 
 struct ray {
 	vec3 origin;
