@@ -109,7 +109,24 @@ bool hit_sphere(inout sphere s, inout ray r, interval ray_t, inout hit_record re
 	return true;
 }
 
-sphere s;
+const int num_spheres = 2;
+sphere spheres[num_spheres];
+
+bool hit_sphere_list(ray r, interval ray_t, inout hit_record rec) {
+	hit_record temp_hit;
+	bool hit_anything = false;
+	float closest_so_far = ray_t.tmax;
+
+	for (int i = 0; i < num_spheres; i++) {
+		if (hit_sphere(spheres[i], r, new_interval(ray_t.tmin, closest_so_far), temp_hit)) {
+			hit_anything = true;
+			closest_so_far = temp_hit.t;
+			rec = temp_hit;
+		}
+	}
+
+	return hit_anything;
+}
 
 struct camera {
 	int image_width, image_height;  // Ratio of image width over height
@@ -139,7 +156,8 @@ struct camera {
 uniform camera cam;
 vec3 ray_colour(inout camera self, ray r) {
 	hit_record rec;
-	if (hit_sphere(s, r, new_interval(0.001, 1000000.0), rec)) {
+
+	if (hit_sphere_list(r, new_interval(0.001, 1000000.0), rec)) {
 		return 0.5 * (rec.normal + vec3(1.0));
 	}
 
@@ -150,8 +168,9 @@ vec3 ray_colour(inout camera self, ray r) {
 
 void main() {
 	// Scene
-	s = new_sphere(vec3(0.0, 0.0, -5.0), 2.5);
-	
+	spheres[0] = new_sphere(vec3(0.0, 0.0, -1.0), 0.5);
+	spheres[1] = new_sphere(vec3(0.0, -100.5, -1.0), 100.0);
+
 	camera Camera = cam;
 
 	// Prepare trace
