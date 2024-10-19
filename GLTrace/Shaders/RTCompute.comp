@@ -65,42 +65,7 @@ struct camera {
 	vec3 defocus_disk_u;			// Defocus disk horizontal radius
 	vec3 defocus_disk_v;			// Defocus disk vertical radius
 };
-void initCamera(inout camera self) {
-	self.aspect_ratio = self.image_width / self.image_height;
-
-	self.pixel_samples_scale = 1.0 / self.samples_per_pixel;
-	self.sqrt_spp = int(sqrt(self.samples_per_pixel));
-	self.pixel_samples_scale = 1.0 / (self.sqrt_spp * self.sqrt_spp);
-	self.recip_sqrt_spp = 1.0 / self.sqrt_spp;
-
-	// Determine viewport dimensions
-	float theta = radians(self.vfov);
-	float h = tan(theta / 2.0);
-	float viewport_height = 2.0 * h * self.focus_dist;
-	float viewport_width = viewport_height * (float(self.image_width) / self.image_height);
-
-	// U, V, W basis vectors for coordinate frame
-	self.w = normalize(self.lookfrom - self.lookat);
-	self.u = normalize(cross(self.vup, self.w));
-	self.v = cross(self.w, self.u);
-
-	// Calculate viewport delta
-	vec3 viewport_u = viewport_width * self.u;
-	vec3 viewport_v = viewport_height * -self.v;
-
-	// Pixel delta
-	self.pixel_delta_u = viewport_u / self.image_width;
-	self.pixel_delta_v = viewport_v / self.image_height;
-
-	// Upper left coordinate
-	vec3 viewport_upper_left = self.lookfrom - (self.focus_dist * self.w) - viewport_u / 2.0 - viewport_v / 2.0;
-	self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
-
-	// Camera defocus disk basis vectors
-	float defocus_radius = self.focus_dist * tan(radians(self.defocus_angle / 2.0));
-	self.defocus_disk_u = self.u * defocus_radius;
-	self.defocus_disk_v = self.v * defocus_radius;
-} // Move this to CPU and push values to GPU as uniforms before dispatch
+uniform camera cam;
 vec3 ray_colour(inout camera self, ray r) {
 	if (hit_sphere(s, r)) {
 		return vec3(1.0, 0.0, 0.0);
@@ -113,24 +78,10 @@ vec3 ray_colour(inout camera self, ray r) {
 
 void main() {
 	// Scene
-	camera cam;
 	s = new_sphere(vec3(0.0, 0.0, -5.0), 2.5);
-
-	// Setup camera
-	cam.image_width = imageSize(screenImage).x;
-	cam.image_height = imageSize(screenImage).y;
-	cam.aspect_ratio = 1.0;
-	cam.samples_per_pixel = 10;
-	cam.max_bounces = 10;
-	cam.background_colour = vec3(1.0, 0.5, 1.0);
-	cam.vfov = 90.0;
-	cam.lookfrom = vec3(0.0);
-	cam.lookat = vec3(0.0, 0.0, -1.0);
-	cam.vup = vec3(0.0, -1.0, 0.0);
-	cam.defocus_angle = 0.0;
-	cam.focus_dist = 10.0;
-	initCamera(cam);
 	
+	camera Camera = cam;
+
 	// Prepare trace
 	vec3 pixel_colour = vec3(0.0);
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
@@ -141,7 +92,7 @@ void main() {
 	ray r = new_ray(cam.lookfrom, ray_direction);
 
 	// Begin trace
-	pixel_colour = ray_colour(cam, r);
+	pixel_colour = ray_colour(Camera, r);
 
 	// Output to image texture
 	imageStore(screenImage, pixel_coords, vec4(pixel_colour, 1.0));

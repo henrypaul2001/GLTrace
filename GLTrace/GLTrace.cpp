@@ -2,6 +2,12 @@
 int main()
 {
 	Renderer renderer;
+	Camera cam;
+	cam.vfov = 90.0;
+	cam.lookfrom = glm::vec3(0.0);
+	cam.lookat = glm::vec3(0.0, 0.0, -1.0);
+	cam.vup = glm::vec3(0.0, -1.0, 0.0);
+
 	GLFWwindow* window = renderer.GetWindow();
 
 	float lastFrame = static_cast<float>(glfwGetTime());
@@ -22,6 +28,10 @@ int main()
 		// Update scene
 		//OnUpdateFrame();
 
-		renderer.Render();
+		renderer.Render(cam);
+
+		glfwSwapBuffers(window);
+
+		glfwPollEvents();
 	}
 }

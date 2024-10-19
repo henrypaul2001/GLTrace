@@ -1,5 +1,6 @@
 #pragma once
 #include <limits>
+#include <cmath>
 
 // Constant
 const double infinity_d = std::numeric_limits<double>::infinity();

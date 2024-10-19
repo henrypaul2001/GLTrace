@@ -1,9 +1,13 @@
 #include "Renderer.h"
-void Renderer::Render()
+void Renderer::Render(Camera& activeCamera)
 {
 	glViewport(SCR_X_POS, SCR_Y_POS, SCR_WIDTH, SCR_HEIGHT);
 
 	if (SCR_WIDTH > 0 && SCR_HEIGHT > 0) {
+		// Update camera
+		activeCamera.Initialise(SCR_WIDTH, SCR_HEIGHT);
+		activeCamera.SetUniforms(rtCompute);
+
 		// Dispatch RT compute shader
 		screenTexture.BindImage(GL_WRITE_ONLY);
 		rtCompute.DispatchCompute(SCR_WIDTH, SCR_HEIGHT, 1, GL_ALL_BARRIER_BITS);
@@ -13,10 +17,6 @@ void Renderer::Render()
 		screenTexture.Bind();
 		screenQuad.DrawMeshData();
 	}
-
-	glfwSwapBuffers(window);
-
-	glfwPollEvents();
 }
 
 bool Renderer::Initialise()
