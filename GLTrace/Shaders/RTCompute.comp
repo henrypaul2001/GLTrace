@@ -4,6 +4,10 @@ layout (rgba32f, binding = 0) uniform image2D screenImage;
 
 const uint max_world_size = 100;
 
+float length_squared(vec3 vec) {
+	return vec.x * vec.x + vec.y * vec.y + vec.z * vec.z;
+}
+
 struct ray {
 	vec3 origin;
 	vec3 direction;
@@ -18,6 +22,51 @@ vec3 at(ray r, float t) {
 	return r.origin + t * r.direction;
 }
 
+struct interval {
+	float tmin;
+	float tmax;
+};
+interval new_interval() {
+	interval t;
+	t.tmin = 0.0;
+	t.tmax = 0.0;
+	return t;
+}
+interval new_interval(float tmin, float tmax) {
+	interval t;
+	t.tmin = tmin;
+	t.tmax = tmax;
+	return t;
+}
+interval new_interval(interval a, interval b) {
+	interval t;
+	t.tmin = a.tmin <= b.tmin ? a.tmin : b.tmin;
+	t.tmax = a.tmax >= b.tmax ? a.tmax : b.tmax;
+	return t;
+}
+float size(interval self) {
+	return self.tmax - self.tmin;
+}
+bool contains(interval self, float x) {
+	return self.tmin <= x && x <= self.tmax;
+}
+bool surrounds(interval self, float x) {
+	return self.tmin < x && x < self.tmax;
+}
+
+struct hit_record {
+	vec3 p;
+	vec3 normal;
+	float t;
+	float u;
+	float v;
+	bool front_face;
+};
+void set_face_normal(inout hit_record self, ray r, vec3 outward_normal) {
+	self.front_face = dot(r.direction, outward_normal) < 0;
+	self.normal = self.front_face ?outward_normal : -outward_normal;
+}
+
 struct sphere {
 	vec3 center;
 	float radius;
@@ -28,14 +77,36 @@ sphere new_sphere(vec3 position, float radius) {
 	s.radius = radius;
 	return s;
 }
-bool hit_sphere(inout sphere s, inout ray r) {
+bool hit_sphere(inout sphere s, inout ray r, interval ray_t, inout hit_record rec) {
 	vec3 oc = s.center - r.origin;
-	float a = dot(r.direction, r.direction);
-	float b = -2.0 * dot(r.direction, oc);
-	float c = dot(oc, oc) - s.radius * s.radius;
-	float discriminant = b * b - 4 * a * c;
+
+	float a = length_squared(r.direction);
+	float h = dot(r.direction, oc);
+	float c = length_squared(oc) - s.radius * s.radius;
+	float discriminant = h * h - a * c;
 	
-	return (discriminant >= 0);
+	if (discriminant < 0) {
+		return false;
+	}
+
+	float sqrtd = sqrt(discriminant);
+
+	// Find nearest root that lies in acceptable range
+	float root = (h - sqrtd) / a;
+	if (!surrounds(ray_t, root)) {
+		root = (h + sqrtd) / a;
+		if (!surrounds(ray_t, root)) {
+			return false;
+		}
+	}
+
+	rec.t = root;
+	rec.p = at(r, rec.t);
+	vec3 outward_normal = (rec.p - s.center) / s.radius;
+	set_face_normal(rec, r, outward_normal);
+	//rec.mat = mat;
+
+	return true;
 }
 
 sphere s;
@@ -67,8 +138,9 @@ struct camera {
 };
 uniform camera cam;
 vec3 ray_colour(inout camera self, ray r) {
-	if (hit_sphere(s, r)) {
-		return vec3(1.0, 0.0, 0.0);
+	hit_record rec;
+	if (hit_sphere(s, r, new_interval(0.001, 1000000.0), rec)) {
+		return 0.5 * (rec.normal + vec3(1.0));
 	}
 
 	vec3 unit_direction = normalize(r.direction);
