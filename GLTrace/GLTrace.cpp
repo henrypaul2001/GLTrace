@@ -1,4 +1,5 @@
 #include "Renderer.h"
+
 int main()
 {
 	Renderer renderer;
@@ -6,7 +7,8 @@ int main()
 	cam.vfov = 90.0;
 	cam.lookfrom = glm::vec3(0.0);
 	cam.lookat = glm::vec3(0.0, 0.0, -1.0);
-	cam.vup = glm::vec3(0.0, -1.0, 0.0);
+	cam.vup = glm::vec3(0.0, 1.0, 0.0);
+	cam.samples_per_pixel = 10;
 
 	GLFWwindow* window = renderer.GetWindow();
 
@@ -21,6 +23,9 @@ int main()
 		lastFrame = currentFrame;
 
 		std::clog << "Delta time: " << dt << "										\r" << std::flush;
+
+		//cam.lookfrom = cam.lookfrom + (glm::vec3(1.0f, 0.0f, 0.0f) * dt);
+		//cam.lookat = cam.lookfrom + glm::vec3(0.0f, 0.0f, -1.0f);
 
 		// Process inputs
 		//ProcessInputs();

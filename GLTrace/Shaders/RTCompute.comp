@@ -2,10 +2,38 @@
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 layout (rgba32f, binding = 0) uniform image2D screenImage;
 
+const float pi = 3.1415926535897932385;
 const uint max_world_size = 100;
 
+// Utility
+uint xorshift32_state = 0x12345678; // Example seed
+uint xorshift32() {
+	uint x = xorshift32_state;
+	x ^= x << 13;
+	x ^= x >> 17;
+	x ^= x << 5;
+	return xorshift32_state = x;
+}
+float fast_random() {
+	return (xorshift32() / 100000000000000000000000000000000000000.0);
+}
+float fast_random(float fmin, float fmax) {
+	return fmin + (fmax - fmin) * fast_random();
+}
 float length_squared(vec3 vec) {
 	return vec.x * vec.x + vec.y * vec.y + vec.z * vec.z;
+}
+vec3 fast_random_in_unit_disk() {
+	// Generate a random angle theta and random radius squared (r^2) for uniform distribution
+	float theta = fast_random(0.0, 2.0 * pi);
+	float r = sqrt(fast_random(0.0f, 1.0));  // sqrt ensures uniform sampling over the disk
+
+	// Convert polar coordinates (r, theta) to Cartesian coordinates (x, y)
+	float x = r * cos(theta);
+	float y = r * sin(theta);
+
+	// Return the point in the unit disk (z is always 0)
+	return vec3(x, y, 0.0f);
 }
 
 struct ray {
@@ -165,6 +193,30 @@ vec3 ray_colour(inout camera self, ray r) {
 	float a = 0.5 * (unit_direction.y + 1.0);
 	return (1.0 - a) * vec3(1.0) + a * vec3(0.5, 0.7, 1.0);
 }
+vec3 sample_square_stratified(int s_i, int s_j, float recip_sqrt_spp) {
+		// Returns vector to random point in square sub-pixel specified by grid indices s_i, s_j
+		float px = ((s_i + fast_random()) * recip_sqrt_spp) - 0.5;
+		float py = ((s_j + fast_random()) * recip_sqrt_spp) - 0.5;
+
+		return vec3(px, py, 0.0);
+}
+vec3 defocus_disk_sample(inout camera self) {
+	// Returns random point in camera focus disk
+	vec3 p = fast_random_in_unit_disk();
+	return self.lookfrom + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v);
+}
+ray get_ray(inout camera self, int i, int j, int s_i, int s_j) {
+	// Construct ray originating from defocus disk and directed and randomly sampled point around pixel location i, j for stratified sample square s_i, s_j
+	vec3 offset = sample_square_stratified(s_i, s_j, self.recip_sqrt_spp);
+	vec3 pixel_sample = self.pixel00_loc
+			+ ((i + offset.x) * self.pixel_delta_u)
+			+ ((j + offset.y) * self.pixel_delta_v);
+	
+	vec3 ray_origin = (self.defocus_angle <= 0.0) ? self.lookfrom : defocus_disk_sample(self);
+	vec3 ray_direction = pixel_sample - ray_origin;
+
+	return new_ray(ray_origin, ray_direction);
+}
 
 void main() {
 	// Scene
@@ -176,14 +228,17 @@ void main() {
 	// Prepare trace
 	vec3 pixel_colour = vec3(0.0);
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
-	uint j = pixel_coords.y;
-	uint i = pixel_coords.x;
-	vec3 pixel_center = cam.pixel00_loc + (i * cam.pixel_delta_u) + (j * cam.pixel_delta_v);
-	vec3 ray_direction = pixel_center - cam.lookfrom;
-	ray r = new_ray(cam.lookfrom, ray_direction);
+	int j = pixel_coords.y;
+	int i = pixel_coords.x;
 
 	// Begin trace
-	pixel_colour = ray_colour(Camera, r);
+	for (int s_j = 0; s_j < Camera.sqrt_spp; s_j++) {
+		for (int s_i = 0; s_i < Camera.sqrt_spp; s_i++) {
+			ray r = get_ray(Camera, i, j, s_i, s_j);
+			pixel_colour += ray_colour(Camera, r);
+		}
+	}
+	pixel_colour = Camera.pixel_samples_scale * pixel_colour;
 
 	// Output to image texture
 	imageStore(screenImage, pixel_coords, vec4(pixel_colour, 1.0));
