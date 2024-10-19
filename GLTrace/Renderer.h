@@ -79,19 +79,19 @@ public:
 
 		Vertex vertex;
 		vertex.Position = glm::vec3(-1.0f, 1.0f, 0.0f);
-		vertex.TexCoords = glm::vec2(0.0f, 1.0f);
+		vertex.TexCoords = glm::vec2(0.0f, 0.0f);
 		vertices.push_back(vertex); // top left
 
 		vertex.Position = glm::vec3(-1.0f, -1.0f, 0.0f);
-		vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+		vertex.TexCoords = glm::vec2(0.0f, 1.0f);
 		vertices.push_back(vertex); // bottom left
 
 		vertex.Position = glm::vec3(1.0f, 1.0f, 0.0f);
-		vertex.TexCoords = glm::vec2(1.0f, 1.0f);
+		vertex.TexCoords = glm::vec2(1.0f, 0.0f);
 		vertices.push_back(vertex); // top right
 
 		vertex.Position = glm::vec3(1.0f, -1.0f, 0.0f);
-		vertex.TexCoords = glm::vec2(1.0f, 0.0f);
+		vertex.TexCoords = glm::vec2(1.0f, 1.0f);
 		vertices.push_back(vertex); // bottom right
 
 		std::vector<unsigned int> indices = {
