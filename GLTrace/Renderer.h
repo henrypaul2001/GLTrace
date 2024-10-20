@@ -131,6 +131,8 @@ public:
 
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 		std::clog << "\r\nMouse move: " << xpos << " | " << ypos << "\r\n";
+		mousePos.x = xpos;
+		mousePos.y = ypos;
 	}
 
 	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -138,6 +140,7 @@ public:
 	}
 
 	GLFWwindow* GetWindow() { return window; }
+	const glm::vec2& MousePos() const { return mousePos; }
 private:
 	bool Initialise();
 
@@ -148,4 +151,5 @@ private:
 
 	GLFWwindow* window;
 	unsigned int SCR_WIDTH, SCR_HEIGHT, SCR_X_POS, SCR_Y_POS;
+	glm::vec2 mousePos;
 };

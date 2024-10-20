@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="AbstractShader.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraController.h" />
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="GLTMath.h" />
     <ClInclude Include="MeshData.h" />

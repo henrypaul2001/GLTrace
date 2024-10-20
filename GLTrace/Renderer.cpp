@@ -71,6 +71,7 @@ bool Renderer::Initialise()
 	glfwSetCursorPosCallback(window, mouse);
 	glfwSetMouseButtonCallback(window, mouse_button);
 	glfwSetFramebufferSizeCallback(window, frame_size);
+	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	//glfwSwapInterval(0); // disables v sync
 
 	// glad: load OpenGL function pointers

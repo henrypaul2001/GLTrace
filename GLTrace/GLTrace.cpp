@@ -1,9 +1,11 @@
 #include "Renderer.h"
-
+#include "CameraController.h"
 int main()
 {
 	Renderer renderer;
 	Camera cam;
+	CameraController camControl;
+	camControl.activeCamera = &cam;
 	cam.vfov = 90.0;
 	cam.lookfrom = glm::vec3(0.0);
 	cam.lookat = glm::vec3(0.0, 0.0, -1.0);
@@ -30,10 +32,11 @@ int main()
 		//cam.lookat = cam.lookfrom + glm::vec3(0.0f, 0.0f, -1.0f);
 
 		// Process inputs
-		//ProcessInputs();
+		const glm::vec2& mousePos = renderer.MousePos();
+		camControl.ProcessMouseMovement(mousePos.x, mousePos.y);
 
 		// Update scene
-		//OnUpdateFrame();
+		camControl.Update();
 
 		renderer.Render(cam);
 
