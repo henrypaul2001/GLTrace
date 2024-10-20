@@ -4,6 +4,7 @@
 #include "GLTMath.h"
 #include <glm/geometric.hpp>
 #include "AbstractShader.h"
+#include <chrono>
 class Camera {
 public:
 	int samples_per_pixel = 10;								// Number of random samples per pixel
@@ -86,6 +87,8 @@ public:
 		shader.setVec3("cam.w", w);
 		shader.setVec3("cam.defocus_disk_u", defocus_disk_u);
 		shader.setVec3("cam.defocus_disk_v", defocus_disk_v);
+
+		shader.setFloat("time", glfwGetTime());
 	}
 
 private:

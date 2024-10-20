@@ -8,7 +8,9 @@ int main()
 	cam.lookfrom = glm::vec3(0.0);
 	cam.lookat = glm::vec3(0.0, 0.0, -1.0);
 	cam.vup = glm::vec3(0.0, 1.0, 0.0);
-	cam.samples_per_pixel = 10;
+	cam.samples_per_pixel = 2;
+	cam.max_bounces = 10;
+	cam.background_colour = glm::vec3(1.0f, 0.0f, 0.0f);
 
 	GLFWwindow* window = renderer.GetWindow();
 
@@ -24,7 +26,7 @@ int main()
 
 		std::clog << "Delta time: " << dt << "										\r" << std::flush;
 
-		//cam.lookfrom = cam.lookfrom + (glm::vec3(1.0f, 0.0f, 0.0f) * dt);
+		//cam.lookfrom = cam.lookfrom + (glm::vec3(0.05f, 0.0f, 0.0f) * dt);
 		//cam.lookat = cam.lookfrom + glm::vec3(0.0f, 0.0f, -1.0f);
 
 		// Process inputs

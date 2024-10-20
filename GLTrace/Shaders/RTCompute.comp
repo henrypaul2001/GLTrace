@@ -1,56 +1,64 @@
 #version 430 core
+
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 layout (rgba32f, binding = 0) uniform image2D screenImage;
 
+uniform float time;
+uint randseed;
 const float pi = 3.1415926535897932385;
 const uint max_world_size = 100;
+const uint UINT_MAX = uint(0xFFFFFFFFu);
 
 // Utility
-uint xorshift32_state = 0x12345678; // Example seed
-uint xorshift32() {
-	uint x = xorshift32_state;
-	x ^= x << 13;
-	x ^= x >> 17;
-	x ^= x << 5;
-	return xorshift32_state = x;
-}
-float fast_random() {
-	return (xorshift32() / 100000000000000000000000000000000000000.0);
-}
-float fast_random(float fmin, float fmax) {
-	return fmin + (fmax - fmin) * fast_random();
-}
 float length_squared(vec3 vec) {
 	return vec.x * vec.x + vec.y * vec.y + vec.z * vec.z;
 }
-vec3 fast_random_in_unit_disk() {
-	// Generate a random angle theta and random radius squared (r^2) for uniform distribution
-	float theta = fast_random(0.0, 2.0 * pi);
-	float r = sqrt(fast_random(0.0f, 1.0));  // sqrt ensures uniform sampling over the disk
-
-	// Convert polar coordinates (r, theta) to Cartesian coordinates (x, y)
-	float x = r * cos(theta);
-	float y = r * sin(theta);
-
-	// Return the point in the unit disk (z is always 0)
-	return vec3(x, y, 0.0f);
+uint PCH_Hash(uint seed) {
+	uint state = seed * 747796405u + 2891336453u;
+	uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+	return (word >> 22u) ^ word;
 }
-vec3 fast_random_unit_vector() {
-	float theta = fast_random(0.0, 2.0 * pi);
-	float phi = acos(fast_random(-1.0, 1.0));  // acos to sample evenly on a sphere
+float rand() {
+	randseed = PCH_Hash(randseed);
+	return float(randseed) / float(UINT_MAX);
+}
+float rand(float fmin, float fmax) {
+	return fmin + (fmax - fmin) * rand();
+}
+vec3 random_vector() {
+	return vec3(rand(0.0, 1.0), rand(0.0, 1.0), rand(0.0, 1.0));
+}
+vec3 random_vector(float fmin, float fmax) {
+	return vec3(rand(fmin, fmax), rand(fmin, fmax), rand(fmin, fmax));
+}
+vec3 random_unit_vector() {
+	float theta = rand(0.0, 2.0 * pi);
+	float phi = acos(rand(-1.0, 1.0));  // acos to sample evenly on a sphere
 	float x = sin(phi) * cos(theta);
 	float y = sin(phi) * sin(theta);
 	float z = cos(phi);
 	return vec3(x, y, z);
 }
-vec3 fast_random_on_hemisphere(vec3 normal) {
-	vec3 on_unit_sphere = fast_random_unit_vector();
+vec3 random_on_hemisphere(vec3 normal) {
+	vec3 on_unit_sphere = random_unit_vector();
 	if (dot(on_unit_sphere, normal) > 0.0) {
 		return on_unit_sphere;
 	}
 	else {
 		return -on_unit_sphere;
 	}
+}
+vec3 random_in_unit_disk() {
+// Generate a random angle theta and random radius squared (r^2) for uniform distribution
+	float theta = rand(0.0, 2.0 * pi);
+	float r = sqrt(rand(0.0, 1.0));  // sqrt ensures uniform sampling over the disk
+
+	// Convert polar coordinates (r, theta) to Cartesian coordinates (x, y)
+	float x = r * cos(theta);
+	float y = r * sin(theta);
+
+	// Return the point in the unit disk (z is always 0)
+	return vec3(x, y, 0.0);
 }
 
 struct ray {
@@ -110,7 +118,7 @@ struct hit_record {
 };
 void set_face_normal(inout hit_record self, ray r, vec3 outward_normal) {
 	self.front_face = dot(r.direction, outward_normal) < 0;
-	self.normal = self.front_face ?outward_normal : -outward_normal;
+	self.normal = self.front_face ? outward_normal : -outward_normal;
 }
 
 struct sphere {
@@ -213,14 +221,14 @@ vec3 ray_colour(inout camera self, ray r) {
 }
 vec3 sample_square_stratified(int s_i, int s_j, float recip_sqrt_spp) {
 		// Returns vector to random point in square sub-pixel specified by grid indices s_i, s_j
-		float px = ((s_i + fast_random()) * recip_sqrt_spp) - 0.5;
-		float py = ((s_j + fast_random()) * recip_sqrt_spp) - 0.5;
+		float px = ((s_i + rand(0.0, 1.0)) * recip_sqrt_spp) - 0.5;
+		float py = ((s_j + rand(0.0, 1.0)) * recip_sqrt_spp) - 0.5;
 
 		return vec3(px, py, 0.0);
 }
 vec3 defocus_disk_sample(inout camera self) {
 	// Returns random point in camera focus disk
-	vec3 p = fast_random_in_unit_disk();
+	vec3 p = random_in_unit_disk();
 	return self.lookfrom + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v);
 }
 ray get_ray(inout camera self, int i, int j, int s_i, int s_j) {
@@ -238,7 +246,7 @@ ray get_ray(inout camera self, int i, int j, int s_i, int s_j) {
 
 void main() {
 	// Scene
-	spheres[0] = new_sphere(vec3(0.0, 0.0, -1.0), 0.5);
+	spheres[0] = new_sphere(vec3(0.0, (0.0 + sin(time)) * 0.1, -1.0), 0.5);
 	spheres[1] = new_sphere(vec3(0.0, -100.5, -1.0), 100.0);
 
 	camera Camera = cam;
@@ -249,43 +257,23 @@ void main() {
 	int j = pixel_coords.y;
 	int i = pixel_coords.x;
 
-	//ray r;
-	//vec3 sample_colour = vec3(0.0);
-	//for (int i = 0; i < cam.max_bounces; i++) {
-		// hit_record rec;
-		
-		// if (hit_sphere_list(r, new_interval(0.001, 100000.0), rec)) {
-		//		pixel_colour += rec.colour * (1 / (i + 1));
-		// }
-		// else {
-		//		vec3 unit_direction = normalize(r.direction);
-		//		float a = 0.5 * (unit_direction.y + 1.0);
-		//		vec3 sky_colour = (1.0 - a) * vec3(1.0) + a * vec3(0.5, 0.7, 1.0);
-		//		pixel_colour += sky_colour * (1 / (i + 1));
-		//		break;
-		// }
-		//
-		// vec3 direction = random_on_hemisphere(rec.normal); 
-		// r = new_ray(rec.p, direction);
-	//}
+	randseed = PCH_Hash((i + j * 65536u + gl_GlobalInvocationID.z * 65536u * 65536u) * uint(time * 1000.0));
 
 	// Begin trace
 	for (int s_j = 0; s_j < Camera.sqrt_spp; s_j++) {
 		for (int s_i = 0; s_i < Camera.sqrt_spp; s_i++) {
 			vec3 sample_colour = vec3(0.0);
 			ray r = get_ray(Camera, i, j, s_i, s_j);
-			//pixel_colour += ray_colour(Camera, r);
 
 			for (int bounce = 0; bounce < Camera.max_bounces; bounce++) {
 				hit_record rec;
 
 				if (hit_sphere_list(r, new_interval(0.001, 1000000.0), rec)) {
-					vec3 direction = reflect(r.direction, rec.normal);
-					//r = new_ray(rec.p, direction);
 					sample_colour += rec.hit_colour / (bounce + 1);
-					//sample_colour += r.origin;
-					//vec3 direction = fast_random_on_hemisphere(rec.normal);
-					r = new_ray(rec.p, normalize(direction));
+
+					// Bounce ray
+					vec3 direction = random_on_hemisphere(rec.normal);
+					r = new_ray(rec.p, direction);
 				}
 				else {
 					vec3 unit_direction = normalize(r.direction);
