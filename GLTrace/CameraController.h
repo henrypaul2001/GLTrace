@@ -44,10 +44,12 @@ public:
 
 			activeCamera->lookat = activeCamera->lookfrom + front;
 			activeCamera->vup = up;
+
+			activeCamera->vfov = zoom;
 		}
 	}
 
-	void ProcessMouseMovement(double xpos, double ypos) {
+	void ProcessMouseMovement(const double xpos, const double ypos) {
 		if (firstMouse) {
 			lastMouseX = xpos;
 			lastMouseY = ypos;
@@ -73,9 +75,20 @@ public:
 		}
 	}
 
+	void ProcessMouseScroll(const double yoffset) {
+		zoom -= (float)yoffset;
+		if (zoom < 1.0f) {
+			zoom = 1.0f;
+		}
+		else if (zoom > 120.0f) {
+			zoom = 120.0f;
+		}
+	}
+
 private:
 	float yaw = -90.0f;
 	float pitch = 0.0f;
+	float zoom = 90.0f;
 
 	float lastMouseX, lastMouseY;
 	bool firstMouse;

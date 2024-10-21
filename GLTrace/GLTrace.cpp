@@ -36,6 +36,7 @@ int main()
 		// Process inputs
 		const glm::vec2& mousePos = renderer.MousePos();
 		camControl.ProcessMouseMovement(mousePos.x, mousePos.y);
+		camControl.ProcessMouseScroll(renderer.MouseScrollOffsetY());
 
 		// Update scene
 		camControl.Update(dt);

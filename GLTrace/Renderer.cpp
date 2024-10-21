@@ -17,6 +17,9 @@ void Renderer::Render(Camera& activeCamera)
 		screenTexture.Bind();
 		screenQuad.DrawMeshData();
 	}
+
+	scrollOffsetX = 0.0;
+	scrollOffsetY = 0.0;
 }
 
 bool Renderer::Initialise()

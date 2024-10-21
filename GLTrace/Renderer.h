@@ -136,6 +136,8 @@ public:
 
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 		std::clog << "\r\nMouse scroll: " << xoffset << " | " << yoffset << "\r\n";
+		scrollOffsetX = xoffset;
+		scrollOffsetY = yoffset;
 	}
 
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -150,6 +152,8 @@ public:
 
 	GLFWwindow* GetWindow() { return window; }
 	const glm::vec2& MousePos() const { return mousePos; }
+	const double MouseScrollOffsetX() const { return scrollOffsetX; }
+	const double MouseScrollOffsetY() const { return scrollOffsetY; }
 private:
 	bool Initialise();
 
@@ -161,4 +165,5 @@ private:
 	GLFWwindow* window;
 	unsigned int SCR_WIDTH, SCR_HEIGHT, SCR_X_POS, SCR_Y_POS;
 	glm::vec2 mousePos;
+	double scrollOffsetX, scrollOffsetY;
 };
