@@ -7,6 +7,7 @@
 #include "MeshData.h"
 #include "Texture.h"
 #include "Camera.h"
+#include "InputManager.h"
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
 	// ignore warning codes or insignificant errors
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -103,6 +104,8 @@ public:
 
 		screenTexture.GenerateTexture();
 		screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
+
+		InputManager::ClearInputs();
 	}
 
 	~Renderer() {
@@ -123,6 +126,12 @@ public:
 
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 		if (key == GLFW_KEY_ESCAPE) { glfwSetWindowShouldClose(window, true); }
+		if (action == GLFW_RELEASE) {
+			InputManager::OnKeyUp(key);
+		}
+		else if (action == GLFW_PRESS) {
+			InputManager::OnKeyDown(key);
+		}
 	}
 
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {

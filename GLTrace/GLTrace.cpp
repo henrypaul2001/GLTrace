@@ -13,6 +13,8 @@ int main()
 	cam.samples_per_pixel = 2;
 	cam.max_bounces = 10;
 	cam.background_colour = glm::vec3(1.0f, 0.0f, 0.0f);
+	cam.focus_dist = 1.0f;
+	cam.defocus_angle = 0.0f;
 
 	GLFWwindow* window = renderer.GetWindow();
 
@@ -36,7 +38,7 @@ int main()
 		camControl.ProcessMouseMovement(mousePos.x, mousePos.y);
 
 		// Update scene
-		camControl.Update();
+		camControl.Update(dt);
 
 		renderer.Render(cam);
 
