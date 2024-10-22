@@ -148,19 +148,16 @@ public:
 	}
 
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-		std::clog << "\r\nMouse scroll: " << xoffset << " | " << yoffset << "\r\n";
 		scrollOffsetX = xoffset;
 		scrollOffsetY = yoffset;
 	}
 
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-		std::clog << "\r\nMouse move: " << xpos << " | " << ypos << "\r\n";
 		mousePos.x = xpos;
 		mousePos.y = ypos;
 	}
 
 	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-		std::clog << "\r\nMouse press: " << button << " | " << action << " | " << mods << "\r\n";
 	}
 
 	GLFWwindow* GetWindow() { return window; }
