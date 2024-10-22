@@ -64,12 +64,14 @@ static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, 
 	} std::cout << std::endl;
 }
 
+const unsigned int WORK_GROUP_SIZE = 32u;
+
 class Renderer
 {
 public:
 	Renderer(const unsigned int width = 600u, const unsigned int height = 600u, unsigned int xPos = 0u, unsigned int yPos = 0u) : SCR_WIDTH(width), SCR_HEIGHT(height), SCR_X_POS(xPos), SCR_Y_POS(yPos) {
 		Initialise(); 
-		
+
 		// Load shaders
 		screenQuadShader.LoadShader("Shaders/passthrough.vert", "Shaders/screenQuad.frag");
 		rtCompute.LoadShader("Shaders/RTCompute.comp");
@@ -103,7 +105,8 @@ public:
 		screenQuad.SetupMesh(vertices, indices);
 
 		screenTexture.GenerateTexture();
-		screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
+		ResizeWindow(SCR_WIDTH, SCR_HEIGHT);
+		//screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
 
 		InputManager::ClearInputs();
 	}
@@ -115,9 +118,19 @@ public:
 	void Render(Camera& activeCamera);
 
 	void ResizeWindow(const unsigned int width, const unsigned int height) {
+		unsigned int widthR = width % WORK_GROUP_SIZE;
+		unsigned int heightR = height % WORK_GROUP_SIZE;
+
 		SCR_WIDTH = width;
 		SCR_HEIGHT = height;
+		if (widthR != 0) {
+			SCR_WIDTH = width - widthR;
+		}
+		if (heightR != 0) {
+			SCR_HEIGHT = height - heightR;
+		}
 		screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
+		glfwSetWindowSize(window, SCR_WIDTH, SCR_HEIGHT);
 	}
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
