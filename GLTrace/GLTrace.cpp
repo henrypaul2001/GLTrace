@@ -10,8 +10,8 @@ int main()
 	cam.lookfrom = glm::vec3(0.0);
 	cam.lookat = glm::vec3(0.0, 0.0, -1.0);
 	cam.vup = glm::vec3(0.0, 1.0, 0.0);
-	cam.samples_per_pixel = 4;
-	cam.max_bounces = 10;
+	cam.samples_per_pixel = 10;
+	cam.max_bounces = 100;
 	cam.background_colour = glm::vec3(0.0f, 0.0f, 0.0f);
 	cam.focus_dist = 1.0f;
 	cam.defocus_angle = 0.0f;

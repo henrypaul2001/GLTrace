@@ -1,6 +1,6 @@
 #version 430 core
 
-layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in; // increase work group size for better performance
 layout (rgba32f, binding = 0) uniform image2D screenImage;
 
 uniform float time;
@@ -8,7 +8,6 @@ uint randseed;
 const float pi = 3.1415926535897932385;
 const uint max_world_size = 100;
 const uint UINT_MAX = uint(0xFFFFFFFFu);
-const uint EXPLICIT_MAX_BOUNCES = 5;
 
 // Utility
 float length_squared(vec3 vec) {
@@ -224,7 +223,8 @@ vec3 ray_colour(inout camera self, ray r) {
 	hit_record rec;
 
 	if (hit_sphere_list(r, new_interval(0.001, 1000000.0), rec)) {
-		return 0.5 * (rec.normal + vec3(1.0));
+		vec3 direction = random_on_hemisphere(rec.normal);
+		return materials[rec.material_index].albedo * ray_colour(self, new_ray(rec.p, direction));
 	}
 
 	vec3 unit_direction = normalize(r.direction);
@@ -260,6 +260,52 @@ vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+vec3 ray_colour_iterative(inout camera self, ray r) {
+	ray current_ray = r;
+
+	vec3 current_attenuation = vec3(1.0);
+
+	for (int i = 0; i < self.max_bounces; i++) {
+		hit_record rec;
+
+		if (hit_sphere_list(current_ray, new_interval(0.001, 1000000.0), rec)) {
+			uint material_index = rec.material_index;
+			vec3 colour_from_emission = materials[material_index].emissive_colour * materials[material_index].emissive_power;
+			vec3 material_colour = materials[material_index].albedo;
+			float metalness = clamp(materials[material_index].metal, 0.0, 1.0);
+
+			//material_colour *= metalness;
+
+			if (colour_from_emission.x > 0.0 || colour_from_emission.y > 0.0 || colour_from_emission.z > 0.0) {
+				return current_attenuation * colour_from_emission + material_colour;
+			}
+
+			// Bounce ray
+			vec3 reflected = normalize(reflect(current_ray.direction, rec.normal));
+			vec3 specular_direction = reflected + (materials[material_index].roughness * random_vector(-0.5, 0.5));
+			vec3 diffuse_direction = random_on_hemisphere(rec.normal);
+
+			// Blend specular (metal) direction with diffuse direction based on material metalness
+			vec3 diffuse_to_specular = specular_direction - diffuse_direction;
+			vec3 direction = diffuse_direction + (diffuse_to_specular * metalness);
+
+			current_ray = new_ray(rec.p, normalize(direction));
+
+			current_attenuation *= material_colour;
+		}
+		else {
+			vec3 unit_direction = normalize(r.direction);
+			float a = 0.5 * (unit_direction.y + 1.0);
+			//vec3 sky_colour = (1.0 - a) * vec3(1.0) + a * vec3(0.5, 0.7, 1.0);
+			vec3 sky_colour = self.background_colour;
+			return current_attenuation * sky_colour;
+		}
+
+	}
+
+	return vec3(0.0);
+}
+
 void main() {
 	// Materials
 	materials[0].albedo = vec3(0.5, 0.0, 0.3);
@@ -270,14 +316,14 @@ void main() {
 	materials[0].emissive_colour = materials[0].albedo;
 	materials[0].emissive_power = 1.0;
 
-	materials[1].albedo = vec3(0.1);
-	materials[1].metal = 0.0;
+	materials[1].albedo = vec3(0.0);
+	materials[1].metal = 0.5;
 	materials[1].roughness = 0.85;
 	materials[1].emissive_colour = vec3(0.0);
 	materials[1].emissive_power = 0.0;
 
 	materials[2].albedo = vec3(1.0);
-	materials[2].metal = 0.0;
+	materials[2].metal = 1.0;
 	materials[2].roughness = 0.0;
 	materials[2].emissive_colour = vec3(0.0);
 	materials[2].emissive_power = 0.0;
@@ -290,10 +336,6 @@ void main() {
 
 	camera Camera = cam;
 
-	if (Camera.max_bounces > EXPLICIT_MAX_BOUNCES) {
-		Camera.max_bounces = int(EXPLICIT_MAX_BOUNCES);
-	}
-
 	// Prepare trace
 	vec3 pixel_colour = vec3(0.0);
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
@@ -301,127 +343,11 @@ void main() {
 	int i = pixel_coords.x;
 
 	randseed = PCH_Hash((i + j * 65536u + gl_GlobalInvocationID.z * 65536u * 65536u) * uint(time * 1000.0));
-
-	vec3 ray_colours[EXPLICIT_MAX_BOUNCES + 1];
 	// Begin trace
 	for (int s_j = 0; s_j < Camera.sqrt_spp; s_j++) {
 		for (int s_i = 0; s_i < Camera.sqrt_spp; s_i++) {
 			ray r = get_ray(Camera, i, j, s_i, s_j);
-
-			
-			// Ray trace colour loop
-			uint bounces = 0;
-			while (bounces < Camera.max_bounces) {
-				hit_record rec;
-
-				if (hit_sphere_list(r, new_interval(0.001, 1000000.0), rec)) {
-					uint material_index = rec.material_index;
-
-					// Bounce ray
-					vec3 reflected = normalize(reflect(r.direction, rec.normal));
-					//vec3 direction = reflected + (materials[material_index].roughness * random_vector(-0.5, 0.5));
-					vec3 direction = random_on_hemisphere(rec.normal);
-
-					// colour = colour * (1.0 - metallic)
-					vec3 colour = materials[material_index].albedo;
-					vec3 emission = materials[material_index].emissive_power * materials[material_index].emissive_colour;
-					ray_colours[bounces] = emission + colour;
-					if (emission.x > 0.0 && emission.y > 0.0 && emission.z > 0.0) {
-						break;
-					}
-
-					r = new_ray(rec.p, direction);
-
-					if (bounces == Camera.max_bounces - 1) {
-						//ray_colours[Camera.max_bounces] = vec3(0.0);
-						//bounces++;
-					}
-				}
-				else {
-					vec3 unit_direction = normalize(r.direction);
-					float a = 0.5 * (unit_direction.y + 1.0);
-					vec3 sky_colour = (1.0 - a) * vec3(1.0) + a * vec3(0.5, 0.7, 1.0);
-					ray_colours[bounces] = vec3(0.0);
-					//bounces++;
-					break;
-				}
-
-				bounces++;
-			}
-			
-			// Attenuation loop
-			vec3 sample_colour = vec3(0.0);
-			vec3 current_colour = ray_colours[bounces];
-			for (int attenuation = int(bounces) - 1; attenuation >= 0; attenuation--) {
-				current_colour += current_colour * ray_colours[attenuation];
-			}
-			sample_colour += current_colour;
-			
-			/*
-			vec3 sample_colour = vec3(0.0);
-			float attenuation = 0.5;
-			bool first_hit = true;
-
-			vec3 contribution = vec3(1.0);
-			vec3 light = vec3(0.0);
-			for (int bounce = 0; bounce < Camera.max_bounces; bounce++) {
-				hit_record rec;
-
-				if (hit_sphere_list(r, new_interval(0.001, 1000000.0), rec)) {
-					uint material_index = rec.material_index;
-					// Bounce ray
-					vec3 reflected = normalize(reflect(r.direction, rec.normal));
-					//vec3 direction = reflected + (materials[material_index].roughness * random_vector(-0.5, 0.5));
-					vec3 roughnessNormal = normalize(rec.normal + (materials[material_index].roughness * random_vector(-0.5, 0.5)));
-					vec3 direction = random_on_hemisphere(rec.normal);
-					//vec3 direction = random_on_hemisphere(rec.normal + (rec.mat.roughness * random_vector(-0.5, 0.5)));
-					//vec3 direction = normalize(reflect(r.direction, roughnessNormal));
-					//direction = normalize(rec.normal + direction);
-					//if (dot(direction, rec.normal) < 0.0) {
-						//direction = -direction;
-					//}
-
-					// Ray colour
-					// calculate reflectance at normal incidence
-					// if dia-electric, use F0 of 0.04
-					// if metal, use albedo colour as F0
-					//vec3 F0 = vec3(0.04);
-					//F0 = mix(F0, rec.mat.albedo, rec.mat.metal);
-
-					//vec3 F = FresnelSchlickRoughness(max(dot(roughnessNormal, r.direction), 0.0), F0, rec.mat.roughness);
-
-					//vec3 kS = F;
-					//vec3 kD = 1.0 - kS;
-					//kD *= 1.0 - rec.mat.metal;
-
-					//contribution *= materials[material_index].albedo;
-					//light += materials[material_index].emissive_colour * materials[material_index].emissive_power;
-
-					vec3 colour_from_emission = materials[material_index].emissive_colour * materials[material_index].emissive_power;
-					vec3 colour_from_scatter = materials[material_index].albedo;
-					sample_colour += colour_from_emission + colour_from_scatter / (bounce + 1);
-
-					if (colour_from_emission.x > 0.0 || colour_from_emission.y > 0.0 || colour_from_emission.z > 0.0) {
-						break;
-					}
-
-					r = new_ray(rec.p, direction);
-
-					attenuation *= 0.5;
-				}
-				else {
-					vec3 unit_direction = normalize(r.direction);
-					float a = 0.5 * (unit_direction.y + 1.0);
-					//vec3 sky_colour = (1.0 - a) * vec3(1.0) + a * vec3(0.5, 0.7, 1.0);
-					vec3 sky_colour = Camera.background_colour;
-					//light += sky_colour * contribution;
-					sample_colour += sky_colour / (bounce + 1);
-					break;
-				}
-			}
-			*/
-			
-			pixel_colour += sample_colour;
+			pixel_colour += ray_colour_iterative(Camera, r);
 		}
 	}
 	pixel_colour = Camera.pixel_samples_scale * pixel_colour;
