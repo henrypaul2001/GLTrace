@@ -152,6 +152,7 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="MeshData.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="rtw_image.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
