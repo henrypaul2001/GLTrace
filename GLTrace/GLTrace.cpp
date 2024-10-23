@@ -34,7 +34,7 @@ int main()
 		dt = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		std::clog << "Delta time: " << dt << "										\r" << std::flush;
+		std::clog << "Delta time: " << dt << " || FPS: " << 1.0 / dt << "										\r" << std::flush;
 
 		//cam.lookfrom = cam.lookfrom + (glm::vec3(0.05f, 0.0f, 0.0f) * dt);
 		//cam.lookat = cam.lookfrom + glm::vec3(0.0f, 0.0f, -1.0f);
