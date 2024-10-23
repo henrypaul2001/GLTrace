@@ -142,6 +142,7 @@
     <ClCompile Include="GLTrace.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractShader.h" />

@@ -1,10 +1,12 @@
 #include "Renderer.h"
 #include "CameraController.h"
+#include "TextureLoader.h"
 int main()
 {
 	Renderer renderer = Renderer(1920, 1080);
 	Camera cam;
 	CameraController camControl;
+
 	camControl.activeCamera = &cam;
 	cam.vfov = 90.0;
 	cam.lookfrom = glm::vec3(0.0);
@@ -21,6 +23,9 @@ int main()
 	float lastFrame = static_cast<float>(glfwGetTime());
 	float currentFrame;
 	float dt = 0.0f;
+
+	Texture2D* test = TextureLoader::LoadTextureFromFile("Textures/gold/albedo.png", true);
+	Texture2D* duplicateTest = TextureLoader::LoadTextureFromFile("Textures/gold/albedo.png", true);
 
 	while (!glfwWindowShouldClose(window))
 	{
