@@ -2,7 +2,7 @@
 #include "CameraController.h"
 int main()
 {
-	Renderer renderer;
+	Renderer renderer = Renderer(1920, 1080);
 	Camera cam;
 	CameraController camControl;
 	camControl.activeCamera = &cam;
