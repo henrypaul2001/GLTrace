@@ -76,6 +76,12 @@ public:
 		screenQuadShader.LoadShader("Shaders/passthrough.vert", "Shaders/screenQuad.frag");
 		rtCompute.LoadShader("Shaders/RTCompute.comp");
 
+		rtCompute.Use();
+		const int max_textures = 31;
+		for (int i = 1; i <= max_textures; i++) {
+			rtCompute.setInt("textures[" + std::to_string(i) + "]", i);
+		}
+
 		// Set up screen quad
 		std::vector<Vertex> vertices;
 		vertices.reserve(4);

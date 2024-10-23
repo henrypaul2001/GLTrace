@@ -24,8 +24,9 @@ int main()
 	float currentFrame;
 	float dt = 0.0f;
 
-	Texture2D* test = TextureLoader::LoadTextureFromFile("Textures/gold/albedo.png", true);
-	Texture2D* duplicateTest = TextureLoader::LoadTextureFromFile("Textures/gold/albedo.png", true);
+	stbi_set_flip_vertically_on_load(true);
+	Texture2D* earth = TextureLoader::LoadTextureFromFile("Textures/earthmap.jpg", false);
+	earth->BindToSlot(1);
 
 	while (!glfwWindowShouldClose(window))
 	{
