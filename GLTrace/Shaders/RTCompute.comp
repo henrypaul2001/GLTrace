@@ -267,6 +267,36 @@ float Reflectance(float cosine, float refractive_index) {
     return r0 + (1.0 - r0) * pow((1.0 - cosine), 5.0);
 }
 
+ray bounce_ray(in ray current_ray, in vec3 hit_normal, in vec3 hit_point, in bool front_face, in uint material_index) {
+	float metalness = clamp(materials[material_index].metal, 0.0, 1.0);
+	float refractive_index = materials[material_index].refractive_index;
+	bool is_transparent = materials[material_index].is_transparent;
+
+	vec3 unit_in_direction = normalize(current_ray.direction);
+	vec3 reflected = normalize(reflect(unit_in_direction, hit_normal));
+	vec3 specular_direction = reflected + (materials[material_index].roughness * random_vector(-0.5, 0.5));
+	vec3 diffuse_direction = random_on_hemisphere(hit_normal);
+
+	// Blend specular (metal) direction with diffuse direction based on material metalness
+	vec3 diffuse_to_specular = specular_direction - diffuse_direction;
+	vec3 direction = diffuse_direction + (diffuse_to_specular * metalness);
+
+	// Trasparency
+	if (is_transparent) {
+		float ri = front_face ? (1.0 / refractive_index) : refractive_index;
+		float cos_theta = min(dot(-unit_in_direction, hit_normal), 1.0);
+		float sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+
+		bool cannot_refract = ri * sin_theta > 1.0;
+
+		if (!cannot_refract && Reflectance(cos_theta, ri) < rand()) {
+			direction = refract(unit_in_direction, hit_normal, ri);
+		}
+	}
+
+	return new_ray(hit_point, normalize(direction));
+}
+
 vec3 ray_colour_iterative(inout camera self, ray r) {
 	ray current_ray = r;
 
@@ -279,9 +309,6 @@ vec3 ray_colour_iterative(inout camera self, ray r) {
 			uint material_index = rec.material_index;
 			vec3 colour_from_emission = materials[material_index].emissive_colour * materials[material_index].emissive_power;
 			vec3 material_colour = materials[material_index].albedo;
-			float metalness = clamp(materials[material_index].metal, 0.0, 1.0);
-			float refractive_index = materials[material_index].refractive_index;
-			bool is_transparent = materials[material_index].is_transparent;
 
 			//material_colour *= metalness;
 
@@ -289,30 +316,7 @@ vec3 ray_colour_iterative(inout camera self, ray r) {
 				return current_attenuation * colour_from_emission + material_colour;
 			}
 
-			// Bounce ray
-			vec3 unit_in_direction = normalize(current_ray.direction);
-			vec3 reflected = normalize(reflect(unit_in_direction, rec.normal));
-			vec3 specular_direction = reflected + (materials[material_index].roughness * random_vector(-0.5, 0.5));
-			vec3 diffuse_direction = random_on_hemisphere(rec.normal);
-
-			// Blend specular (metal) direction with diffuse direction based on material metalness
-			vec3 diffuse_to_specular = specular_direction - diffuse_direction;
-			vec3 direction = diffuse_direction + (diffuse_to_specular * metalness);
-
-			// Trasparency
-			if (is_transparent) {
-				float ri = rec.front_face ? (1.0 / refractive_index) : refractive_index;
-				float cos_theta = min(dot(-unit_in_direction, rec.normal), 1.0);
-				float sin_theta = sqrt(1.0 - cos_theta * cos_theta);
-
-				bool cannot_refract = ri * sin_theta > 1.0;
-
-				if (!cannot_refract && Reflectance(cos_theta, ri) < rand()) {
-					direction = refract(unit_in_direction, rec.normal, ri);
-				}
-			}
-
-			current_ray = new_ray(rec.p, normalize(direction));
+			current_ray = bounce_ray(current_ray, rec.normal, rec.p, rec.front_face, material_index);
 
 			current_attenuation *= material_colour;
 		}
