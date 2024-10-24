@@ -25,8 +25,11 @@ int main()
 	float dt = 0.0f;
 
 	stbi_set_flip_vertically_on_load(true);
-	Texture2D* earth = TextureLoader::LoadTextureFromFile("Textures/earthmap.jpg", false);
-	earth->BindToSlot(1);
+	Texture2D* earth = TextureLoader::LoadTextureFromFile("Textures/earthmap.jpg");
+	Texture2D* space_blanket = TextureLoader::LoadTextureFromFile("Textures/space_blanket/albedo.png");
+	Texture2D* space_blanket_nomal = TextureLoader::LoadTextureFromFile("Textures/space_blanket/normal.png");
+	space_blanket->BindToSlot(1);
+	space_blanket_nomal->BindToSlot(2);
 
 	while (!glfwWindowShouldClose(window))
 	{
