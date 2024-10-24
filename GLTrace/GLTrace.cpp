@@ -25,11 +25,22 @@ int main()
 	float dt = 0.0f;
 
 	stbi_set_flip_vertically_on_load(true);
-	Texture2D* earth = TextureLoader::LoadTextureFromFile("Textures/earthmap.jpg");
-	Texture2D* space_blanket = TextureLoader::LoadTextureFromFile("Textures/space_blanket/albedo.png");
-	Texture2D* space_blanket_nomal = TextureLoader::LoadTextureFromFile("Textures/space_blanket/normal.png");
-	space_blanket->BindToSlot(1);
-	space_blanket_nomal->BindToSlot(2);
+	Texture2D* earth = TextureLoader::LoadTextureFromFile("Textures/earth/albedo.jpg");
+	Texture2D* earth_specular = TextureLoader::LoadTextureFromFile("Textures/earth/specular.jpg");
+	Texture2D* earth_displacement = TextureLoader::LoadTextureFromFile("Textures/earth/displacement.jpg");
+
+	//Texture2D* marble_tile = TextureLoader::LoadTextureFromFile("Textures/marbleTile/albedo.png");
+	//Texture2D* marble_tile_normal = TextureLoader::LoadTextureFromFile("Textures/marbleTile/normal.png");
+	//Texture2D* marble_tile_metal = TextureLoader::LoadTextureFromFile("Textures/marbleTile/metal.png");
+	//Texture2D* marble_tile_rough = TextureLoader::LoadTextureFromFile("Textures/marbleTile/roughness.png");
+	//marble_tile->BindToSlot(1);
+	//marble_tile_normal->BindToSlot(2);
+	//marble_tile_metal->BindToSlot(3);
+	//marble_tile_rough->BindToSlot(4);
+
+	earth->BindToSlot(1);
+	earth_specular->BindToSlot(3);
+	earth_displacement->BindToSlot(4);
 
 	while (!glfwWindowShouldClose(window))
 	{

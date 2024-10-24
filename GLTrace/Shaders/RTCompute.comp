@@ -365,6 +365,52 @@ ray bounce_ray(in ray current_ray, in vec3 hit_normal, in vec3 hit_point, in boo
 	return new_ray(hit_point, normalize(direction));
 }
 
+void get_material_properties(in uint material_index, inout vec3 colour_from_material, inout float metal, inout float roughness, inout bool is_transparent, inout float refractive_index, inout vec3 colour_from_emission, vec2 uv) {
+	// Get albedo
+	if (materials[material_index].texture_maps.albedo_ID == -1) {
+		colour_from_material = materials[material_index].albedo;
+	}
+	else {
+		colour_from_material = texture(textures[materials[material_index].texture_maps.albedo_ID], uv).xyz;
+	}
+
+	// Get transparency
+	refractive_index = materials[material_index].refractive_index;
+	if (materials[material_index].texture_maps.opacity_ID == -1) {
+		is_transparent = materials[material_index].is_transparent;
+	}
+	else {
+		is_transparent = (texture(textures[materials[material_index].texture_maps.albedo_ID], uv).a == 0.0);
+	}
+
+	// Get metalness
+	if (materials[material_index].texture_maps.metal_ID == -1) {
+		metal = materials[material_index].metal;
+	}
+	else {
+		metal = texture(textures[materials[material_index].texture_maps.metal_ID], uv).r;
+	}
+
+	// Get roughness
+	if (materials[material_index].texture_maps.roughness_ID == -1) {
+		roughness = materials[material_index].roughness;
+	}
+	else {
+		roughness = texture(textures[materials[material_index].texture_maps.roughness_ID], uv).r;
+	}
+
+	// Get emission
+	if (materials[material_index].texture_maps.emission_ID == -1) {
+		colour_from_emission = materials[material_index].emissive_colour * materials[material_index].emissive_power;
+	}
+	else {
+		colour_from_emission = texture(textures[materials[material_index].texture_maps.emission_ID], uv).rgb * materials[material_index].emissive_power;
+	}
+
+	metal = clamp(metal, 0.0, 1.0);
+	roughness = clamp(roughness, 0.0, 1.0);
+}
+
 vec3 ray_colour_iterative(inout camera self, ray r) {
 	ray current_ray = r;
 
@@ -375,33 +421,28 @@ vec3 ray_colour_iterative(inout camera self, ray r) {
 
 		if (hit_sphere_list(current_ray, new_interval(0.001, 1000000.0), rec)) {
 			uint material_index = rec.material_index;
-			vec3 colour_from_emission = materials[material_index].emissive_colour * materials[material_index].emissive_power;
+			vec3 colour_from_emission;
 			vec3 material_colour;
+			float metal, roughness, refractive_index;
+			bool is_transparent;
 
-			if (materials[material_index].texture_maps.albedo_ID == -1) {
-				material_colour = materials[material_index].albedo;
-			}
-			else {
-				// Sample texture
-				vec3 texSample = texture(textures[materials[material_index].texture_maps.albedo_ID], vec2(rec.u, rec.v)).xyz;
-				material_colour = texSample;
-			}
+			get_material_properties(material_index, material_colour, metal, roughness, is_transparent, refractive_index, colour_from_emission, vec2(rec.u, rec.v));
 
-			//material_colour *= metalness;
+			//material_colour *= metal;
 
 			if (colour_from_emission.x > 0.0 || colour_from_emission.y > 0.0 || colour_from_emission.z > 0.0) {
 				return current_attenuation * (colour_from_emission + material_colour);
 			}
 
-			current_ray = bounce_ray(current_ray, rec.normal, rec.p, rec.front_face, materials[material_index].roughness, materials[material_index].metal, materials[material_index].is_transparent, materials[material_index].refractive_index);
+			current_ray = bounce_ray(current_ray, rec.normal, rec.p, rec.front_face, roughness, metal, is_transparent, refractive_index);
 
 			current_attenuation *= material_colour;
 		}
 		else {
 			vec3 unit_direction = normalize(r.direction);
 			float a = 0.5 * (unit_direction.y + 1.0);
-			vec3 sky_colour = (1.0 - a) * vec3(1.0) + a * vec3(0.5, 0.7, 1.0);
-			//vec3 sky_colour = self.background_colour;
+			//vec3 sky_colour = (1.0 - a) * vec3(1.0) + a * vec3(0.5, 0.7, 1.0);
+			vec3 sky_colour = self.background_colour;
 			return current_attenuation * sky_colour;
 		}
 
@@ -425,26 +466,30 @@ void main() {
 	materials[0] = sun;
 
 	material ground = default_material();
-	ground.albedo = vec3(0.8, 0.8, 0.0);
+	//ground.albedo = vec3(0.8, 0.8, 0.0);
+	ground.albedo = vec3(1.0);
 	ground.metal = 0.0;
-	ground.roughness = 0.85;
+	ground.roughness = 0.0;
 	ground.emissive_colour = vec3(0.0);
 	ground.emissive_power = 0.0;
 	ground.is_transparent = false;
 	ground.refractive_index = 1.5;
 	materials[1] = ground;
 
-	material white = default_material();
-	white.albedo = vec3(1.0);
-	white.metal = 1.0;
-	white.roughness = 0.0;
-	white.emissive_colour = vec3(0.0);
-	white.emissive_power = 0.0;
-	white.is_transparent = false;
-	white.refractive_index = 1.5;
-	white.texture_maps.albedo_ID = 1;
-	white.texture_maps.normal_ID = 2;
-	materials[2] = white;
+	material textured = default_material();
+	textured.albedo = vec3(1.0);
+	textured.metal = 0.0;
+	textured.roughness = 0.0;
+	textured.emissive_colour = vec3(0.0);
+	textured.emissive_power = 1.0;
+	textured.is_transparent = false;
+	textured.refractive_index = 1.5;
+	textured.texture_maps.albedo_ID = 1;
+	textured.texture_maps.normal_ID = -1;
+	textured.texture_maps.metal_ID = 3;
+	textured.texture_maps.roughness_ID = 4;
+	textured.texture_maps.emission_ID = 1;
+	materials[2] = textured;
 
 	material glass = default_material();
 	glass.albedo = vec3(1.0);
@@ -467,7 +512,9 @@ void main() {
 	materials[4] = bubble;
 
 	// Scene
-	spheres[0] = new_sphere(vec3(120.0, (30.0 + sin(time) * 100.0), -55.0), 50.0, 0);
+	float sun_y = 30.0 + sin(time) * 120.0;
+	//sun_y = -300.0;
+	spheres[0] = new_sphere(vec3(120.0, sun_y, -55.0), 50.0, 0);
 	//spheres[0] = new_sphere(vec3(120.0, 30.0, -55.0), 50.0, 0);
 	spheres[1] = new_sphere(vec3(0.0, -100.5, -1.0), 100.0, 1);
 	spheres[2] = new_sphere(vec3(0.0, 1.5, 0.0), 2.0, 2);
