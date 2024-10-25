@@ -12,11 +12,11 @@ int main()
 	cam.lookfrom = glm::vec3(0.0);
 	cam.lookat = glm::vec3(0.0, 0.0, -1.0);
 	cam.vup = glm::vec3(0.0, 1.0, 0.0);
-	cam.samples_per_pixel = 10;
+	cam.samples_per_pixel = 1;
 	cam.max_bounces = 100;
 	cam.focus_dist = 1.0f;
 	cam.defocus_angle = 0.0f;
-	//cam.sky_colour_min_y = glm::vec3(0.1f);
+	cam.sky_colour_min_y = glm::vec3(0.0f);
 
 	GLFWwindow* window = renderer.GetWindow();
 
@@ -40,10 +40,10 @@ int main()
 	//marble_tile_metal->BindToSlot(3);
 	//marble_tile_rough->BindToSlot(4);
 
-	earth->BindToSlot(1);
-	earth_specular->BindToSlot(3);
-	earth_displacement->BindToSlot(4);
-	windowTexture->BindToSlot(5);
+	earth->BindToSlot(2);
+	earth_specular->BindToSlot(4);
+	earth_displacement->BindToSlot(5);
+	windowTexture->BindToSlot(6);
 
 	while (!glfwWindowShouldClose(window))
 	{

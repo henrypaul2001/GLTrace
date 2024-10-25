@@ -1,6 +1,6 @@
 #version 430 core
 layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in; // increase work group size for better performance
-layout (rgba32f, binding = 0) uniform image2D screenImage;
+layout (rgba32f, binding = 0) uniform image2DArray screenBuffers;
 
 uniform float time;
 uint randseed;
@@ -10,6 +10,9 @@ const int max_textures = 30;
 const uint UINT_MAX = uint(0xFFFFFFFFu);
 
 uniform sampler2D textures[max_textures];
+
+vec3 firstBounceDirection;
+vec3 firstBounceNormal;
 
 // Utility
 float length_squared(vec3 vec) {
@@ -440,9 +443,13 @@ vec3 ray_colour_iterative(inout camera self, ray r) {
 
 			current_ray = bounce_ray(current_ray, rec.normal, rec.p, rec.front_face, roughness, metal, is_transparent, refractive_index);
 
+			if (i == 0) { firstBounceDirection = current_ray.direction; firstBounceNormal = rec.normal; }
+
 			current_attenuation *= material_colour;
 		}
 		else {
+			if (i == 0) { firstBounceDirection = vec3(0.0); firstBounceNormal = vec3(0.0); }
+
 			vec3 unit_direction = normalize(r.direction);
 			float a = 0.5 * (unit_direction.y + 1.0);
 			vec3 sky_colour = (1.0 - a) * self.sky_colour_min_y + a * self.sky_colour_max_y;
@@ -487,11 +494,11 @@ void main() {
 	textured.emissive_power = 1.0;
 	textured.is_transparent = false;
 	textured.refractive_index = 1.5;
-	textured.texture_maps.albedo_ID = 1;
+	textured.texture_maps.albedo_ID = 2;
 	textured.texture_maps.normal_ID = -1;
-	textured.texture_maps.metal_ID = 3;
-	textured.texture_maps.roughness_ID = 4;
-	textured.texture_maps.emission_ID = 1;
+	textured.texture_maps.metal_ID = 4;
+	textured.texture_maps.roughness_ID = 5;
+	textured.texture_maps.emission_ID = 2;
 	materials[2] = textured;
 
 	material glass = default_material();
@@ -502,8 +509,8 @@ void main() {
 	glass.emissive_power = 0.0;
 	glass.is_transparent = true;
 	glass.refractive_index = 1.5;
-	glass.texture_maps.albedo_ID = 5;
-	glass.texture_maps.opacity_ID = 5;
+	glass.texture_maps.albedo_ID = 6;
+	glass.texture_maps.opacity_ID = 6;
 	materials[3] = glass;
 
 	material bubble = default_material();
@@ -514,8 +521,8 @@ void main() {
 	bubble.emissive_power = 0.0;
 	bubble.is_transparent = true;
 	bubble.refractive_index = 1.0 / 1.5;
-	//bubble.texture_maps.albedo_ID = 5;
-	//bubble.texture_maps.opacity_ID = 5;
+	//bubble.texture_maps.albedo_ID = 6;
+	//bubble.texture_maps.opacity_ID = 6;
 	materials[4] = bubble;
 
 	// Scene
@@ -546,6 +553,8 @@ void main() {
 	}
 	pixel_colour = Camera.pixel_samples_scale * pixel_colour;
 
-	// Output to image texture
-	imageStore(screenImage, pixel_coords, vec4(pixel_colour, 1.0));
+	// Output to image textures
+	imageStore(screenBuffers, ivec3(pixel_coords, 0), vec4(pixel_colour, 1.0));
+	imageStore(screenBuffers, ivec3(pixel_coords, 1), vec4(firstBounceDirection, 1.0));
+	imageStore(screenBuffers, ivec3(pixel_coords, 2), vec4(firstBounceNormal, 1.0));
 }

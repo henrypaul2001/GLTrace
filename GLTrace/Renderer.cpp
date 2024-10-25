@@ -9,12 +9,12 @@ void Renderer::Render(Camera& activeCamera)
 		activeCamera.SetUniforms(rtCompute);
 
 		// Dispatch RT compute shader
-		screenTexture.BindImage(GL_WRITE_ONLY);
+		screenBuffers.BindImage(GL_WRITE_ONLY, 0);
 		rtCompute.DispatchCompute(SCR_WIDTH / WORK_GROUP_SIZE, SCR_HEIGHT / WORK_GROUP_SIZE, 1, GL_ALL_BARRIER_BITS);
 
 		// Render screen quad
 		screenQuadShader.Use();
-		screenTexture.Bind();
+		screenBuffers.BindToSlot(0);
 		screenQuad.DrawMeshData();
 	}
 

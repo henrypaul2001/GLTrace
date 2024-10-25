@@ -5,7 +5,7 @@
 #include "ComputeShader.h"
 #include "Shader.h"
 #include "MeshData.h"
-#include "Texture.h"
+#include "Texture2DArray.h"
 #include "Camera.h"
 #include "InputManager.h"
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
@@ -78,7 +78,7 @@ public:
 
 		rtCompute.Use();
 		const int max_textures = 31;
-		for (int i = 1; i <= max_textures; i++) {
+		for (int i = 2; i <= max_textures; i++) {
 			rtCompute.setInt("textures[" + std::to_string(i) + "]", i);
 		}
 
@@ -110,7 +110,8 @@ public:
 
 		screenQuad.SetupMesh(vertices, indices);
 
-		screenTexture.GenerateTexture();
+		screenBuffers = Texture2DArray(3);
+		screenBuffers.GenerateTexture();
 		ResizeWindow(SCR_WIDTH, SCR_HEIGHT);
 		//screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
 
@@ -135,7 +136,7 @@ public:
 		if (heightR != 0) {
 			SCR_HEIGHT = height - heightR;
 		}
-		screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
+		screenBuffers.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
 		glfwSetWindowSize(window, SCR_WIDTH, SCR_HEIGHT);
 	}
 
@@ -173,7 +174,7 @@ public:
 private:
 	bool Initialise();
 
-	Texture2D screenTexture;
+	Texture2DArray screenBuffers;
 	MeshData screenQuad;
 	Shader screenQuadShader;
 	ComputeShader rtCompute;
