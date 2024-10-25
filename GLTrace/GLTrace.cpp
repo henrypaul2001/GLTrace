@@ -29,6 +29,8 @@ int main()
 	Texture2D* earth_specular = TextureLoader::LoadTextureFromFile("Textures/earth/specular.jpg");
 	Texture2D* earth_displacement = TextureLoader::LoadTextureFromFile("Textures/earth/displacement.jpg");
 
+	Texture2D* windowTexture = TextureLoader::LoadTextureFromFile("Textures/window.png");
+
 	//Texture2D* marble_tile = TextureLoader::LoadTextureFromFile("Textures/marbleTile/albedo.png");
 	//Texture2D* marble_tile_normal = TextureLoader::LoadTextureFromFile("Textures/marbleTile/normal.png");
 	//Texture2D* marble_tile_metal = TextureLoader::LoadTextureFromFile("Textures/marbleTile/metal.png");
@@ -41,6 +43,7 @@ int main()
 	earth->BindToSlot(1);
 	earth_specular->BindToSlot(3);
 	earth_displacement->BindToSlot(4);
+	windowTexture->BindToSlot(5);
 
 	while (!glfwWindowShouldClose(window))
 	{
