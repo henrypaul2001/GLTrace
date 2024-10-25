@@ -7,17 +7,18 @@
 #include <chrono>
 class Camera {
 public:
-	int samples_per_pixel = 10;								// Number of random samples per pixel
-	int max_bounces = 10;									// Maximum times a ray can bounce off of geometry
-	glm::vec3 background_colour = glm::vec3(0.0);			// Scene background colour
+	int samples_per_pixel = 10;										// Number of random samples per pixel
+	int max_bounces = 10;											// Maximum times a ray can bounce off of geometry
+	glm::vec3 sky_colour_min_y = glm::vec3(1.0f);					// Sky colour when ray hits background at y = 0
+	glm::vec3 sky_colour_max_y = glm::vec3(0.5f, 0.7f, 1.0f);		// Sky colour when ray hits background at y = 1
 
-	float vfov = 90.0f;										// Vertical field of view
-	glm::vec3 lookfrom = glm::vec3(0.0f);					// Camera position
-	glm::vec3 lookat = glm::vec3(0.0f, 0.0f, -1.0f);		// Point camera is looking at
-	glm::vec3 vup = glm::vec3(0.0f, 1.0f, 0.0f);			// Camera relative up direction
+	float vfov = 90.0f;												// Vertical field of view
+	glm::vec3 lookfrom = glm::vec3(0.0f);							// Camera position
+	glm::vec3 lookat = glm::vec3(0.0f, 0.0f, -1.0f);				// Point camera is looking at
+	glm::vec3 vup = glm::vec3(0.0f, 1.0f, 0.0f);					// Camera relative up direction
 
-	float defocus_angle = 0.0f;								// Variation angle of rays through each pixel
-	float focus_dist = 10.0f;								// Distance from camera lookfrom point to plane of perfect focus
+	float defocus_angle = 0.0f;										// Variation angle of rays through each pixel
+	float focus_dist = 10.0f;										// Distance from camera lookfrom point to plane of perfect focus
 
 	void Initialise(const unsigned int viewWidth, const unsigned int viewHeight) {
 		image_width = viewWidth;
@@ -66,7 +67,8 @@ public:
 		shader.setFloat("cam.aspect_ratio", aspect_ratio);
 		shader.setInt("cam.samples_per_pixel", samples_per_pixel);
 		shader.setInt("cam.max_bounces", max_bounces);
-		shader.setVec3("cam.background_colour", background_colour);
+		shader.setVec3("cam.sky_colour_min_y", sky_colour_min_y);
+		shader.setVec3("cam.sky_colour_max_y", sky_colour_max_y);
 
 		shader.setFloat("cam.vfov", vfov);
 		shader.setVec3("cam.lookfrom", lookfrom);
