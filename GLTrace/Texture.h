@@ -3,16 +3,16 @@
 
 class Texture2D {
 public:
-	Texture2D(GLint wrap_s = GL_CLAMP_TO_EDGE, GLint wrap_t = GL_CLAMP_TO_EDGE, GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR, GLint internalFormat = GL_RGBA32F, GLenum format = GL_RGBA, GLenum type = GL_FLOAT) : generated(false), wrap_s(wrap_s), wrap_t(wrap_t), minFilter(minFilter), magFilter(magFilter), internalFormat(internalFormat), format(format), type(type), texID(0), width(0), height(0) {}
-	Texture2D(const unsigned int width, const unsigned int height, GLint wrap_s = GL_CLAMP_TO_EDGE, GLint wrap_t = GL_CLAMP_TO_EDGE, GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR, GLint internalFormat = GL_RGBA32F, GLenum format = GL_RGBA, GLenum type = GL_FLOAT) : generated(false), wrap_s(wrap_s), wrap_t(wrap_t), minFilter(minFilter), magFilter(magFilter), internalFormat(internalFormat), format(format), type(type) {
+	Texture2D(GLint wrap_s = GL_CLAMP_TO_EDGE, GLint wrap_t = GL_CLAMP_TO_EDGE, GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR, GLint internalFormat = GL_RGBA32F, GLenum format = GL_RGBA, GLenum type = GL_FLOAT) : generated(false), wrap_s(wrap_s), wrap_t(wrap_t), minFilter(minFilter), magFilter(magFilter), internalFormat(internalFormat), format(format), type(type), texID(0), width(0), height(0), texture_type(GL_TEXTURE_2D) {}
+	Texture2D(const unsigned int width, const unsigned int height, GLint wrap_s = GL_CLAMP_TO_EDGE, GLint wrap_t = GL_CLAMP_TO_EDGE, GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR, GLint internalFormat = GL_RGBA32F, GLenum format = GL_RGBA, GLenum type = GL_FLOAT) : generated(false), wrap_s(wrap_s), wrap_t(wrap_t), minFilter(minFilter), magFilter(magFilter), internalFormat(internalFormat), format(format), type(type), texture_type(GL_TEXTURE_2D) {
 		GenerateTexture();
 		ResizeTexture(width, height);
 	}
-	~Texture2D() {
+	virtual ~Texture2D() {
 		glDeleteTextures(1, &texID);
 	}
 
-	void GenerateTexture() {
+	virtual void GenerateTexture() {
 		if (!generated) {
 			texID = 0;
 			glGenTextures(1, &texID);
@@ -20,7 +20,7 @@ public:
 		}
 	}
 
-	void ResizeTexture(const unsigned int newWidth, const unsigned int newHeight) {
+	virtual void ResizeTexture(const unsigned int newWidth, const unsigned int newHeight) {
 		if (generated) {
 			width = newWidth;
 			height = newHeight;
@@ -28,44 +28,43 @@ public:
 		}
 	}
 
-	void SetupImage() {
+	virtual void SetupImage() {
 		if (generated) {
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texID);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
-			glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, nullptr);
-			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindTexture(texture_type, texID);
+			glTexParameteri(texture_type, GL_TEXTURE_WRAP_S, wrap_s);
+			glTexParameteri(texture_type, GL_TEXTURE_WRAP_T, wrap_t);
+			glTexParameteri(texture_type, GL_TEXTURE_MIN_FILTER, minFilter);
+			glTexParameteri(texture_type, GL_TEXTURE_MAG_FILTER, magFilter);
+			glTexImage2D(texture_type, 0, internalFormat, width, height, 0, format, type, nullptr);
+			glBindTexture(texture_type, 0);
 		}
 	}
 
-	void BindToSlot(const unsigned int textureSlot) const {
+	virtual void BindToSlot(const unsigned int textureSlot) const {
 		if (generated) {
 			glActiveTexture(GL_TEXTURE0 + textureSlot);
-			glBindTexture(GL_TEXTURE_2D, texID);
+			glBindTexture(texture_type, texID);
 		}
 	}
 
-	void Bind() const {
+	virtual void Bind() const {
 		if (generated) {
-			glBindTexture(GL_TEXTURE_2D, texID);
+			glBindTexture(texture_type, texID);
 		}
 	}
 
-	void BindImage(const GLenum access = GL_READ_WRITE, const GLenum slot = GL_TEXTURE0) const {
+	virtual void BindImage(const GLenum access = GL_READ_WRITE, const unsigned int slot = 0, const bool layered = false, const unsigned int layer = 0) const {
 		if (generated) {
-			glActiveTexture(slot);
-			glBindImageTexture(0, texID, 0, GL_FALSE, 0, access, internalFormat);
+			glBindImageTexture(slot, texID, 0, layered, layer, access, internalFormat);
 		}
 	}
 
-	void GenMipmaps() const {
+	virtual void GenMipmaps() const {
 		if (generated) {
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texID);
-			glGenerateMipmap(GL_TEXTURE_2D);
+			glBindTexture(texture_type, texID);
+			glGenerateMipmap(texture_type);
 		}
 	}
 
@@ -87,7 +86,7 @@ public:
 	void SetFormat(const GLenum form)					{ format = form; }
 	void SetType(const GLenum t)						{ type = t; }
 
-private:
+protected:
 	GLint wrap_s;
 	GLint wrap_t;
 	GLint minFilter;
@@ -95,6 +94,7 @@ private:
 	GLint internalFormat;
 	GLenum format;
 	GLenum type;
+	GLenum texture_type;
 
 	unsigned int width, height, texID;
 	bool generated;
