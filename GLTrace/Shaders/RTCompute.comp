@@ -9,7 +9,7 @@ const uint max_world_size = 31;
 const int max_textures = 30;
 const uint UINT_MAX = uint(0xFFFFFFFFu);
 
-uniform sampler2D textures[max_textures];
+uniform sampler2DArray material_textures[max_textures];
 
 vec3 firstBounceDirection;
 vec3 firstBounceNormal;
@@ -66,15 +66,23 @@ vec3 random_in_unit_disk() {
 	return vec3(x, y, 0.0);
 }
 
-// TODO: Replace with textureArray
-// Each material will have a texture map array as each material will have the same texture resolution
-struct material_textures {
-	int albedo_ID;
-	int normal_ID;
-	int roughness_ID;
-	int metal_ID;
-	int emission_ID;
-	int opacity_ID;
+struct material_set {
+	int albedo_index;
+	int normal_index;
+	int roughness_index;
+	int metal_index;
+	int emission_index;
+	int opacity_index;
+};
+material_set default_material_set() {
+	material_set mat_set;
+	mat_set.albedo_index = -1;
+	mat_set.normal_index = -1;
+	mat_set.roughness_index = -1;
+	mat_set.metal_index = -1;
+	mat_set.emission_index = -1;
+	mat_set.opacity_index = -1;
+	return mat_set;
 };
 
 struct material {
@@ -87,7 +95,8 @@ struct material {
 	bool is_transparent;
 	float refractive_index;
 
-	material_textures texture_maps;
+	int material_set_index;
+	//material_set material_textures;
 };
 material default_material() {
 	material mat;
@@ -99,15 +108,7 @@ material default_material() {
 	mat.is_transparent = false;
 	mat.refractive_index = 1.5;
 	
-	material_textures texture_maps;
-	texture_maps.albedo_ID = -1;
-	texture_maps.normal_ID = -1;
-	texture_maps.roughness_ID = -1;
-	texture_maps.metal_ID = -1;
-	texture_maps.emission_ID = -1;
-	texture_maps.opacity_ID = -1;
-
-	mat.texture_maps = texture_maps;
+	mat.material_set_index = -1;
 	return mat;
 }
 
@@ -195,10 +196,11 @@ const int num_spheres = 5;
 const int num_materials = 5;
 sphere spheres[num_spheres];
 material materials[num_materials];
+material_set material_sets[num_materials];
 
 vec3 tangent_normal_to_local(vec3 tangent_normal, vec3 outward_normal) {
-	vec3 up = abs(dot(outward_normal, vec3(0.0, 1.0, 0.0))) > 0.99 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
-	//vec3 up = abs(outward_normal.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, 0.0, -1.0);
+	//vec3 up = abs(dot(outward_normal, vec3(0.0, 1.0, 0.0))) > 0.99 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+	vec3 up = abs(outward_normal.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, 0.0, -1.0);
 	vec3 tangent = normalize(cross(up, outward_normal));
 	vec3 bitangent = normalize(cross(outward_normal, tangent));
 
@@ -240,16 +242,18 @@ bool hit_sphere(inout sphere s, inout ray r, interval ray_t, inout hit_record re
 	rec.material_index = s.material_index;
 
 	// Check for normal map
-	if (materials[s.material_index].texture_maps.normal_ID > -1) {
-		vec3 tangent_normal = texture(textures[materials[s.material_index].texture_maps.normal_ID], vec2(rec.u, rec.v)).xyz * 2.0 - 1.0;
+	int mat_set_index = materials[s.material_index].material_set_index;
+	if (mat_set_index > -1) {
+		if (material_sets[mat_set_index].normal_index > -1) {
+			vec3 tangent_normal = texture(material_textures[mat_set_index], vec3(rec.u, rec.v, material_sets[mat_set_index].normal_index)).xyz * 2.0 - 1.0;
 
-		rec.normal = tangent_normal_to_local(tangent_normal, rec.normal);
+			rec.normal = tangent_normal_to_local(tangent_normal, rec.normal);
 
-		if (!rec.front_face) {
-			rec.normal = -rec.normal;
+			if (!rec.front_face) {
+				rec.normal = -rec.normal;
+			}
 		}
 	}
-
 	return true;
 }
 
@@ -373,47 +377,58 @@ ray bounce_ray(in ray current_ray, in vec3 hit_normal, in vec3 hit_point, in boo
 }
 
 void get_material_properties(in uint material_index, inout vec3 colour_from_material, inout float metal, inout float roughness, inout bool is_transparent, inout float refractive_index, inout vec3 colour_from_emission, vec2 uv) {
-	// Get albedo
-	if (materials[material_index].texture_maps.albedo_ID == -1) {
+	int mat_set_index = materials[material_index].material_set_index;
+	if (mat_set_index == -1) {
 		colour_from_material = materials[material_index].albedo;
-	}
-	else {
-		colour_from_material = texture(textures[materials[material_index].texture_maps.albedo_ID], uv).xyz;
-	}
-
-	// Get transparency
-	refractive_index = materials[material_index].refractive_index;
-	if (materials[material_index].texture_maps.opacity_ID == -1) {
 		is_transparent = materials[material_index].is_transparent;
-	}
-	else {
-		is_transparent = (texture(textures[materials[material_index].texture_maps.albedo_ID], uv).a < 1.0);
-	}
-
-	// Get metalness
-	if (materials[material_index].texture_maps.metal_ID == -1) {
 		metal = materials[material_index].metal;
-	}
-	else {
-		metal = texture(textures[materials[material_index].texture_maps.metal_ID], uv).r;
-	}
-
-	// Get roughness
-	if (materials[material_index].texture_maps.roughness_ID == -1) {
 		roughness = materials[material_index].roughness;
-	}
-	else {
-		roughness = texture(textures[materials[material_index].texture_maps.roughness_ID], uv).r;
-	}
-
-	// Get emission
-	if (materials[material_index].texture_maps.emission_ID == -1) {
 		colour_from_emission = materials[material_index].emissive_colour * materials[material_index].emissive_power;
+		refractive_index = materials[material_index].refractive_index;
 	}
 	else {
-		colour_from_emission = texture(textures[materials[material_index].texture_maps.emission_ID], uv).rgb * materials[material_index].emissive_power;
-	}
+		// Get albedo
+		if (material_sets[mat_set_index].albedo_index == -1) {
+			colour_from_material = materials[material_index].albedo;
+		}
+		else {
+			colour_from_material = texture(material_textures[mat_set_index], vec3(uv, material_sets[mat_set_index].albedo_index)).rgb;
+		}
 
+		// Get transparency
+		refractive_index = materials[material_index].refractive_index;
+		if (material_sets[mat_set_index].opacity_index == -1) {
+			is_transparent = materials[material_index].is_transparent;
+		}
+		else {
+			is_transparent = (texture(material_textures[mat_set_index], vec3(uv, material_sets[mat_set_index].opacity_index)).a < 1.0);
+		}
+
+		// Get metalness
+		if (material_sets[mat_set_index].metal_index == -1) {
+			metal = materials[material_index].metal;
+		}
+		else {
+			metal = texture(material_textures[mat_set_index], vec3(uv, material_sets[mat_set_index].metal_index)).r;
+		}
+
+		// Get roughness
+		if (material_sets[mat_set_index].roughness_index == -1) {
+			roughness = materials[material_index].roughness;
+		}
+		else {
+			roughness = texture(material_textures[mat_set_index], vec3(uv, material_sets[mat_set_index].roughness_index)).r;
+		}
+
+		// Get emission
+		if (material_sets[mat_set_index].emission_index == -1) {
+			colour_from_emission = materials[material_index].emissive_colour * materials[material_index].emissive_power;
+		}
+		else {
+			colour_from_emission = texture(material_textures[mat_set_index], vec3(uv, material_sets[mat_set_index].emission_index)).rgb * materials[material_index].emissive_power;
+		}
+	}
+	
 	metal = clamp(metal, 0.0, 1.0);
 	roughness = clamp(roughness, 0.0, 1.0);
 }
@@ -462,6 +477,23 @@ vec3 ray_colour_iterative(inout camera self, ray r) {
 }
 
 void main() {
+	// Material texture map sets
+	material_set earth_set = default_material_set();
+	earth_set.albedo_index = 0;
+	earth_set.normal_index = -1;
+	earth_set.metal_index = 1;
+	earth_set.roughness_index = 2;
+	earth_set.emission_index = 0;
+	material_sets[0] = earth_set;
+
+	material_set space_blanket_set = default_material_set();
+	space_blanket_set.albedo_index = 0;
+	space_blanket_set.normal_index = 2;
+	space_blanket_set.metal_index = 1;
+	space_blanket_set.roughness_index = 3;
+	space_blanket_set.emission_index = -1;
+	material_sets[1] = space_blanket_set;
+
 	// Materials
 	material sun = default_material();
 	sun.albedo = vec3(0.5, 0.0, 0.3);
@@ -478,39 +510,48 @@ void main() {
 	material ground = default_material();
 	//ground.albedo = vec3(0.8, 0.8, 0.0);
 	ground.albedo = vec3(1.0);
-	ground.metal = 0.0;
-	ground.roughness = 0.0;
+	ground.metal = 0.1;
+	ground.roughness = 1.0;
 	ground.emissive_colour = vec3(0.0);
 	ground.emissive_power = 0.0;
 	ground.is_transparent = false;
 	ground.refractive_index = 1.5;
 	materials[1] = ground;
 
-	material textured = default_material();
-	textured.albedo = vec3(1.0);
-	textured.metal = 0.0;
-	textured.roughness = 0.0;
-	textured.emissive_colour = vec3(0.0);
-	textured.emissive_power = 1.0;
-	textured.is_transparent = false;
-	textured.refractive_index = 1.5;
-	textured.texture_maps.albedo_ID = 2;
-	textured.texture_maps.normal_ID = -1;
-	textured.texture_maps.metal_ID = 4;
-	textured.texture_maps.roughness_ID = 5;
-	textured.texture_maps.emission_ID = 2;
-	materials[2] = textured;
+	// Emissive earth
+	material emissive_earth = default_material();
+	emissive_earth.albedo = vec3(1.0);
+	emissive_earth.metal = 0.0;
+	emissive_earth.roughness = 0.0;
+	emissive_earth.emissive_colour = vec3(0.0);
+	emissive_earth.emissive_power = 1.0;
+	emissive_earth.is_transparent = false;
+	emissive_earth.refractive_index = 1.5;
+	emissive_earth.material_set_index = 0;
+	materials[2] = emissive_earth;
+
+	// Space blanket
+	material space_blanket = default_material();
+	space_blanket.albedo = vec3(1.0);
+	space_blanket.metal = 0.0;
+	space_blanket.roughness = 0.0;
+	space_blanket.emissive_colour = vec3(0.0);
+	space_blanket.emissive_power = 1.0;
+	space_blanket.is_transparent = false;
+	space_blanket.refractive_index = 1.5;
+	space_blanket.material_set_index = 1;
+	materials[2] = space_blanket;
 
 	material glass = default_material();
-	glass.albedo = vec3(1.0);
+	glass.albedo = vec3(1.0, 0.0, 0.0);
 	glass.metal = 1.0;
 	glass.roughness = 0.0;
 	glass.emissive_colour = vec3(0.0);
 	glass.emissive_power = 0.0;
 	glass.is_transparent = true;
 	glass.refractive_index = 1.5;
-	glass.texture_maps.albedo_ID = 6;
-	glass.texture_maps.opacity_ID = 6;
+	//glass.texture_maps.albedo_ID = 6;
+	//glass.texture_maps.opacity_ID = 6;
 	materials[3] = glass;
 
 	material bubble = default_material();

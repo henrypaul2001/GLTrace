@@ -78,8 +78,8 @@ public:
 
 		rtCompute.Use();
 		const int max_textures = 31;
-		for (int i = 2; i <= max_textures; i++) {
-			rtCompute.setInt("textures[" + std::to_string(i) + "]", i);
+		for (int i = 0; i <= max_textures; i++) {
+			rtCompute.setInt("material_textures[" + std::to_string(i) + "]", i + 1);
 		}
 
 		// Set up screen quad

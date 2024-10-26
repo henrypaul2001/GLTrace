@@ -27,7 +27,7 @@ int main()
 
 	stbi_set_flip_vertically_on_load(true);
 	Texture2DArray* earth_set = TextureLoader::LoadTextureArrayFromFile({ "Textures/earth/albedo.jpg", "Textures/earth/specular.jpg", "Textures/earth/displacement.jpg" });
-	earth_set->BindToSlot(2);
+	earth_set->BindToSlot(1);
 
 	//Texture2D* windowTexture = TextureLoader::LoadTextureFromFile("Textures/window.png");
 
@@ -41,17 +41,9 @@ int main()
 	//marble_tile_rough->BindToSlot(4);
 
 	Texture2DArray* space_blanket_set = TextureLoader::LoadTextureArrayFromFile({ "Textures/space_blanket/albedo.png", "Textures/space_blanket/metallic.png", "Textures/space_blanket/normal.png", "Textures/space_blanket/roughness.png" });
-	space_blanket_set->BindToSlot(3);
+	space_blanket_set->BindToSlot(2);
 
-	//earth->BindToSlot(2);
-	//earth_specular->BindToSlot(4);
-	//earth_displacement->BindToSlot(5);
 	//windowTexture->BindToSlot(6);
-
-	//space_blanket->BindToSlot(7);
-	//space_blanket_normal->BindToSlot(8);
-	//space_blanket_metallic->BindToSlot(9);
-	//space_blanket_roughness->BindToSlot(10);
 
 	while (!glfwWindowShouldClose(window))
 	{
