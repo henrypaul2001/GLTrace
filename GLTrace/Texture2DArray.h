@@ -24,7 +24,7 @@ public:
 			glTexParameteri(texture_type, GL_TEXTURE_MIN_FILTER, minFilter);
 			glTexParameteri(texture_type, GL_TEXTURE_MAG_FILTER, magFilter);
 			glTexImage3D(texture_type, 0, internalFormat, width, height, num_layers, 0, format, type, nullptr);
-			glBindTexture(texture_type, 0);
+			//glBindTexture(texture_type, 0);
 		}
 	}
 protected:

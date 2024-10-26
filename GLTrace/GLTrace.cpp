@@ -12,11 +12,12 @@ int main()
 	cam.lookfrom = glm::vec3(0.0);
 	cam.lookat = glm::vec3(0.0, 0.0, -1.0);
 	cam.vup = glm::vec3(0.0, 1.0, 0.0);
-	cam.samples_per_pixel = 1;
-	cam.max_bounces = 100;
+	cam.samples_per_pixel = 5;
+	cam.max_bounces = 10;
 	cam.focus_dist = 1.0f;
 	cam.defocus_angle = 0.0f;
-	cam.sky_colour_min_y = glm::vec3(0.0f);
+	cam.sky_colour_min_y = glm::vec3(0.2f, 0.05f, 0.05f);
+	cam.sky_colour_max_y = glm::vec3(0.8f, 0.5f, 0.25f);
 
 	GLFWwindow* window = renderer.GetWindow();
 
@@ -25,11 +26,10 @@ int main()
 	float dt = 0.0f;
 
 	stbi_set_flip_vertically_on_load(true);
-	Texture2D* earth = TextureLoader::LoadTextureFromFile("Textures/earth/albedo.jpg");
-	Texture2D* earth_specular = TextureLoader::LoadTextureFromFile("Textures/earth/specular.jpg");
-	Texture2D* earth_displacement = TextureLoader::LoadTextureFromFile("Textures/earth/displacement.jpg");
+	Texture2DArray* earth_set = TextureLoader::LoadTextureArrayFromFile({ "Textures/earth/albedo.jpg", "Textures/earth/specular.jpg", "Textures/earth/displacement.jpg" });
+	earth_set->BindToSlot(2);
 
-	Texture2D* windowTexture = TextureLoader::LoadTextureFromFile("Textures/window.png");
+	//Texture2D* windowTexture = TextureLoader::LoadTextureFromFile("Textures/window.png");
 
 	//Texture2D* marble_tile = TextureLoader::LoadTextureFromFile("Textures/marbleTile/albedo.png");
 	//Texture2D* marble_tile_normal = TextureLoader::LoadTextureFromFile("Textures/marbleTile/normal.png");
@@ -40,10 +40,18 @@ int main()
 	//marble_tile_metal->BindToSlot(3);
 	//marble_tile_rough->BindToSlot(4);
 
-	earth->BindToSlot(2);
-	earth_specular->BindToSlot(4);
-	earth_displacement->BindToSlot(5);
-	windowTexture->BindToSlot(6);
+	Texture2DArray* space_blanket_set = TextureLoader::LoadTextureArrayFromFile({ "Textures/space_blanket/albedo.png", "Textures/space_blanket/metallic.png", "Textures/space_blanket/normal.png", "Textures/space_blanket/roughness.png" });
+	space_blanket_set->BindToSlot(3);
+
+	//earth->BindToSlot(2);
+	//earth_specular->BindToSlot(4);
+	//earth_displacement->BindToSlot(5);
+	//windowTexture->BindToSlot(6);
+
+	//space_blanket->BindToSlot(7);
+	//space_blanket_normal->BindToSlot(8);
+	//space_blanket_metallic->BindToSlot(9);
+	//space_blanket_roughness->BindToSlot(10);
 
 	while (!glfwWindowShouldClose(window))
 	{
