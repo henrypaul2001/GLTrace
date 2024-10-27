@@ -1,5 +1,5 @@
 #version 430 core
-layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in; // increase work group size for better performance
+layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 layout (rgba32f, binding = 0) uniform image2DArray screenBuffers;
 
 uniform float time;
@@ -15,6 +15,7 @@ vec3 firstBounceDirection;
 vec3 firstBounceNormal;
 
 // Utility
+// -------
 float length_squared(vec3 vec) {
 	return vec.x * vec.x + vec.y * vec.y + vec.z * vec.z;
 }
@@ -65,7 +66,29 @@ vec3 random_in_unit_disk() {
 	// Return the point in the unit disk (z is always 0)
 	return vec3(x, y, 0.0);
 }
+vec3 tangent_normal_to_local(vec3 tangent_normal, vec3 outward_normal) {
+	//vec3 up = abs(dot(outward_normal, vec3(0.0, 1.0, 0.0))) > 0.99 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+	vec3 up = abs(outward_normal.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, 0.0, -1.0);
+	vec3 tangent = normalize(cross(up, outward_normal));
+	vec3 bitangent = normalize(cross(outward_normal, tangent));
 
+	mat3 TBN = mat3(tangent, bitangent, outward_normal);
+
+	vec3 local_normal = normalize(TBN * tangent_normal);
+
+	return local_normal;
+}
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+float Reflectance(float cosine, float refractive_index) {
+    float r0 = (1.0 - refractive_index) / (1.0 + refractive_index);
+    r0 = r0 * r0;
+    return r0 + (1.0 - r0) * pow((1.0 - cosine), 5.0);
+}
+
+// Material structures
+// -------------------
 struct material_set {
 	int albedo_index;
 	int normal_index;
@@ -84,7 +107,6 @@ material_set default_material_set() {
 	mat_set.opacity_index = -1;
 	return mat_set;
 };
-
 struct material {
 	vec3 albedo;
 	float roughness;
@@ -112,6 +134,8 @@ material default_material() {
 	return mat;
 }
 
+// RT Utils
+// --------
 struct ray {
 	vec3 origin;
 	vec3 direction;
@@ -172,6 +196,8 @@ void set_face_normal(inout hit_record self, ray r, vec3 outward_normal) {
 	self.normal = self.front_face ? outward_normal : -outward_normal;
 }
 
+// Hittables
+// ---------
 struct sphere {
 	vec3 center;
 	float radius;
@@ -192,25 +218,17 @@ void get_sphere_uv(in vec3 p, inout float u, inout float v) {
 	v = theta / pi;
 }
 
+
+// Scene structure
+// ---------------
 const int num_spheres = 5;
 const int num_materials = 5;
 sphere spheres[num_spheres];
 material materials[num_materials];
 material_set material_sets[num_materials];
 
-vec3 tangent_normal_to_local(vec3 tangent_normal, vec3 outward_normal) {
-	//vec3 up = abs(dot(outward_normal, vec3(0.0, 1.0, 0.0))) > 0.99 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
-	vec3 up = abs(outward_normal.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, 0.0, -1.0);
-	vec3 tangent = normalize(cross(up, outward_normal));
-	vec3 bitangent = normalize(cross(outward_normal, tangent));
-
-	mat3 TBN = mat3(tangent, bitangent, outward_normal);
-
-	vec3 local_normal = normalize(TBN * tangent_normal);
-
-	return local_normal;
-}
-
+// Ray intersections
+// -----------------
 bool hit_sphere(inout sphere s, inout ray r, interval ray_t, inout hit_record rec) {
 	vec3 oc = s.center - r.origin;
 
@@ -256,7 +274,6 @@ bool hit_sphere(inout sphere s, inout ray r, interval ray_t, inout hit_record re
 	}
 	return true;
 }
-
 bool hit_sphere_list(ray r, interval ray_t, inout hit_record rec) {
 	hit_record temp_hit;
 	bool hit_anything = false;
@@ -273,6 +290,8 @@ bool hit_sphere_list(ray r, interval ray_t, inout hit_record rec) {
 	return hit_anything;
 }
 
+// Camera structure
+// ----------------
 struct camera {
 	int image_width, image_height;  // Ratio of image width over height
 	float aspect_ratio;				// Rendered image width in pixel count
@@ -338,15 +357,8 @@ ray get_ray(inout camera self, int i, int j, int s_i, int s_j) {
 	return new_ray(ray_origin, ray_direction);
 }
 
-vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-}
-float Reflectance(float cosine, float refractive_index) {
-    float r0 = (1.0 - refractive_index) / (1.0 + refractive_index);
-    r0 = r0 * r0;
-    return r0 + (1.0 - r0) * pow((1.0 - cosine), 5.0);
-}
-
+// Ray tracing loop
+// ----------------
 ray bounce_ray(in ray current_ray, in vec3 hit_normal, in vec3 hit_point, in bool front_face, in float roughness, in float metal, in bool is_transparent, in float refractive_index) {
 	metal = clamp(metal, 0.0, 1.0);
 	roughness = clamp(roughness, 0.0, 1.0);
@@ -375,7 +387,6 @@ ray bounce_ray(in ray current_ray, in vec3 hit_normal, in vec3 hit_point, in boo
 
 	return new_ray(hit_point, normalize(direction));
 }
-
 void get_material_properties(in uint material_index, inout vec3 colour_from_material, inout float metal, inout float roughness, inout bool is_transparent, inout float refractive_index, inout vec3 colour_from_emission, vec2 uv) {
 	int mat_set_index = materials[material_index].material_set_index;
 	if (mat_set_index == -1) {
@@ -432,7 +443,6 @@ void get_material_properties(in uint material_index, inout vec3 colour_from_mate
 	metal = clamp(metal, 0.0, 1.0);
 	roughness = clamp(roughness, 0.0, 1.0);
 }
-
 vec3 ray_colour_iterative(inout camera self, ray r) {
 	ray current_ray = r;
 
