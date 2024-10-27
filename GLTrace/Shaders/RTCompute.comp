@@ -226,6 +226,8 @@ struct quad {
 	float D;
 	float area;
 	uint material_index;
+
+	bool is_triangle;
 };
 quad new_quad(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	quad newQuad;
@@ -233,6 +235,7 @@ quad new_quad(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	newQuad.Q = Q;
 	newQuad.u = u;
 	newQuad.v = v;
+	newQuad.is_triangle = false;
 	newQuad.material_index = material_index;
 
 	vec3 n = cross(u, v);
@@ -243,7 +246,24 @@ quad new_quad(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 
 	return newQuad;
 }
-bool is_interior(in quad quad_hittable, in float a, in float b, inout hit_record rec) {
+quad new_triangle(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
+	quad newQuad;
+	
+	newQuad.Q = Q;
+	newQuad.u = u;
+	newQuad.v = v;
+	newQuad.is_triangle = true;
+	newQuad.material_index = material_index;
+
+	vec3 n = cross(u, v);
+	newQuad.normal = normalize(n);
+	newQuad.D = dot(newQuad.normal, Q);
+	newQuad.w = n / dot(n, n);
+	newQuad.area = length(n);
+
+	return newQuad;
+}
+bool quad_is_interior(in quad quad_hittable, in float a, in float b, inout hit_record rec) {
 	interval unit_interval = new_interval(0.0, 1.0);
 
 	if (!contains(unit_interval, a) || !contains(unit_interval, b)) {
@@ -253,6 +273,16 @@ bool is_interior(in quad quad_hittable, in float a, in float b, inout hit_record
 	rec.u = a;
 	rec.v = b;
 	return true;
+}
+bool triangle_is_interior(in quad triangle_hittable, in float a, in float b, inout hit_record rec) {
+	if (a > 0.0 && b > 0.0 && a + b < 1.0) {
+		rec.u = a;
+		rec.v = b;
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 // Scene structure
@@ -336,6 +366,7 @@ bool hit_quad(in uint quad_index, in ray r, in interval ray_t, inout hit_record 
 		vec3 W = quad_hittables[quad_index].w;
 		float D = quad_hittables[quad_index].D;
 		uint material_index = quad_hittables[quad_index].material_index;
+		bool is_triangle = quad_hittables[quad_index].is_triangle;
 
 		float denom = dot(Normal, r.direction);
 
@@ -356,7 +387,10 @@ bool hit_quad(in uint quad_index, in ray r, in interval ray_t, inout hit_record 
 		float alpha = dot(W, cross(planar_hitpt_vector, V));
 		float beta = dot(W, cross(U, planar_hitpt_vector));
 
-		if (!is_interior(quad_hittables[quad_index], alpha, beta, rec)) {
+		if (!is_triangle && !quad_is_interior(quad_hittables[quad_index], alpha, beta, rec)) {
+			return false;
+		}
+		else if (is_triangle && !triangle_is_interior(quad_hittables[quad_index], alpha, beta, rec)) {
 			return false;
 		}
 
@@ -699,7 +733,7 @@ void main() {
 	spheres[3] = new_sphere(vec3(6.0, 1.5, 0.0), 2.0, 3);
 	spheres[4] = new_sphere(vec3(6.0, 1.5, 0.0), 1.9, 4);
 
-	quad_hittables[0] = new_quad(vec3(0.0, 5.0, 0.0), vec3(2.5, 0.0, 0.0), vec3(0.0, 2.5, 0.0), 2);
+	quad_hittables[0] = new_triangle(vec3(0.0, 5.0, 0.0), vec3(2.5, 0.0, 0.0), vec3(0.0, 2.5, 0.0), 2);
 
 	camera Camera = cam;
 
