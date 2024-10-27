@@ -218,12 +218,50 @@ void get_sphere_uv(in vec3 p, inout float u, inout float v) {
 	v = theta / pi;
 }
 
+struct quad {
+	vec3 Q;
+	vec3 u, v;
+	vec3 w;
+	vec3 normal;
+	float D;
+	float area;
+	uint material_index;
+};
+quad new_quad(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
+	quad newQuad;
+	
+	newQuad.Q = Q;
+	newQuad.u = u;
+	newQuad.v = v;
+	newQuad.material_index = material_index;
+
+	vec3 n = cross(u, v);
+	newQuad.normal = normalize(n);
+	newQuad.D = dot(newQuad.normal, Q);
+	newQuad.w = n / dot(n, n);
+	newQuad.area = length(n);
+
+	return newQuad;
+}
+bool is_interior(in quad quad_hittable, in float a, in float b, inout hit_record rec) {
+	interval unit_interval = new_interval(0.0, 1.0);
+
+	if (!contains(unit_interval, a) || !contains(unit_interval, b)) {
+		return false;
+	}
+
+	rec.u = a;
+	rec.v = b;
+	return true;
+}
 
 // Scene structure
 // ---------------
 const int num_spheres = 5;
+const int num_quads = 5;
 const int num_materials = 5;
 sphere spheres[num_spheres];
+quad quads[num_quads];
 material materials[num_materials];
 material_set material_sets[num_materials];
 
@@ -288,6 +326,15 @@ bool hit_sphere_list(ray r, interval ray_t, inout hit_record rec) {
 	}
 
 	return hit_anything;
+}
+
+bool hit_quad(in quad self, in ray r, in interval ray_t, inout hit_record rec) {
+	// not yet implemented
+	return false;
+}
+bool hit_quad_list(in ray r, in interval ray_t, inout hit_record rec, inout float closest_so_far) {
+	// not yet implemented
+	return false;
 }
 
 // Camera structure
