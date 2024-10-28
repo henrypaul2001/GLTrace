@@ -328,57 +328,65 @@ material_set material_sets[num_materials];
 
 // Ray intersections
 // -----------------
-bool hit_sphere(inout sphere s, inout ray r, interval ray_t, inout hit_record rec) {
-	vec3 oc = s.center - r.origin;
+bool hit_sphere(in uint sphere_index, inout ray r, interval ray_t, inout hit_record rec) {
+	if (sphere_index < num_spheres) {
+		vec3 Center = spheres[sphere_index].center;
+		float Radius = spheres[sphere_index].radius;
+		uint material_index = spheres[sphere_index].material_index;
 
-	float a = length_squared(r.direction);
-	float h = dot(r.direction, oc);
-	float c = length_squared(oc) - s.radius * s.radius;
-	float discriminant = h * h - a * c;
+		vec3 oc = Center - r.origin;
+
+		float a = length_squared(r.direction);
+		float h = dot(r.direction, oc);
+		float c = length_squared(oc) - Radius * Radius;
+		float discriminant = h * h - a * c;
 	
-	if (discriminant < 0) {
-		return false;
-	}
-
-	float sqrtd = sqrt(discriminant);
-
-	// Find nearest root that lies in acceptable range
-	float root = (h - sqrtd) / a;
-	if (!surrounds(ray_t, root)) {
-		root = (h + sqrtd) / a;
-		if (!surrounds(ray_t, root)) {
+		if (discriminant < 0) {
 			return false;
 		}
-	}
 
-	rec.t = root;
-	rec.p = at(r, rec.t);
-	vec3 outward_normal = (rec.p - s.center) / s.radius;
-	set_face_normal(rec, r, outward_normal);
-	get_sphere_uv(outward_normal, rec.u, rec.v);
-	rec.material_index = s.material_index;
+		float sqrtd = sqrt(discriminant);
 
-	// Check for normal map
-	int mat_set_index = materials[s.material_index].material_set_index;
-	if (mat_set_index > -1) {
-		if (material_sets[mat_set_index].normal_index > -1) {
-			vec3 tangent_normal = texture(material_textures[mat_set_index], vec3(rec.u, rec.v, material_sets[mat_set_index].normal_index)).xyz * 2.0 - 1.0;
-
-			rec.normal = tangent_normal_to_local(tangent_normal, rec.normal);
-
-			if (!rec.front_face) {
-				rec.normal = -rec.normal;
+		// Find nearest root that lies in acceptable range
+		float root = (h - sqrtd) / a;
+		if (!surrounds(ray_t, root)) {
+			root = (h + sqrtd) / a;
+			if (!surrounds(ray_t, root)) {
+				return false;
 			}
 		}
+
+		rec.t = root;
+		rec.p = at(r, rec.t);
+		vec3 outward_normal = (rec.p - Center) / Radius;
+		set_face_normal(rec, r, outward_normal);
+		get_sphere_uv(outward_normal, rec.u, rec.v);
+		rec.material_index = material_index;
+
+		// Check for normal map
+		int mat_set_index = materials[material_index].material_set_index;
+		if (mat_set_index > -1) {
+			if (material_sets[mat_set_index].normal_index > -1) {
+				vec3 tangent_normal = texture(material_textures[mat_set_index], vec3(rec.u, rec.v, material_sets[mat_set_index].normal_index)).xyz * 2.0 - 1.0;
+
+				rec.normal = tangent_normal_to_local(tangent_normal, rec.normal);
+
+				if (!rec.front_face) {
+					rec.normal = -rec.normal;
+				}
+			}
+		}
+		return true;
 	}
-	return true;
+	// index out of bounds
+	return false;
 }
 bool hit_sphere_list(ray r, interval ray_t, inout hit_record rec, inout float closest_so_far) {
 	hit_record temp_hit;
 	bool hit_anything = false;
 
 	for (int i = 0; i < num_spheres; i++) {
-		if (hit_sphere(spheres[i], r, new_interval(ray_t.tmin, closest_so_far), temp_hit)) {
+		if (hit_sphere(i, r, new_interval(ray_t.tmin, closest_so_far), temp_hit)) {
 			hit_anything = true;
 			closest_so_far = temp_hit.t;
 			rec = temp_hit;
