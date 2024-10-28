@@ -16,8 +16,13 @@ int main()
 	cam.max_bounces = 10;
 	cam.focus_dist = 1.0f;
 	cam.defocus_angle = 0.0f;
-	cam.sky_colour_min_y = glm::vec3(0.2f, 0.05f, 0.05f);
-	cam.sky_colour_max_y = glm::vec3(0.8f, 0.5f, 0.25f);
+
+	cam.lookfrom = glm::vec3(278.0f, 278.0f, -800.0f);
+	cam.lookat = glm::vec3(0.0f, 0.0f, -1.0f);
+	//cam.sky_colour_min_y = glm::vec3(0.2f, 0.05f, 0.05f);
+	//cam.sky_colour_max_y = glm::vec3(0.8f, 0.5f, 0.25f);
+	cam.sky_colour_min_y = glm::vec3(0.0f);
+	cam.sky_colour_max_y = glm::vec3(0.0f);
 
 	GLFWwindow* window = renderer.GetWindow();
 

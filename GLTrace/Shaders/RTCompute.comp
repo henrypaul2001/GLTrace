@@ -340,13 +340,16 @@ bool disk_is_interior(in quad disk_hittable, in float a, in float b, inout hit_r
 
 // Scene structure
 // ---------------
-const int num_spheres = 5;
-const int num_quads = 1;
-const int num_materials = 6;
-sphere spheres[num_spheres];
-quad quad_hittables[num_quads];
-material materials[num_materials];
-material_set material_sets[num_materials];
+const int max_spheres = 6;
+const int max_quads = 6;
+const int max_materials = 6;
+int num_spheres;
+int num_quads;
+int num_materials;
+sphere spheres[max_spheres];
+quad quad_hittables[max_quads];
+material materials[max_materials];
+material_set material_sets[max_materials];
 
 // Ray intersections
 // -----------------
@@ -535,7 +538,7 @@ bool hit_quad_list(in ray r, in interval ray_t, inout hit_record rec, inout floa
 	hit_record temp_hit;
 	bool hit_anything = false;
 
-	for (int i = 0; i < num_spheres; i++) {
+	for (int i = 0; i < num_quads; i++) {
 		if (hit_quad(i, r, new_interval(ray_t.tmin, closest_so_far), temp_hit)) {
 			hit_anything = true;
 			closest_so_far = temp_hit.t;
@@ -752,7 +755,11 @@ vec3 ray_colour_iterative(inout camera self, ray r) {
 	return vec3(0.0);
 }
 
-void main() {
+void TestScene() {
+	num_spheres = 5;
+	num_quads = 1;
+	num_materials = 6;
+
 	// Material texture map sets
 	material_set earth_set = default_material_set();
 	earth_set.albedo_index = 0;
@@ -856,6 +863,67 @@ void main() {
 	spheres[4] = new_sphere(vec3(6.0, 1.5, 0.0), 1.9, 4);
 
 	quad_hittables[0] = new_quad(vec3(0.0, 5.0, 0.0), vec3(2.5, 0.0, 0.0), vec3(0.0, 2.5, 0.0), 2);
+}
+
+void CornellBox() {
+	num_spheres = 0;
+	num_quads = 6;
+	num_materials = 4;
+
+	// Materials
+	material white = default_material();
+	white.albedo = vec3(0.73);
+	white.roughness = 1.0;
+	white.metal = 0.0;
+	materials[0] = white;
+
+	material red = default_material();
+	red.albedo = vec3(0.65, 0.05, 0.05);
+	red.roughness = 1.0;
+	red.metal = 0.0;
+	materials[1] = red;
+
+	material green = default_material();
+	green.albedo = vec3(0.12, 0.45, 0.15);
+	green.roughness = 1.0;
+	green.metal = 0.0;
+	materials[2] = green;
+
+	material light = default_material();
+	light.albedo = vec3(1.0);
+	light.roughness = 1.0;
+	light.metal = 0.0;
+	light.emissive_power = 7.0;
+	light.emissive_colour = vec3(1.0);
+	materials[3] = light;
+
+	// Scene
+	quad left = new_quad(vec3(555.0, 0.0, 0.0), vec3(0.0, 555.0, 0.0), vec3(0.0, 0.0, 555.0), 2);
+	quad right = new_quad(vec3(0.0), vec3(0.0, 555.0, 0.0), vec3(0.0, 0.0, 555.0), 1);
+	quad light_quad = new_quad(vec3(113.0, 554.0, 127.0), vec3(330.0, 0.0, 0.0), vec3(0.0, 0.0, 305.0), 3);
+	quad top = new_quad(vec3(0.0, 555.0, 0.0), vec3(555.0, 0.0, 0.0), vec3(0.0, 0.0, 555.0), 0);
+	quad bottom = new_quad(vec3(0.0), vec3(555.0, 0.0, 0.0), vec3(0.0, 0.0, 555.0), 0);
+	quad back = new_quad(vec3(0.0, 0.0, 555.0), vec3(555.0, 0.0, 0.0), vec3(0.0, 555.0, 0.0), 0);
+	
+	quad_hittables[0] = left;
+	quad_hittables[1] = right;
+	quad_hittables[2] = light_quad;
+	quad_hittables[3] = top;
+	quad_hittables[4] = bottom;
+	quad_hittables[5] = back;
+	
+	/*
+	quad_hittables[0] = new_quad(vec3(555.0, 0.0, 0.0), vec3(0.0, 555.0, 0.0), vec3(0.0, 0.0, 555.0), 2);
+	quad_hittables[1] = new_quad(vec3(0.0), vec3(0.0, 555.0, 0.0), vec3(0.0, 0.0, 555.0), 1);
+	quad_hittables[2] = new_quad(vec3(113.0, 554.0, 127.0), vec3(330.0, 0.0, 0.0), vec3(0.0, 0.0, 305.0), 3);
+	quad_hittables[3] = new_quad(vec3(0.0, 555.0, 0.0), vec3(555.0, 0.0, 0.0), vec3(0.0, 0.0, 555.0), 0);
+	quad_hittables[4] = new_quad(vec3(0.0), vec3(555.0, 0.0, 0.0), vec3(0.0, 0.0, 555.0), 0);
+	quad_hittables[5] = new_quad(vec3(0.0, 0.0, 555.0), vec3(555.0, 0.0, 0.0), vec3(0.0, 555.0, 0.0), 0);
+	*/
+}
+
+void main() {
+	CornellBox();
 
 	camera Camera = cam;
 
