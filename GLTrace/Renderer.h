@@ -8,6 +8,7 @@
 #include "Texture2DArray.h"
 #include "Camera.h"
 #include "InputManager.h"
+#include "Scene.h"
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
 	// ignore warning codes or insignificant errors
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -122,7 +123,7 @@ public:
 		glfwTerminate();
 	}
 
-	void Render(Camera& activeCamera);
+	void Render(Camera& activeCamera, const Scene& activeScene);
 
 	void ResizeWindow(const unsigned int width, const unsigned int height) {
 		unsigned int widthR = width % WORK_GROUP_SIZE;

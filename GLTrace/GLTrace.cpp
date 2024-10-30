@@ -1,11 +1,13 @@
 #include "Renderer.h"
 #include "CameraController.h"
-#include "TextureLoader.h"
+#include "TestScene.h"
 int main()
 {
 	Renderer renderer = Renderer(1920, 1080);
 	Camera cam;
 	CameraController camControl;
+	Scene* scene = new TestScene();
+	scene->SetupScene();
 
 	camControl.activeCamera = &cam;
 	cam.vfov = 90.0;
@@ -17,8 +19,9 @@ int main()
 	cam.focus_dist = 1.0f;
 	cam.defocus_angle = 0.0f;
 
-	cam.lookfrom = glm::vec3(278.0f, 278.0f, -800.0f);
-	cam.lookat = glm::vec3(0.0f, 0.0f, -1.0f);
+	//cam.lookfrom = glm::vec3(278.0f, 278.0f, -800.0f);
+	//cam.lookat = glm::vec3(0.0f, 0.0f, -1.0f);
+
 	//cam.sky_colour_min_y = glm::vec3(0.2f, 0.05f, 0.05f);
 	//cam.sky_colour_max_y = glm::vec3(0.8f, 0.5f, 0.25f);
 	cam.sky_colour_min_y = glm::vec3(0.0f);
@@ -29,26 +32,6 @@ int main()
 	float lastFrame = static_cast<float>(glfwGetTime());
 	float currentFrame;
 	float dt = 0.0f;
-
-	stbi_set_flip_vertically_on_load(true);
-	Texture2DArray* earth_set = TextureLoader::LoadTextureArrayFromFile({ "Textures/earth/albedo.jpg", "Textures/earth/specular.jpg", "Textures/earth/displacement.jpg" });
-	earth_set->BindToSlot(1);
-
-	//Texture2D* windowTexture = TextureLoader::LoadTextureFromFile("Textures/window.png");
-
-	//Texture2D* marble_tile = TextureLoader::LoadTextureFromFile("Textures/marbleTile/albedo.png");
-	//Texture2D* marble_tile_normal = TextureLoader::LoadTextureFromFile("Textures/marbleTile/normal.png");
-	//Texture2D* marble_tile_metal = TextureLoader::LoadTextureFromFile("Textures/marbleTile/metal.png");
-	//Texture2D* marble_tile_rough = TextureLoader::LoadTextureFromFile("Textures/marbleTile/roughness.png");
-	//marble_tile->BindToSlot(1);
-	//marble_tile_normal->BindToSlot(2);
-	//marble_tile_metal->BindToSlot(3);
-	//marble_tile_rough->BindToSlot(4);
-
-	Texture2DArray* space_blanket_set = TextureLoader::LoadTextureArrayFromFile({ "Textures/space_blanket/albedo.png", "Textures/space_blanket/metallic.png", "Textures/space_blanket/normal.png", "Textures/space_blanket/roughness.png" });
-	space_blanket_set->BindToSlot(2);
-
-	//windowTexture->BindToSlot(6);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -68,11 +51,13 @@ int main()
 
 		// Update scene
 		camControl.Update(dt);
+		scene->UpdateScene(dt);
 
-		renderer.Render(cam);
+		renderer.Render(cam, *scene);
 
 		glfwSwapBuffers(window);
 
 		glfwPollEvents();
 	}
+	delete scene;
 }

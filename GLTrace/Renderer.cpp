@@ -1,5 +1,5 @@
 #include "Renderer.h"
-void Renderer::Render(Camera& activeCamera)
+void Renderer::Render(Camera& activeCamera, const Scene& activeScene)
 {
 	glViewport(SCR_X_POS, SCR_Y_POS, SCR_WIDTH, SCR_HEIGHT);
 
@@ -7,6 +7,9 @@ void Renderer::Render(Camera& activeCamera)
 		// Update camera
 		activeCamera.Initialise(SCR_WIDTH, SCR_HEIGHT);
 		activeCamera.SetUniforms(rtCompute);
+
+		// Update scene information
+		activeScene.SetUniforms(rtCompute);
 
 		// Dispatch RT compute shader
 		screenBuffers.BindImage(GL_WRITE_ONLY, 0);

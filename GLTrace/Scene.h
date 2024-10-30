@@ -3,6 +3,7 @@
 #include <glm/ext/quaternion_geometric.hpp>
 #include <vector>
 #include "Shader.h"
+#include "TextureLoader.h"
 
 struct MaterialSet {
 	int albedo_index = -1;
@@ -14,6 +15,14 @@ struct MaterialSet {
 };
 
 struct Material {
+	Material() {}
+	// Constructor for volumetric materials
+	Material(const float density, const glm::vec3& colour) {
+		Albedo = colour;
+		is_constant_medium = true;
+		neg_inv_density = (-1.0f / density);
+	}
+
 	glm::vec3 Albedo = glm::vec3(1.0f);
 	float Roughness = 0.0f;
 	float Metal = 0.0f;
@@ -57,7 +66,7 @@ public:
 	}
 
 	void Recalculate() {
-		glm::vec3 n = glm::normalize(glm::cross(U, V));
+		glm::vec3 n = glm::cross(U, V);
 		Normal = glm::normalize(n);
 		D = glm::dot(Normal, Q);
 		W = n / glm::dot(n, n);
@@ -70,29 +79,29 @@ public:
 
 	QUAD_TYPE quad_type;
 
-	void SetUniforms(const Shader& s, const int i) {
+	void SetUniforms(const AbstractShader& s, const int i) const {
 		std::string i_string = std::to_string(i);
-		s.setVec3("quads[" + i_string + "].Q", Q);
-		s.setVec3("quads[" + i_string + "].u", U);
-		s.setVec3("quads[" + i_string + "].v", V);
-		s.setVec3("quads[" + i_string + "].w", W);
-		s.setVec3("quads[" + i_string + "].normal", Normal);
-		s.setFloat("quads[" + i_string + "].D", D);
-		s.setFloat("quads[" + i_string + "].area", Area);
-		s.setUInt("quads[" + i_string + "].material_index", material_index);
+		s.setVec3("quad_hittables[" + i_string + "].Q", Q);
+		s.setVec3("quad_hittables[" + i_string + "].u", U);
+		s.setVec3("quad_hittables[" + i_string + "].v", V);
+		s.setVec3("quad_hittables[" + i_string + "].w", W);
+		s.setVec3("quad_hittables[" + i_string + "].normal", Normal);
+		s.setFloat("quad_hittables[" + i_string + "].D", D);
+		s.setFloat("quad_hittables[" + i_string + "].area", Area);
+		s.setUInt("quad_hittables[" + i_string + "].material_index", material_index);
 
 		switch (quad_type) {
 		case QUAD:
-			s.setBool("quads[" + i_string + "].is_triangle", false);
-			s.setBool("quads[" + i_string + "].is_disk", false);
+			s.setBool("quad_hittables[" + i_string + "].is_triangle", false);
+			s.setBool("quad_hittables[" + i_string + "].is_disk", false);
 			break;
 		case TRIANGLE:
-			s.setBool("quads[" + i_string + "].is_triangle", true);
-			s.setBool("quads[" + i_string + "].is_disk", false);
+			s.setBool("quad_hittables[" + i_string + "].is_triangle", true);
+			s.setBool("quad_hittables[" + i_string + "].is_disk", false);
 			break;
 		case DISK:
-			s.setBool("quads[" + i_string + "].is_triangle", false);
-			s.setBool("quads[" + i_string + "].is_disk", true);
+			s.setBool("quad_hittables[" + i_string + "].is_triangle", false);
+			s.setBool("quad_hittables[" + i_string + "].is_disk", true);
 			break;
 		}
 	}
@@ -107,9 +116,9 @@ protected:
 	float Area;
 };
 
-static const int MAX_SPHERES = 100;
-static const int MAX_QUADS = 100;
-static const int MAX_MATERIALS = 100;
+static const int MAX_SPHERES = 10;
+static const int MAX_QUADS = 10;
+static const int MAX_MATERIALS = 10;
 
 class Scene {
 public:
@@ -121,7 +130,7 @@ public:
 	}
 	virtual ~Scene() {}
 
-	void SetUniforms(const Shader& shader) {
+	void SetUniforms(const AbstractShader& shader) const {
 		shader.Use();
 		
 		// Set sphere uniforms
@@ -134,11 +143,13 @@ public:
 		}
 
 		// Set quads
+		shader.setInt("num_quads", quads.size());
 		for (int i = 0; i < quads.size(); i++) {
 			quads[i].SetUniforms(shader, i);
 		}
 
 		// Set materials
+		shader.setInt("num_materials", materials.size());
 		for (int i = 0; i < materials.size(); i++) {
 			std::string i_string = std::to_string(i);
 			shader.setVec3("materials[" + i_string + "].albedo", materials[i].Albedo);
@@ -166,7 +177,7 @@ public:
 	}
 
 	virtual void SetupScene() = 0;
-	virtual void UpdateScene() {}
+	virtual void UpdateScene(const float dt) {}
 
 protected:
 	Sphere& AddSphere(const glm::vec3& position, const float radius, const unsigned int material_index) {
