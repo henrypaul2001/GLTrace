@@ -25,6 +25,9 @@
     <Filter Include="Source Files\Shaders\Generic">
       <UniqueIdentifier>{efb986e4-3792-4fe7-b05a-58c6ba53422b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{0729b9c3-2b96-4c0f-a84d-52a25f2fcae1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLTrace.cpp">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="Texture2DArray.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
