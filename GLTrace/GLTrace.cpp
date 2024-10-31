@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "CameraController.h"
 #include "TestScene.h"
+#include "CornellBox.h"
 int main()
 {
 	Renderer renderer = Renderer(1920, 1080);
@@ -9,14 +10,7 @@ int main()
 	scene->SetupScene();
 
 	camControl.activeCamera = scene->GetSceneCamera();
-
-	//cam.lookfrom = glm::vec3(278.0f, 278.0f, -800.0f);
-	//cam.lookat = glm::vec3(0.0f, 0.0f, -1.0f);
-
-	//cam.sky_colour_min_y = glm::vec3(0.2f, 0.05f, 0.05f);
-	//cam.sky_colour_max_y = glm::vec3(0.8f, 0.5f, 0.25f);
-	//cam.sky_colour_min_y = glm::vec3(0.0f);
-	//cam.sky_colour_max_y = glm::vec3(0.0f);
+	camControl.Initialise();
 
 	GLFWwindow* window = renderer.GetWindow();
 
@@ -31,9 +25,6 @@ int main()
 		lastFrame = currentFrame;
 
 		std::clog << "Delta time: " << dt << " || FPS: " << 1.0 / dt << "										\r" << std::flush;
-
-		//cam.lookfrom = cam.lookfrom + (glm::vec3(0.05f, 0.0f, 0.0f) * dt);
-		//cam.lookat = cam.lookfrom + glm::vec3(0.0f, 0.0f, -1.0f);
 
 		// Process inputs
 		const glm::vec2& mousePos = renderer.MousePos();

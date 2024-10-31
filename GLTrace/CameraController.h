@@ -8,6 +8,13 @@ public:
 	float movementSpeed = 6.5f;
 	float mouseSensitivity = 0.1f;
 
+	void Initialise() {
+		zoom = activeCamera->vfov;
+		glm::vec3 front = glm::normalize(activeCamera->lookfrom - activeCamera->lookat);
+		pitch = glm::degrees(asin(front.y));
+		yaw = glm::degrees(atan2(front.z, front.x));
+	}
+
 	void Update(const float dt) {
 		if (activeCamera) {
 
