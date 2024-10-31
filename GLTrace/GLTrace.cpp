@@ -2,11 +2,12 @@
 #include "CameraController.h"
 #include "TestScene.h"
 #include "CornellBox.h"
+#include "CornellMirror.h"
 int main()
 {
 	Renderer renderer = Renderer(1920, 1080);
 	CameraController camControl;
-	Scene* scene = new CornellBoxScene();
+	Scene* scene = new CornellBoxMirrorScene();
 	scene->SetupScene();
 
 	camControl.activeCamera = scene->GetSceneCamera();

@@ -98,6 +98,9 @@
     <ClInclude Include="CornellBox.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="CornellMirror.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\passthrough.vert">
