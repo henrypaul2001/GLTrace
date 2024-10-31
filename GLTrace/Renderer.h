@@ -165,8 +165,7 @@ public:
 		mousePos.y = ypos;
 	}
 
-	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-	}
+	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {}
 
 	GLFWwindow* GetWindow() { return window; }
 	const glm::vec2& MousePos() const { return mousePos; }

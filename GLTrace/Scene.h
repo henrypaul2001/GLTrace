@@ -13,7 +13,6 @@ struct MaterialSet {
 	int emission_index = -1;
 	int opacity_index = -1;
 };
-
 struct Material {
 	Material() {}
 	// Constructor for volumetric materials
@@ -179,6 +178,7 @@ public:
 	virtual void SetupScene() = 0;
 	virtual void UpdateScene(const float dt) {}
 
+	Camera* GetSceneCamera() { return &sceneCamera; }
 protected:
 	Sphere& AddSphere(const glm::vec3& position, const float radius, const unsigned int material_index) {
 		if (spheres.size() < MAX_SPHERES) {
@@ -217,6 +217,7 @@ protected:
 		}
 	}
 
+	Camera sceneCamera;
 private:
 	std::vector<Sphere> spheres;
 	std::vector<Quad> quads;

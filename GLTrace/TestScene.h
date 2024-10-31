@@ -6,6 +6,18 @@ public:
 	~TestScene() {}
 
 	void SetupScene() override {
+		// Setup camera
+		sceneCamera.vfov = 90.0;
+		sceneCamera.lookfrom = glm::vec3(0.0);
+		sceneCamera.lookat = glm::vec3(0.0, 0.0, -1.0);
+		sceneCamera.vup = glm::vec3(0.0, 1.0, 0.0);
+		sceneCamera.samples_per_pixel = 5;
+		sceneCamera.max_bounces = 10;
+		sceneCamera.focus_dist = 1.0f;
+		sceneCamera.defocus_angle = 0.0f;
+		sceneCamera.sky_colour_min_y = glm::vec3(0.0f);
+		sceneCamera.sky_colour_max_y = glm::vec3(0.0f);
+
 		// Load material sets
 		stbi_set_flip_vertically_on_load(true);
 		Texture2DArray* earth_maps = TextureLoader::LoadTextureArrayFromFile({ "Textures/earth/albedo.jpg", "Textures/earth/specular.jpg", "Textures/earth/displacement.jpg" });
