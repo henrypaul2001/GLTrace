@@ -115,8 +115,8 @@ protected:
 	float Area;
 };
 
-static const int MAX_SPHERES = 10;
-static const int MAX_QUADS = 10;
+static const int MAX_SPHERES = 23;
+static const int MAX_QUADS = 23;
 static const int MAX_MATERIALS = 10;
 
 class Scene {
@@ -203,6 +203,26 @@ protected:
 			quads.push_back(Quad(DISK, Q, U, V, material_index));
 		}
 		return quads.back();
+	}
+	std::vector<Quad*> AddBox(const glm::vec3& a, const glm::vec3& b, const unsigned int material_index) {
+		std::vector<Quad*> sides;
+		sides.reserve(6);
+
+		glm::vec3 min = glm::vec3(std::fmin(a.x, b.x), std::fmin(a.y, b.y), std::fmin(a.z, b.z));
+		glm::vec3 max = glm::vec3(std::fmax(a.x, b.x), std::fmax(a.y, b.y), std::fmax(a.z, b.z));
+
+		glm::vec3 dx = glm::vec3(max.x - min.x, 0.0f, 0.0f);
+		glm::vec3 dy = glm::vec3(0.0f, max.y - min.y, 0.0f);
+		glm::vec3 dz = glm::vec3(0.0f, 0.0f, max.z - min.z);
+
+		sides.push_back(&AddQuad(glm::vec3(min.x, min.y, max.z), dx, dy, material_index)); // front
+		sides.push_back(&AddQuad(glm::vec3(max.x, min.y, max.z), -dz, dy, material_index)); // right
+		sides.push_back(&AddQuad(glm::vec3(max.x, min.y, min.z), -dx, dy, material_index)); // back
+		sides.push_back(&AddQuad(glm::vec3(min.x, min.y, min.z), dz, dy, material_index)); // left
+		sides.push_back(&AddQuad(glm::vec3(min.x, max.y, max.z), dx, -dz, material_index)); // top
+		sides.push_back(&AddQuad(glm::vec3(min.x, min.y, min.z), dx, dz, material_index)); // bottom
+
+		return sides;
 	}
 
 	void AddMaterial(const Material& mat) {
