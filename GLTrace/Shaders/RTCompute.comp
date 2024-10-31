@@ -341,8 +341,8 @@ bool disk_is_interior(in quad disk_hittable, in float a, in float b, inout hit_r
 
 // Scene structure
 // ---------------
-const int max_spheres = 10;
-const int max_quads = 10;
+const int max_spheres = 23;
+const int max_quads = 23;
 const int max_materials = 10;
 uniform int num_spheres;
 uniform int num_quads;
