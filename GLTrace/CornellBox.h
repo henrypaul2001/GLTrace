@@ -8,9 +8,9 @@ public:
 
 	void SetupScene() override {
 		// Setup camera
-		sceneCamera.vfov = 40.0f;
-		sceneCamera.lookfrom = glm::vec3(278.0f, 278.0f, -800.0f);
-		sceneCamera.lookat = sceneCamera.lookfrom + glm::vec3(1.0f, 0.0f, -1.0f);
+		sceneCamera.vfov = 80.0f;
+		sceneCamera.lookfrom = glm::vec3(-27.75f, 27.75f, 0.0f);
+		sceneCamera.lookat = glm::vec3(0.0f, 0.0f, -1.0f);
 		sceneCamera.vup = glm::vec3(0.0f, 1.0f, 0.0f);
 		sceneCamera.samples_per_pixel = 5;
 		sceneCamera.max_bounces = 10;
@@ -58,12 +58,12 @@ public:
 		// Spheres
 
 		// Quads
-		AddQuad(glm::vec3(555.0f, 0.0f, 0.0f), glm::vec3(0.0f, 555.0f, 0.0f), glm::vec3(0.0f, 0.0f, 555.0f), 2); // left
-		AddQuad(glm::vec3(0.0f), glm::vec3(0.0f, 555.0f, 0.0f), glm::vec3(0.0f, 0.0f, 555.0f), 1); // Right
-		AddQuad(glm::vec3(113.0f, 554.0f, 127.0f), glm::vec3(330.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 305.0f), 3); // Light
-		AddQuad(glm::vec3(0.0f, 555.0f, 0.0f), glm::vec3(555.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 555.0f), 0); // Top
-		AddQuad(glm::vec3(0.0f), glm::vec3(555.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 555.0f), 0); // Bottom
-		AddQuad(glm::vec3(0.0f, 0.0f, 555.0f), glm::vec3(555.0f, 0.0f, 0.0f), glm::vec3(0.0f, 555.0f, 0.0f), 0); // Back
+		AddQuad(glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 2); // left
+		AddQuad(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 1); // Right
+		AddQuad(glm::vec3(-55.5f + 18.5f, 55.4f, -18.5f), glm::vec3(0.0f, 0.0f, -18.5f), glm::vec3(18.5f, 0.0f, 0.0f), 3); // Light
+		AddQuad(glm::vec3(-55.5f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Top
+		AddQuad(glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Bottom
+		AddQuad(glm::vec3(-55.5f, 0.0f, -55.5f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), 0); // Back
 	}
 
 	void UpdateScene(const float dt) override {

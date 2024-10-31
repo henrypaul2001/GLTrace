@@ -6,7 +6,7 @@ int main()
 {
 	Renderer renderer = Renderer(1920, 1080);
 	CameraController camControl;
-	Scene* scene = new TestScene();
+	Scene* scene = new CornellBoxScene();
 	scene->SetupScene();
 
 	camControl.activeCamera = scene->GetSceneCamera();
