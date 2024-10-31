@@ -70,7 +70,7 @@ const unsigned int WORK_GROUP_SIZE = 32u;
 class Renderer
 {
 public:
-	Renderer(const unsigned int width = 600u, const unsigned int height = 600u, unsigned int xPos = 0u, unsigned int yPos = 0u) : SCR_WIDTH(width), SCR_HEIGHT(height), SCR_X_POS(xPos), SCR_Y_POS(yPos) {
+	Renderer(const unsigned int width = 600u, const unsigned int height = 600u, unsigned int xPos = 0u, unsigned int yPos = 0u) : SCR_WIDTH(width), SCR_HEIGHT(height), SCR_X_POS(xPos), SCR_Y_POS(yPos), accumulation_frame_index(1), accumulate_frames(true) {
 		Initialise(); 
 
 		// Load shaders
@@ -111,7 +111,7 @@ public:
 
 		screenQuad.SetupMesh(vertices, indices);
 
-		screenBuffers = Texture2DArray(3);
+		screenBuffers = Texture2DArray(4);
 		screenBuffers.GenerateTexture();
 		ResizeWindow(SCR_WIDTH, SCR_HEIGHT);
 		//screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
@@ -167,6 +167,9 @@ public:
 
 	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {}
 
+	void ResetAccumulation() { accumulation_frame_index = 1; }
+	void ToggleAccumulation() { accumulate_frames = !accumulate_frames; ResetAccumulation(); }
+
 	GLFWwindow* GetWindow() { return window; }
 	const glm::vec2& MousePos() const { return mousePos; }
 	const double MouseScrollOffsetX() const { return scrollOffsetX; }
@@ -180,7 +183,8 @@ private:
 	ComputeShader rtCompute;
 
 	GLFWwindow* window;
-	unsigned int SCR_WIDTH, SCR_HEIGHT, SCR_X_POS, SCR_Y_POS;
+	unsigned int SCR_WIDTH, SCR_HEIGHT, SCR_X_POS, SCR_Y_POS, accumulation_frame_index;
 	glm::vec2 mousePos;
 	double scrollOffsetX, scrollOffsetY;
+	bool accumulate_frames;
 };

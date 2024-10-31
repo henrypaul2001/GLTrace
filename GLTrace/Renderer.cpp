@@ -7,6 +7,7 @@ void Renderer::Render(Camera& activeCamera, const Scene& activeScene)
 		// Update camera
 		activeCamera.Initialise(SCR_WIDTH, SCR_HEIGHT);
 		activeCamera.SetUniforms(rtCompute);
+		rtCompute.setInt("accumulation_frame_index", accumulation_frame_index);
 
 		// Update scene information
 		activeScene.SetUniforms(rtCompute);
@@ -19,6 +20,8 @@ void Renderer::Render(Camera& activeCamera, const Scene& activeScene)
 		screenQuadShader.Use();
 		screenBuffers.BindToSlot(0);
 		screenQuad.DrawMeshData();
+
+		if (accumulate_frames) { accumulation_frame_index++; }
 	}
 
 	scrollOffsetX = 0.0;

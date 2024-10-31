@@ -3,6 +3,7 @@ layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 layout (rgba32f, binding = 0) uniform image2DArray screenBuffers;
 
 uniform float time;
+uniform int accumulation_frame_index = 1;
 uint randseed;
 const float pi = 3.1415926535897932385;
 const uint max_world_size = 31;
@@ -774,8 +775,21 @@ void main() {
 	}
 	pixel_colour = Camera.pixel_samples_scale * pixel_colour;
 
+	// Accumulation
+	vec3 current_accumulation;
+	vec3 accumulated_colour;
+	if (accumulation_frame_index == 1) {
+		current_accumulation = vec3(0.0);
+		accumulated_colour = pixel_colour;
+	}
+	else {
+		current_accumulation = imageLoad(screenBuffers, ivec3(pixel_coords, 3)).xyz;
+		accumulated_colour = current_accumulation + pixel_colour;
+	}
+
 	// Output to image textures
-	imageStore(screenBuffers, ivec3(pixel_coords, 0), vec4(pixel_colour, 1.0));
+	imageStore(screenBuffers, ivec3(pixel_coords, 0), vec4(accumulated_colour / accumulation_frame_index, 1.0));
 	imageStore(screenBuffers, ivec3(pixel_coords, 1), vec4(firstBounceDirection, 1.0));
 	imageStore(screenBuffers, ivec3(pixel_coords, 2), vec4(firstBounceNormal, 1.0));
+	imageStore(screenBuffers, ivec3(pixel_coords, 3), vec4(accumulated_colour, 1.0));
 }

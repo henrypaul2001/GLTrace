@@ -31,6 +31,8 @@ int main()
 		camControl.ProcessMouseMovement(mousePos.x, mousePos.y);
 		camControl.ProcessMouseScroll(renderer.MouseScrollOffsetY());
 
+		if (InputManager::IsKeyDown(GLFW_KEY_R)) { renderer.ToggleAccumulation(); }
+
 		// Update scene
 		camControl.Update(dt);
 		scene->UpdateScene(dt);

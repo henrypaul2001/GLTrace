@@ -18,6 +18,9 @@ public:
 		sceneCamera.sky_colour_min_y = glm::vec3(0.0f);
 		sceneCamera.sky_colour_max_y = glm::vec3(0.0f);
 
+		//sceneCamera.sky_colour_min_y = glm::vec3(0.2f, 0.05f, 0.05f);
+		//sceneCamera.sky_colour_max_y = glm::vec3(0.8f, 0.5f, 0.25f);
+
 		// Load material sets
 		stbi_set_flip_vertically_on_load(true);
 		Texture2DArray* earth_maps = TextureLoader::LoadTextureArrayFromFile({ "Textures/earth/albedo.jpg", "Textures/earth/specular.jpg", "Textures/earth/displacement.jpg" });
