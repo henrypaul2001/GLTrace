@@ -93,6 +93,8 @@ public:
 		shader.setFloat("time", glfwGetTime());
 	}
 
+	void SetCameraHasMoved(const bool moved) { camera_has_moved = moved; }
+	const bool HasCameraMoved() const { return camera_has_moved; }
 private:
 	unsigned int image_width, image_height;	// Rendered image width and height in pixel count
 	float aspect_ratio;						// Ratio of image width over height
@@ -105,4 +107,6 @@ private:
 	glm::vec3 u, v, w;						// Camera frame basis vectors
 	glm::vec3 defocus_disk_u;				// Defocus disk horizontal radius
 	glm::vec3 defocus_disk_v;				// Defocus disk vertical radius
+
+	bool camera_has_moved = false;
 };

@@ -5,6 +5,10 @@ void Renderer::Render(Camera& activeCamera, const Scene& activeScene)
 
 	if (SCR_WIDTH > 0 && SCR_HEIGHT > 0) {
 		// Update camera
+		if (activeCamera.HasCameraMoved()) {
+			ResetAccumulation();
+			activeCamera.SetCameraHasMoved(false);
+		}
 		activeCamera.Initialise(SCR_WIDTH, SCR_HEIGHT);
 		activeCamera.SetUniforms(rtCompute);
 		rtCompute.setInt("accumulation_frame_index", accumulation_frame_index);

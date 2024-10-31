@@ -32,21 +32,27 @@ public:
 			float velocity = movementSpeed * dt;
 			if (InputManager::IsKeyDown(GLFW_KEY_W)) {
 				activeCamera->lookfrom = activeCamera->lookfrom += front * velocity;
+				activeCamera->SetCameraHasMoved(true);
 			}
 			if (InputManager::IsKeyDown(GLFW_KEY_S)) {
 				activeCamera->lookfrom = activeCamera->lookfrom -= front * velocity;
+				activeCamera->SetCameraHasMoved(true);
 			}
 			if (InputManager::IsKeyDown(GLFW_KEY_A)) {
 				activeCamera->lookfrom = activeCamera->lookfrom -= right * velocity;
+				activeCamera->SetCameraHasMoved(true);
 			}
 			if (InputManager::IsKeyDown(GLFW_KEY_D)) {
 				activeCamera->lookfrom = activeCamera->lookfrom += right * velocity;
+				activeCamera->SetCameraHasMoved(true);
 			}
 			if (InputManager::IsKeyDown(GLFW_KEY_SPACE)) {
 				activeCamera->lookfrom = activeCamera->lookfrom += up * velocity;
+				activeCamera->SetCameraHasMoved(true);
 			}
 			if (InputManager::IsKeyDown(GLFW_KEY_LEFT_SHIFT)) {
 				activeCamera->lookfrom = activeCamera->lookfrom -= up * velocity;
+				activeCamera->SetCameraHasMoved(true);
 			}
 
 			activeCamera->lookat = activeCamera->lookfrom + front;
@@ -65,6 +71,9 @@ public:
 
 		float xoffset = xpos - lastMouseX;
 		float yoffset = lastMouseY - ypos;
+
+		if (abs(xoffset) > 0.0f || abs(yoffset) > 0.0f) { activeCamera->SetCameraHasMoved(true); }
+
 		lastMouseX = xpos;
 		lastMouseY = ypos;
 
@@ -90,6 +99,8 @@ public:
 		else if (zoom > 120.0f) {
 			zoom = 120.0f;
 		}
+
+		if (abs(yoffset) > 0.0f) { activeCamera->SetCameraHasMoved(true); }
 	}
 
 private:
