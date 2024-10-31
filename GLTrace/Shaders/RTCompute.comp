@@ -776,16 +776,9 @@ void main() {
 	pixel_colour = Camera.pixel_samples_scale * pixel_colour;
 
 	// Accumulation
-	vec3 current_accumulation;
-	vec3 accumulated_colour;
-	if (accumulation_frame_index == 1) {
-		current_accumulation = vec3(0.0);
-		accumulated_colour = pixel_colour;
-	}
-	else {
-		current_accumulation = imageLoad(screenBuffers, ivec3(pixel_coords, 3)).xyz;
-		accumulated_colour = current_accumulation + pixel_colour;
-	}
+	vec3 current_accumulation = vec3(0.0);
+	if (accumulation_frame_index > 1) { current_accumulation = imageLoad(screenBuffers, ivec3(pixel_coords, 3)).xyz; }
+	vec3 accumulated_colour = current_accumulation + pixel_colour;
 
 	// Output to image textures
 	imageStore(screenBuffers, ivec3(pixel_coords, 0), vec4(accumulated_colour / accumulation_frame_index, 1.0));
