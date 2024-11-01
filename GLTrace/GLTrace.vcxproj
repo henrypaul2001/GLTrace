@@ -146,12 +146,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractShader.h" />
+    <ClInclude Include="BVH.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="CornellBox.h" />
     <ClInclude Include="CornellMirror.h" />
     <ClInclude Include="GLTMath.h" />
+    <ClInclude Include="Hittables.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="MeshData.h" />
     <ClInclude Include="Renderer.h" />
