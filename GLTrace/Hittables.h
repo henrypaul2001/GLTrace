@@ -60,6 +60,12 @@ public:
 		Recalculate();
 	}
 
+	glm::vec3 GetCentre() const {
+		glm::vec3 extent = Q + U + V;
+		if (quad_type == TRIANGLE) { return extent * 0.3333f; }
+		else { return extent * 0.5f; }
+	}
+
 	void Recalculate() {
 		glm::vec3 n = glm::cross(U, V);
 		Normal = glm::normalize(n);
@@ -67,6 +73,10 @@ public:
 		W = n / glm::dot(n, n);
 		Area = glm::length(n);
 	}
+
+	const glm::vec3& GetQ() const { return Q; }
+	const glm::vec3& GetU() const { return U; }
+	const glm::vec3& GetV() const { return V; }
 
 	void SetQ(const glm::vec3& q) { Q = q; Recalculate(); }
 	void SetU(const glm::vec3& u) { U = u; Recalculate(); }
