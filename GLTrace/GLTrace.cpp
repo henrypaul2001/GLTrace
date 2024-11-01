@@ -9,6 +9,7 @@ int main()
 	CameraController camControl;
 	Scene* scene = new CornellBoxMirrorScene();
 	scene->SetupScene();
+	scene->BuildBVH();
 
 	camControl.activeCamera = scene->GetSceneCamera();
 	camControl.Initialise();

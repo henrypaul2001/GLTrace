@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "TextureLoader.h"
 #include "Hittables.h"
+#include "BVH.h"
 
 static const int MAX_SPHERES = 23;
 static const int MAX_QUADS = 23;
@@ -68,6 +69,8 @@ public:
 	virtual void UpdateScene(const float dt) {}
 
 	Camera* GetSceneCamera() { return &sceneCamera; }
+
+	void BuildBVH() { bvh.BuildBVH(quads, spheres); }
 protected:
 	Sphere& AddSphere(const glm::vec3& position, const float radius, const unsigned int material_index) {
 		if (spheres.size() < MAX_SPHERES) {
@@ -132,4 +135,6 @@ private:
 	std::vector<Quad> quads;
 	std::vector<Material> materials;
 	std::vector<MaterialSet> material_sets;
+
+	BVH bvh;
 };
