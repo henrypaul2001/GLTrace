@@ -88,6 +88,20 @@ float Reflectance(float cosine, float refractive_index) {
     return r0 + (1.0 - r0) * pow((1.0 - cosine), 5.0);
 }
 
+// BVH Structure
+struct BVHNode {
+	vec3 aabbMin, aabbMax;
+	uint leftChild; // rightChild == leftChild + 1
+	uint firstQuadPrimitive, quadPrimitiveCount;
+	uint firstSpherePrimitive, spherePrimitiveCount;
+};
+
+layout (std430, binding = 1) readonly buffer bvhBuffer {
+	uint totalElements;
+	uint nodesUsed;
+	BVHNode[] tree;
+};
+
 // Material structures
 // -------------------
 struct material_set {
