@@ -100,8 +100,11 @@ struct BVHNode {
 layout (std430, binding = 1) readonly buffer bvhBuffer {
 	uint totalElements;
 	uint nodesUsed;
-	BVHNode[] tree;
+	BVHNode[] bvhTree;
 };
+bool isLeafNode(in uint nodeID) {
+	return (bvhTree[nodeID].quadPrimitiveCount + bvhTree[nodeID].spherePrimitiveCount > 0);
+}
 
 // Material structures
 // -------------------
@@ -565,6 +568,16 @@ bool hit_quad_list(in ray r, in interval ray_t, inout hit_record rec, inout floa
 	return hit_anything;
 }
 
+bool hit_aabb(in ray r, in interval t, in vec3 aabbMin, in vec3 aabbMax) {
+	float tx1 = (aabbMin.x - r.origin.x) / r.direction.x, tx2 = (aabbMax.x - r.origin.x) / r.direction.x;
+	float tmin = min(tx1, tx2), tmax = max(tx1, tx2);
+	float ty1 = (aabbMin.y - r.origin.y) / r.direction.y, ty2 = (aabbMax.y - r.origin.y) / r.direction.y;
+	tmin = max(tmin, min(ty1, ty2)), tmax = min(tmax, max(ty1, ty2));
+	float tz1 = (aabbMin.z - r.origin.z) / r.direction.z, tz2 = (aabbMax.z - r.origin.z)/ r.direction.z;
+	tmin = max(tmin, min(tz1, tz2)), tmax = min(tmax, (tz1, tz2));
+	return tmax >= tmin && tmin >= t.tmin && tmax <= t.tmax && tmax > 0;
+}
+
 // Camera structure
 // ----------------
 struct camera {
@@ -634,6 +647,47 @@ ray get_ray(inout camera self, int i, int j, int s_i, int s_j) {
 
 // Ray tracing loop
 // ----------------
+bool TraverseBVH(in ray r, interval ray_t, inout hit_record rec, inout float closest_so_far) {
+	// Test root node
+	uint nodeID = 0;
+	if (!hit_aabb(r, ray_t, bvhTree[nodeID].aabbMin.xyz, bvhTree[nodeID].aabbMax.xyz)) { return false; }
+
+	if (isLeafNode(nodeID)) {
+		// Intersect primitives
+		uint firstSphereIndex = bvhTree[nodeID].firstSpherePrimitive;
+		uint firstQuadIndex = bvhTree[nodeID].firstQuadPrimitive;
+		uint totalQuads = bvhTree[nodeID].quadPrimitiveCount;
+		uint totalSpheres = bvhTree[nodeID].spherePrimitiveCount;
+
+		// Test spheres
+		hit_record temp_hit;
+		bool hit_anything = false;
+
+		// i needs to be used to look up the sphere index from bvhBuffer->sphereIDs
+		for (int i = 0; i < totalSpheres; i++) {
+			if (materials[spheres[i].material_index].is_constant_medium) {
+				if (hit_sphere_volume(i, r, new_interval(ray_t.tmin, closest_so_far), temp_hit)) {
+					hit_anything = true;
+					closest_so_far = temp_hit.t;
+					rec = temp_hit;
+				}
+			}
+			else {
+				if (hit_sphere(i, r, new_interval(ray_t.tmin, closest_so_far), temp_hit)) {
+					hit_anything = true;
+					closest_so_far = temp_hit.t;
+					rec = temp_hit;
+				}
+			}
+		}
+	}
+	else {
+		// Intersect child nodes
+	}
+
+	return true;
+}
+
 ray bounce_ray(in ray current_ray, in vec3 hit_normal, in vec3 hit_point, in bool front_face, in float roughness, in float metal, in bool is_transparent, in float refractive_index, in bool is_constant_medium, in float neg_inv_density) {
 	metal = clamp(metal, 0.0, 1.0);
 	roughness = clamp(roughness, 0.0, 1.0);
@@ -799,5 +853,5 @@ void main() {
 	imageStore(screenBuffers, ivec3(pixel_coords, 0), vec4(accumulated_colour / accumulation_frame_index, 1.0));
 	imageStore(screenBuffers, ivec3(pixel_coords, 1), vec4(firstBounceDirection, 1.0));
 	imageStore(screenBuffers, ivec3(pixel_coords, 2), vec4(firstBounceNormal, 1.0));
-	imageStore(screenBuffers, ivec3(pixel_coords, 3), vec4(accumulated_colour + totalElements, 1.0));
+	imageStore(screenBuffers, ivec3(pixel_coords, 3), vec4(accumulated_colour, 1.0));
 }
