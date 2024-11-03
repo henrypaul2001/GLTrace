@@ -80,8 +80,9 @@ public:
 		rtCompute.Use();
 		const int max_textures = 31;
 		for (int i = 0; i <= max_textures; i++) {
-			rtCompute.setInt("material_textures[" + std::to_string(i) + "]", i + 1);
+			rtCompute.setInt("material_textures[" + std::to_string(i) + "]", i + 2);
 		}
+		rtCompute.AddNewSSBO(1);
 
 		// Set up screen quad
 		std::vector<Vertex> vertices;
@@ -174,6 +175,8 @@ public:
 	const glm::vec2& MousePos() const { return mousePos; }
 	const double MouseScrollOffsetX() const { return scrollOffsetX; }
 	const double MouseScrollOffsetY() const { return scrollOffsetY; }
+
+	ComputeShader& GetRTCompute() { return rtCompute; }
 private:
 	bool Initialise();
 

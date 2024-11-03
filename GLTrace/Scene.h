@@ -71,6 +71,7 @@ public:
 	Camera* GetSceneCamera() { return &sceneCamera; }
 
 	void BuildBVH() { bvh.BuildBVH(quads, spheres); }
+	void BufferBVH(const ShaderStorageBuffer* ssbo) const { bvh.Buffer(ssbo); }
 protected:
 	Sphere& AddSphere(const glm::vec3& position, const float radius, const unsigned int material_index) {
 		if (spheres.size() < MAX_SPHERES) {

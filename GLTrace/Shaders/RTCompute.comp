@@ -90,10 +90,11 @@ float Reflectance(float cosine, float refractive_index) {
 
 // BVH Structure
 struct BVHNode {
-	vec3 aabbMin, aabbMax;
+	vec4 aabbMin, aabbMax;
 	uint leftChild; // rightChild == leftChild + 1
 	uint firstQuadPrimitive, quadPrimitiveCount;
 	uint firstSpherePrimitive, spherePrimitiveCount;
+	uint padding1, padding2, padding3;
 };
 
 layout (std430, binding = 1) readonly buffer bvhBuffer {
@@ -798,5 +799,5 @@ void main() {
 	imageStore(screenBuffers, ivec3(pixel_coords, 0), vec4(accumulated_colour / accumulation_frame_index, 1.0));
 	imageStore(screenBuffers, ivec3(pixel_coords, 1), vec4(firstBounceDirection, 1.0));
 	imageStore(screenBuffers, ivec3(pixel_coords, 2), vec4(firstBounceNormal, 1.0));
-	imageStore(screenBuffers, ivec3(pixel_coords, 3), vec4(accumulated_colour, 1.0));
+	imageStore(screenBuffers, ivec3(pixel_coords, 3), vec4(accumulated_colour + totalElements, 1.0));
 }

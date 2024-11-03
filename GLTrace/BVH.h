@@ -4,10 +4,11 @@
 #include "Hittables.h"
 
 struct BVHNode {
-	glm::vec3 aabbMin, aabbMax;
+	glm::vec4 aabbMin, aabbMax; // vec4 for 16 byte padding
 	unsigned int leftChild; // rightChild == leftChild + 1
 	unsigned int firstQuadPrimitive, quadPrimitiveCount;
 	unsigned int firstSpherePrimitive, spherePrimitiveCount;
+	unsigned int padding1, padding2, padding3;
 	bool isLeaf() { return (quadPrimitiveCount > 0 || spherePrimitiveCount > 0); }
 };
 
@@ -39,29 +40,45 @@ public:
 		root.leftChild = 0;
 		root.quadPrimitiveCount = quads.size();
 		root.spherePrimitiveCount = spheres.size();
+		root.padding1 = 0;
+		root.padding2 = 0;
+		root.padding3 = 0;
 		UpdateNodeBounds(rootNodeID, quads, spheres);
 
 		// Recursive build
 		Subdivide(rootNodeID, quads, spheres);
 	}
 
+	void Buffer(const ShaderStorageBuffer* ssbo) const {
+		// Initialise buffer
+		ssbo->BufferData(nullptr, (sizeof(BVHNode) * nodesUsed) + (sizeof(unsigned int) * 4), GL_STATIC_DRAW);
+
+		// Buffer data
+		ssbo->BufferSubData(&totalElements, sizeof(unsigned int), 0);
+		ssbo->BufferSubData(&nodesUsed, sizeof(unsigned int), sizeof(unsigned int));
+		ssbo->BufferSubData(&tree[0], sizeof(BVHNode) * nodesUsed, sizeof(unsigned int) * 4);
+	}
+
+private:
 	void UpdateNodeBounds(const unsigned int nodeID, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
 		BVHNode& node = tree[nodeID];
-		node.aabbMin = glm::vec3(1e30f);
-		node.aabbMax = glm::vec3(-1e30f);
+		node.aabbMin = glm::vec4(1e30f, 1e30f, 1e30f, 1.0f);
+		node.aabbMax = glm::vec4(-1e30f, -1e30f, -1e30f, 1.0f);
 		for (unsigned int first = node.firstQuadPrimitive, i = 0; i < node.quadPrimitiveCount; i++) {
 			const unsigned int quadID = quadIDs[first + i];
 			const Quad& leafQuad = quads[quadID];
 
 			const glm::vec3& Q = leafQuad.GetQ(), U = leafQuad.GetU(), V = leafQuad.GetV();
+			const glm::vec4 QU = glm::vec4(Q + U, 1.0f);
+			const glm::vec4 QV = glm::vec4(Q + V, 1.0f);
 
-			node.aabbMin = glm::min(node.aabbMin, Q);
-			node.aabbMin = glm::min(node.aabbMin, Q + U);
-			node.aabbMin = glm::min(node.aabbMin, Q + V);
+			node.aabbMin = glm::min(node.aabbMin, glm::vec4(Q, 1.0f));
+			node.aabbMin = glm::min(node.aabbMin, QU);
+			node.aabbMin = glm::min(node.aabbMin, QV);
 
-			node.aabbMax = glm::max(node.aabbMax, Q);
-			node.aabbMax = glm::max(node.aabbMax, Q + U);
-			node.aabbMax = glm::max(node.aabbMax, Q + V);
+			node.aabbMax = glm::max(node.aabbMax, glm::vec4(Q, 1.0f));
+			node.aabbMax = glm::max(node.aabbMax, QU);
+			node.aabbMax = glm::max(node.aabbMax, QV);
 		}
 		for (unsigned int first = node.firstSpherePrimitive, i = 0; i < node.spherePrimitiveCount; i++) {
 			const unsigned int sphereID = sphereIDs[first + i];
@@ -70,8 +87,8 @@ public:
 			const float sphereRadius = leafSphere.Radius;
 			const glm::vec3 sphereMin = leafSphere.Center - glm::vec3(sphereRadius), sphereMax = leafSphere.Center + glm::vec3(sphereRadius);
 
-			node.aabbMin = glm::min(node.aabbMin, sphereMin);
-			node.aabbMax = glm::max(node.aabbMax, sphereMax);
+			node.aabbMin = glm::min(node.aabbMin, glm::vec4(sphereMin, 1.0f));
+			node.aabbMax = glm::max(node.aabbMax, glm::vec4(sphereMax, 1.0f));
 		}
 	}
 
@@ -105,20 +122,26 @@ public:
 		int leftQuadCount = quadI - node.firstQuadPrimitive;
 		int leftSphereCount = sphereI - node.firstSpherePrimitive;
 		if (leftQuadCount + leftSphereCount == 0 || leftQuadCount + leftSphereCount == node.quadPrimitiveCount + node.spherePrimitiveCount) { return; }
-		
+
 		// Create child nodes
 		int leftChildID = ++nodesUsed;
 		int rightChildID = ++nodesUsed;
 		node.leftChild = leftChildID;
-		
+
 		tree[leftChildID].firstQuadPrimitive = node.firstQuadPrimitive;
 		tree[leftChildID].quadPrimitiveCount = leftQuadCount;
 		tree[leftChildID].firstSpherePrimitive = node.firstSpherePrimitive;
 		tree[leftChildID].spherePrimitiveCount = leftSphereCount;
+		tree[leftChildID].padding1 = 0;
+		tree[leftChildID].padding2 = 0;
+		tree[leftChildID].padding3 = 0;
 		tree[rightChildID].firstQuadPrimitive = quadI;
 		tree[rightChildID].quadPrimitiveCount = node.quadPrimitiveCount - leftQuadCount;
 		tree[rightChildID].firstSpherePrimitive = sphereI;
 		tree[rightChildID].spherePrimitiveCount = node.spherePrimitiveCount - leftSphereCount;
+		tree[rightChildID].padding1 = 0;
+		tree[rightChildID].padding2 = 0;
+		tree[rightChildID].padding3 = 0;
 		node.quadPrimitiveCount = 0;
 		node.spherePrimitiveCount = 0;
 
@@ -130,7 +153,7 @@ public:
 		Subdivide(rightChildID, quads, spheres);
 	}
 
-private:
+
 	unsigned int rootNodeID, nodesUsed, totalElements;
 	std::vector<BVHNode> tree;
 
