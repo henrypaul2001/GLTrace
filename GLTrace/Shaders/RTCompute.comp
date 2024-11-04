@@ -89,6 +89,7 @@ float Reflectance(float cosine, float refractive_index) {
 }
 
 // BVH Structure
+// -------------
 struct BVHNode {
 	vec4 aabbMin, aabbMax;
 	uint leftChild; // rightChild == leftChild + 1
@@ -105,6 +106,13 @@ layout (std430, binding = 1) readonly buffer bvhBuffer {
 bool isLeafNode(in uint nodeID) {
 	return (bvhTree[nodeID].quadPrimitiveCount + bvhTree[nodeID].spherePrimitiveCount > 0);
 }
+
+layout (std430, binding = 2) readonly buffer spherePrimitiveIDBuffer {
+	uint[] sphereIDs;
+};
+layout (std430, binding = 3) readonly buffer quadPrimitiveIDBuffer {
+	uint[] quadIDs;
+};
 
 // Material structures
 // -------------------

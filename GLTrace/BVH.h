@@ -49,14 +49,36 @@ public:
 		Subdivide(rootNodeID, quads, spheres);
 	}
 
-	void Buffer(const ShaderStorageBuffer* ssbo) const {
+	void Buffer(ComputeShader& computeShader) const {
+		const ShaderStorageBuffer* bvhSSBO = computeShader.GetSSBO(1);
+		const ShaderStorageBuffer* sphereSSBO = computeShader.GetSSBO(2);
+		const ShaderStorageBuffer* quadSSBO = computeShader.GetSSBO(3);
+
+		// BVH buffer
+		// ----------
 		// Initialise buffer
-		ssbo->BufferData(nullptr, (sizeof(BVHNode) * nodesUsed) + (sizeof(unsigned int) * 4), GL_STATIC_DRAW);
+		bvhSSBO->BufferData(nullptr, (sizeof(BVHNode) * nodesUsed) + (sizeof(unsigned int) * 4), GL_STATIC_DRAW);
 
 		// Buffer data
-		ssbo->BufferSubData(&totalElements, sizeof(unsigned int), 0);
-		ssbo->BufferSubData(&nodesUsed, sizeof(unsigned int), sizeof(unsigned int));
-		ssbo->BufferSubData(&tree[0], sizeof(BVHNode) * nodesUsed, sizeof(unsigned int) * 4);
+		bvhSSBO->BufferSubData(&totalElements, sizeof(unsigned int), 0);
+		bvhSSBO->BufferSubData(&nodesUsed, sizeof(unsigned int), sizeof(unsigned int));
+		bvhSSBO->BufferSubData(&tree[0], sizeof(BVHNode) * nodesUsed, sizeof(unsigned int) * 4);
+
+		// Sphere ID buffer
+		// ----------------
+		// Initialise buffer
+		sphereSSBO->BufferData(nullptr, sizeof(unsigned int) * sphereIDs.size(), GL_STATIC_DRAW);
+
+		// Buffer data
+		sphereSSBO->BufferData(&sphereIDs[0], sizeof(unsigned int) * sphereIDs.size(), GL_STATIC_DRAW);
+
+		// Quad ID buffer
+		// --------------
+		// Initialise buffer
+		quadSSBO->BufferData(nullptr, sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
+
+		// Buffer data
+		quadSSBO->BufferData(&quadIDs[0], sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
 	}
 
 private:
