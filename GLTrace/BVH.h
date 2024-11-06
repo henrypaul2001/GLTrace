@@ -57,12 +57,12 @@ public:
 		// BVH buffer
 		// ----------
 		// Initialise buffer
-		bvhSSBO->BufferData(nullptr, (sizeof(BVHNode) * nodesUsed) + (sizeof(unsigned int) * 4), GL_STATIC_DRAW);
+		bvhSSBO->BufferData(nullptr, (sizeof(BVHNode) * (nodesUsed + 1)) + (sizeof(unsigned int) * 4), GL_STATIC_DRAW);
 
 		// Buffer data
 		bvhSSBO->BufferSubData(&totalElements, sizeof(unsigned int), 0);
 		bvhSSBO->BufferSubData(&nodesUsed, sizeof(unsigned int), sizeof(unsigned int));
-		bvhSSBO->BufferSubData(&tree[0], sizeof(BVHNode) * nodesUsed, sizeof(unsigned int) * 4);
+		bvhSSBO->BufferSubData(&tree[0], sizeof(BVHNode) * (nodesUsed + 1), sizeof(unsigned int) * 4);
 
 		// Sphere ID buffer
 		// ----------------
