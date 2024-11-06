@@ -66,19 +66,23 @@ public:
 
 		// Sphere ID buffer
 		// ----------------
-		// Initialise buffer
-		sphereSSBO->BufferData(nullptr, sizeof(unsigned int) * sphereIDs.size(), GL_STATIC_DRAW);
+		if (sphereIDs.size() > 0) {
+			// Initialise buffer
+			sphereSSBO->BufferData(nullptr, sizeof(unsigned int) * sphereIDs.size(), GL_STATIC_DRAW);
 
-		// Buffer data
-		sphereSSBO->BufferData(&sphereIDs[0], sizeof(unsigned int) * sphereIDs.size(), GL_STATIC_DRAW);
+			// Buffer data
+			sphereSSBO->BufferData(&sphereIDs[0], sizeof(unsigned int) * sphereIDs.size(), GL_STATIC_DRAW);
+		}
 
 		// Quad ID buffer
 		// --------------
-		// Initialise buffer
-		quadSSBO->BufferData(nullptr, sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
+		if (quadIDs.size() > 0) {
+			// Initialise buffer
+			quadSSBO->BufferData(nullptr, sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
 
-		// Buffer data
-		quadSSBO->BufferData(&quadIDs[0], sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
+			// Buffer data
+			quadSSBO->BufferData(&quadIDs[0], sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
+		}
 	}
 
 private:
