@@ -333,7 +333,7 @@ quad new_disk(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 
 	return newQuad;
 }
-bool quad_is_interior(in quad quad_hittable, in float a, in float b, inout hit_record rec) {
+bool quad_is_interior(in float a, in float b, inout hit_record rec) {
 	interval unit_interval = new_interval(0.0, 1.0);
 
 	if (!contains(unit_interval, a) || !contains(unit_interval, b)) {
@@ -344,7 +344,7 @@ bool quad_is_interior(in quad quad_hittable, in float a, in float b, inout hit_r
 	rec.v = b;
 	return true;
 }
-bool triangle_is_interior(in quad triangle_hittable, in float a, in float b, inout hit_record rec) {
+bool triangle_is_interior(in float a, in float b, inout hit_record rec) {
 	if (a > 0.0 && b > 0.0 && a + b < 1.0) {
 		rec.u = a;
 		rec.v = b;
@@ -354,7 +354,7 @@ bool triangle_is_interior(in quad triangle_hittable, in float a, in float b, ino
 		return false;
 	}
 }
-bool disk_is_interior(in quad disk_hittable, in float a, in float b, inout hit_record rec) {
+bool disk_is_interior(in float a, in float b, inout hit_record rec) {
 	if (sqrt(a * a + b * b) < 1.0) {
 		rec.u = a / 2.0 + 0.5;
 		rec.v = b / 2.0 + 0.5;
@@ -380,7 +380,7 @@ uniform material_set material_sets[max_materials];
 
 // Ray intersections
 // -----------------
-bool hit_sphere(in uint sphere_index, inout ray r, interval ray_t, inout hit_record rec) {
+bool hit_sphere(in uint sphere_index, in ray r, in interval ray_t, inout hit_record rec) {
 	if (sphere_index < num_spheres) {
 		vec3 Center = spheres[sphere_index].center;
 		float Radius = spheres[sphere_index].radius;
@@ -433,7 +433,7 @@ bool hit_sphere(in uint sphere_index, inout ray r, interval ray_t, inout hit_rec
 	// index out of bounds
 	return false;
 }
-bool hit_sphere_volume(in uint sphere_index, inout ray r, interval ray_t, inout hit_record rec) {
+bool hit_sphere_volume(in uint sphere_index, in ray r, in interval ray_t, inout hit_record rec) {
 	if (sphere_index < num_spheres) {
 		hit_record rec1, rec2;
 
@@ -472,7 +472,7 @@ bool hit_sphere_volume(in uint sphere_index, inout ray r, interval ray_t, inout 
 	// index out of bounds
 	return false;
 }
-bool hit_sphere_list(ray r, interval ray_t, inout hit_record rec, inout float closest_so_far) {
+bool hit_sphere_list(ray r, in interval ray_t, inout hit_record rec, inout float closest_so_far) {
 	hit_record temp_hit;
 	bool hit_anything = false;
 
@@ -527,13 +527,13 @@ bool hit_quad(in uint quad_index, in ray r, in interval ray_t, inout hit_record 
 		float alpha = dot(W, cross(planar_hitpt_vector, V));
 		float beta = dot(W, cross(U, planar_hitpt_vector));
 
-		if (!is_triangle && !is_disk && !quad_is_interior(quad_hittables[quad_index], alpha, beta, rec)) {
+		if (!is_triangle && !is_disk && !quad_is_interior(alpha, beta, rec)) {
 			return false;
 		}
-		else if (is_triangle && !triangle_is_interior(quad_hittables[quad_index], alpha, beta, rec)) {
+		else if (is_triangle && !triangle_is_interior(alpha, beta, rec)) {
 			return false;
 		}
-		else if (is_disk && !disk_is_interior(quad_hittables[quad_index], alpha, beta, rec)) {
+		else if (is_disk && !disk_is_interior(alpha, beta, rec)) {
 			return false;
 		}
 
@@ -711,7 +711,7 @@ ray get_ray(inout camera self, int i, int j, int s_i, int s_j) {
 bool TraverseBVHLoop(in ray r, in interval ray_t, inout hit_record rec, inout float closest_so_far) {
 	bool hit_anything = false;
 	uint nodeID = 0;
-	uint stackIDs[64];
+	uint stackIDs[32];
 	uint stackPTR = 0;
 
 	while (true) {
@@ -752,7 +752,7 @@ bool TraverseBVHLoop(in ray r, in interval ray_t, inout hit_record rec, inout fl
 		if (hit1) {
 			// Set current node to hit1 node, add hit2 to stack for later testing
 			nodeID = childID1;
-			if (hit2 && stackPTR < 63) {
+			if (hit2 && stackPTR < 31) {
 				stackIDs[stackPTR++] = childID2;
 			}
 		}
@@ -862,7 +862,7 @@ void get_material_properties(in uint material_index, inout vec3 colour_from_mate
 	metal = clamp(metal, 0.0, 1.0);
 	roughness = clamp(roughness, 0.0, 1.0);
 }
-vec3 ray_colour_iterative(inout camera self, ray r) {
+vec3 ray_colour_iterative(in camera self, ray r) {
 	ray current_ray = r;
 	vec3 current_attenuation = vec3(1.0);
 
