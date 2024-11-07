@@ -3,14 +3,29 @@
 #include "TestScene.h"
 #include "CornellBox.h"
 #include "CornellMirror.h"
+#include "CPURTDEBUG.h"
+
+void TestBVH(const BVH_DEBUG_RAY ray, const Scene* scene) {
+	BVH_DEBUG_HIT_RECORD rec;
+	bool hit_anything = false;
+	float closest_so_far = 1000000.0;
+	hit_anything = CPURTDEBUG::DebugBVHTraversal(ray, BVH_DEBUG_INTERVAL(0.001f, 1000000.0f), rec, closest_so_far, scene->GetQuads(), scene->GetSpheres(), scene->GetBVH());
+}
+
 int main()
 {
 	Renderer renderer = Renderer(1920, 1080);
 	CameraController camControl;
+
 	Scene* scene = new CornellBoxMirrorScene();
 	scene->SetupScene();
 	scene->BuildBVH();
 	scene->BufferBVH(renderer.GetRTCompute());
+
+	//glm::vec3 origin = glm::vec3(-13.63268f, 15.22046f, 17.82981f);
+	//glm::vec3 direction = glm::vec3(0.25227f, -0.69145f, -1.0188f);
+	//BVH_DEBUG_RAY test_ray = BVH_DEBUG_RAY(origin, direction);
+	//TestBVH(test_ray, scene);
 
 	camControl.activeCamera = scene->GetSceneCamera();
 	camControl.Initialise();

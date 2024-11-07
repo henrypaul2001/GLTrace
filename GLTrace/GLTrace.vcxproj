@@ -138,6 +138,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ComputeShader.cpp" />
+    <ClCompile Include="CPURTDEBUG.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLTrace.cpp" />
     <ClCompile Include="InputManager.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="CornellBox.h" />
     <ClInclude Include="CornellMirror.h" />
+    <ClInclude Include="CPURTDEBUG.h" />
     <ClInclude Include="GLTMath.h" />
     <ClInclude Include="Hittables.h" />
     <ClInclude Include="InputManager.h" />

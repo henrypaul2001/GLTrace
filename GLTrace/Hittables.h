@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
+#include "Shader.h"
 struct MaterialSet {
 	int albedo_index = -1;
 	int normal_index = -1;
@@ -77,6 +78,10 @@ public:
 	const glm::vec3& GetQ() const { return Q; }
 	const glm::vec3& GetU() const { return U; }
 	const glm::vec3& GetV() const { return V; }
+	const glm::vec3& GetNormal() const { return Normal; }
+	const glm::vec3& GetW() const { return W; }
+	const float GetD() const { return D; }
+	const float GetArea() const { return Area; }
 
 	void SetQ(const glm::vec3& q) { Q = q; Recalculate(); }
 	void SetU(const glm::vec3& u) { U = u; Recalculate(); }

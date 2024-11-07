@@ -69,6 +69,9 @@ public:
 	virtual void UpdateScene(const float dt) {}
 
 	Camera* GetSceneCamera() { return &sceneCamera; }
+	const std::vector<Sphere>& GetSpheres() const { return spheres; }
+	const std::vector<Quad>& GetQuads() const { return quads; }
+	const BVH& GetBVH() const { return bvh; }
 
 	void BuildBVH() { bvh.BuildBVH(quads, spheres); }
 	void BufferBVH(ComputeShader& computeShader) const { bvh.Buffer(computeShader); }

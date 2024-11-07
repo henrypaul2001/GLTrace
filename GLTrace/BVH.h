@@ -2,6 +2,7 @@
 #include <glm/ext/vector_float3.hpp>
 #include <vector>
 #include "Hittables.h"
+#include "ComputeShader.h"
 
 struct BVHNode {
 	glm::vec4 aabbMin, aabbMax; // vec4 for 16 byte padding
@@ -84,6 +85,10 @@ public:
 			quadSSBO->BufferData(&quadIDs[0], sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
 		}
 	}
+
+	const std::vector<BVHNode>& GetTree() const { return tree; }
+	const std::vector<unsigned int>& GetQuadIDs() const { return quadIDs; }
+	const std::vector<unsigned int>& GetSphereIDs() const { return sphereIDs; }
 
 private:
 	void UpdateNodeBounds(const unsigned int nodeID, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
@@ -181,7 +186,6 @@ private:
 		Subdivide(leftChildID, quads, spheres);
 		Subdivide(rightChildID, quads, spheres);
 	}
-
 
 	unsigned int rootNodeID, nodesUsed, totalElements;
 	std::vector<BVHNode> tree;

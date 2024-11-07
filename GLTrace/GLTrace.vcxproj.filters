@@ -28,6 +28,9 @@
     <Filter Include="Header Files\Scene">
       <UniqueIdentifier>{0729b9c3-2b96-4c0f-a84d-52a25f2fcae1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Debug">
+      <UniqueIdentifier>{72be3738-1fc4-460e-8307-6e12852820f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLTrace.cpp">
@@ -46,6 +49,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextureLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPURTDEBUG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -105,6 +111,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Hittables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPURTDEBUG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
