@@ -21,6 +21,7 @@ int main()
 	scene->SetupScene();
 	scene->BuildBVH();
 	scene->BufferBVH(renderer.GetRTCompute());
+	scene->BufferSceneHittables(renderer.GetRTCompute());
 
 	//glm::vec3 origin = glm::vec3(-13.63268f, 15.22046f, 17.82981f);
 	//glm::vec3 direction = glm::vec3(0.25227f, -0.69145f, -1.0188f);

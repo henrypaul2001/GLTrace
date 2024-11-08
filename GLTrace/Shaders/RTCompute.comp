@@ -248,13 +248,14 @@ void set_face_normal(inout hit_record self, ray r, vec3 outward_normal) {
 // Hittables
 // ---------
 struct sphere {
-	vec3 center;
+	vec4 center;
 	float radius;
 	uint material_index;
+	vec2 padding;
 };
 sphere new_sphere(vec3 position, float radius, uint material_index) {
 	sphere s;
-	s.center = position;
+	s.center = vec4(position, 1.0);
 	s.radius = radius;
 	s.material_index = material_index;
 	return s;
@@ -370,19 +371,24 @@ bool disk_is_interior(in float a, in float b, inout hit_record rec) {
 const int max_spheres = 23;
 const int max_quads = 23;
 const int max_materials = 10;
-uniform int num_spheres;
+//uniform int num_spheres;
 uniform int num_quads;
 uniform int num_materials;
-uniform sphere spheres[max_spheres];
+//uniform sphere spheres[max_spheres];
 uniform quad quad_hittables[max_quads];
 uniform material materials[max_materials];
 uniform material_set material_sets[max_materials];
+
+layout (std430, binding = 4) readonly buffer sphereBuffer {
+	uint num_spheres;
+	sphere[] spheres;
+};
 
 // Ray intersections
 // -----------------
 bool hit_sphere(in uint sphere_index, in ray r, in interval ray_t, inout hit_record rec) {
 	if (sphere_index < num_spheres) {
-		vec3 Center = spheres[sphere_index].center;
+		vec3 Center = spheres[sphere_index].center.xyz;
 		float Radius = spheres[sphere_index].radius;
 		uint material_index = spheres[sphere_index].material_index;
 
@@ -747,7 +753,6 @@ bool TraverseBVHLoop(in ray r, in interval ray_t, inout hit_record rec, inout fl
 			childID1 = childID2;
 			childID2 = tempChild;
 		}
-		
 		
 		if (hit1) {
 			// Set current node to hit1 node, add hit2 to stack for later testing

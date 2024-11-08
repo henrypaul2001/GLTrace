@@ -12,7 +12,7 @@ public:
 		sceneCamera.lookfrom = glm::vec3(-27.75f, 27.75f, -1.0f);
 		sceneCamera.lookat = glm::vec3(0.0f, 0.0f, -1.0f);
 		sceneCamera.vup = glm::vec3(0.0f, 1.0f, 0.0f);
-		sceneCamera.samples_per_pixel = 5;
+		sceneCamera.samples_per_pixel = 2;
 		sceneCamera.max_bounces = 10;
 		sceneCamera.focus_dist = 1.0f;
 		sceneCamera.defocus_angle = 0.0f;

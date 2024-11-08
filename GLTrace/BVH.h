@@ -119,7 +119,7 @@ private:
 			const Sphere& leafSphere = spheres[sphereID];
 
 			const float sphereRadius = leafSphere.Radius;
-			const glm::vec3 sphereMin = leafSphere.Center - glm::vec3(sphereRadius), sphereMax = leafSphere.Center + glm::vec3(sphereRadius);
+			const glm::vec3 sphereMin = glm::vec3(leafSphere.Center) - glm::vec3(sphereRadius), sphereMax = glm::vec3(leafSphere.Center) + glm::vec3(sphereRadius);
 
 			node.aabbMin = glm::min(node.aabbMin, glm::vec4(sphereMin, 1.0f));
 			node.aabbMax = glm::max(node.aabbMax, glm::vec4(sphereMax, 1.0f));

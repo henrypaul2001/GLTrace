@@ -23,13 +23,13 @@ public:
 		shader.Use();
 		
 		// Set sphere uniforms
-		shader.setInt("num_spheres", spheres.size());
-		for (int i = 0; i < spheres.size(); i++) {
-			std::string i_string = std::to_string(i);
-			shader.setVec3("spheres[" + std::to_string(i) + "].center", spheres[i].Center);
-			shader.setFloat("spheres[" + std::to_string(i) + "].radius", spheres[i].Radius);
-			shader.setUInt("spheres[" + std::to_string(i) + "].material_index", spheres[i].material_index);
-		}
+		//shader.setInt("num_spheres", spheres.size());
+		//for (int i = 0; i < spheres.size(); i++) {
+		//	std::string i_string = std::to_string(i);
+		//	shader.setVec3("spheres[" + std::to_string(i) + "].center", spheres[i].Center);
+		//	shader.setFloat("spheres[" + std::to_string(i) + "].radius", spheres[i].Radius);
+		//	shader.setUInt("spheres[" + std::to_string(i) + "].material_index", spheres[i].material_index);
+		//}
 
 		// Set quads
 		shader.setInt("num_quads", quads.size());
@@ -75,11 +75,29 @@ public:
 
 	void BuildBVH() { bvh.BuildBVH(quads, spheres); }
 	void BufferBVH(ComputeShader& computeShader) const { bvh.Buffer(computeShader); }
+	void BufferSceneHittables(ComputeShader& computeShader) const {
+		const ShaderStorageBuffer* sphereSSBO = computeShader.GetSSBO(4);
+		unsigned int num_spheres = spheres.size();
+		unsigned int num_quads = quads.size();
+
+		if (num_spheres > 0) {
+			// Buffer spheres
+			// --------------
+			// Initialise buffer
+			sphereSSBO->BufferData(nullptr, (sizeof(unsigned int) * 4) + (sizeof(Sphere) * spheres.size()), GL_STATIC_DRAW);
+
+			// Buffer data
+			unsigned int num_spheres = spheres.size();
+			sphereSSBO->BufferSubData(&num_spheres, sizeof(unsigned int), 0);
+			int sphereSize = sizeof(Sphere);
+			sphereSSBO->BufferSubData(&spheres[0], sizeof(Sphere) * num_spheres, sizeof(unsigned int) * 4);
+		}
+	}
 
 protected:
 	Sphere& AddSphere(const glm::vec3& position, const float radius, const unsigned int material_index) {
 		if (spheres.size() < MAX_SPHERES) {
-			spheres.push_back(Sphere(position, radius, material_index));
+			spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, material_index));
 		}
 		return spheres.back();
 	}

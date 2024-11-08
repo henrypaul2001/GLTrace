@@ -40,24 +40,21 @@ enum QUAD_TYPE {
 	TRIANGLE,
 	DISK
 };
-class Hittable {
+class Sphere {
 public:
-	Hittable(const unsigned int material_index = 0) : material_index(material_index) {}
-	virtual ~Hittable() {}
-
-	unsigned int material_index;
-};
-class Sphere : public Hittable {
-public:
-	Sphere(const glm::vec3& center, const float radius, const unsigned int material_index = 0) : Hittable(material_index), Center(center), Radius(radius) {}
+	Sphere(const glm::vec4& center, const float radius, const unsigned int material_index = 0) : Center(center), Radius(radius), padding(0.0f, 0.0f), material_index(material_index) {}
 	~Sphere() {}
 
-	glm::vec3 Center;
+	glm::vec4 Center;
 	float Radius;
+	unsigned int material_index;
+
+private:
+	glm::vec2 padding;
 };
-class Quad : public Hittable {
+class Quad {
 public:
-	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index = 0) : Hittable(material_index), quad_type(quad_type), Q(Q), U(U), V(V) {
+	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index = 0) : quad_type(quad_type), Q(Q), U(U), V(V), material_index(material_index) {
 		Recalculate();
 	}
 
@@ -88,6 +85,7 @@ public:
 	void SetV(const glm::vec3& v) { V = v; Recalculate(); }
 
 	QUAD_TYPE quad_type;
+	unsigned int material_index;
 
 	void SetUniforms(const AbstractShader& s, const int i) const {
 		std::string i_string = std::to_string(i);
