@@ -269,16 +269,15 @@ void get_sphere_uv(in vec3 p, inout float u, inout float v) {
 }
 
 struct quad {
-	vec3 Q;
-	vec3 u, v;
-	vec3 w;
-	vec3 normal;
-	float D;
-	float area;
-	uint material_index;
+	vec3 Q; // 16 bytes
+	vec3 u, v; // 32 bytes
+	vec3 w; // 16 bytes
+	vec3 normal; // 16 bytes
+	float D; // 4 bytes
+	float area; // 4 bytes
+	uint material_index; // 4 bytes
 
-	bool is_triangle;
-	bool is_disk;
+	uint triangle_disk_mask; // 0010 = triangle, 0001 = disk // 4 bytes
 };
 quad new_quad(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	quad newQuad;
@@ -286,8 +285,8 @@ quad new_quad(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	newQuad.Q = Q;
 	newQuad.u = u;
 	newQuad.v = v;
-	newQuad.is_triangle = false;
-	newQuad.is_disk = false;
+	//newQuad.is_triangle = false;
+	//newQuad.is_disk = false;
 	newQuad.material_index = material_index;
 
 	vec3 n = cross(u, v);
@@ -304,8 +303,8 @@ quad new_triangle(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	newQuad.Q = Q;
 	newQuad.u = u;
 	newQuad.v = v;
-	newQuad.is_triangle = true;
-	newQuad.is_disk = false;
+	//newQuad.is_triangle = true;
+	//newQuad.is_disk = false;
 	newQuad.material_index = material_index;
 
 	vec3 n = cross(u, v);
@@ -322,8 +321,8 @@ quad new_disk(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	newQuad.Q = Q;
 	newQuad.u = u;
 	newQuad.v = v;
-	newQuad.is_triangle = false;
-	newQuad.is_disk = true;
+	//newQuad.is_triangle = false;
+	//newQuad.is_disk = true;
 	newQuad.material_index = material_index;
 
 	vec3 n = cross(u, v);
@@ -371,10 +370,8 @@ bool disk_is_interior(in float a, in float b, inout hit_record rec) {
 const int max_spheres = 23;
 const int max_quads = 23;
 const int max_materials = 10;
-//uniform int num_spheres;
 uniform int num_quads;
 uniform int num_materials;
-//uniform sphere spheres[max_spheres];
 uniform quad quad_hittables[max_quads];
 uniform material materials[max_materials];
 uniform material_set material_sets[max_materials];
@@ -511,8 +508,8 @@ bool hit_quad(in uint quad_index, in ray r, in interval ray_t, inout hit_record 
 		vec3 W = quad_hittables[quad_index].w;
 		float D = quad_hittables[quad_index].D;
 		uint material_index = quad_hittables[quad_index].material_index;
-		bool is_triangle = quad_hittables[quad_index].is_triangle;
-		bool is_disk = quad_hittables[quad_index].is_disk;
+		bool is_triangle = (quad_hittables[quad_index].triangle_disk_mask & 0x2) == 0x2;
+		bool is_disk = (quad_hittables[quad_index].triangle_disk_mask & 0x1) == 0x1;
 
 		float denom = dot(Normal, r.direction);
 

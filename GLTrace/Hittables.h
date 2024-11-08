@@ -100,16 +100,13 @@ public:
 
 		switch (quad_type) {
 		case QUAD:
-			s.setBool("quad_hittables[" + i_string + "].is_triangle", false);
-			s.setBool("quad_hittables[" + i_string + "].is_disk", false);
+			s.setUInt("quad_hittables[" + i_string + "].triangle_disk_mask", 0u);
 			break;
 		case TRIANGLE:
-			s.setBool("quad_hittables[" + i_string + "].is_triangle", true);
-			s.setBool("quad_hittables[" + i_string + "].is_disk", false);
+			s.setUInt("quad_hittables[" + i_string + "].triangle_disk_mask", 1u << 1);
 			break;
 		case DISK:
-			s.setBool("quad_hittables[" + i_string + "].is_triangle", false);
-			s.setBool("quad_hittables[" + i_string + "].is_disk", true);
+			s.setUInt("quad_hittables[" + i_string + "].triangle_disk_mask", 1u);
 			break;
 		}
 	}
