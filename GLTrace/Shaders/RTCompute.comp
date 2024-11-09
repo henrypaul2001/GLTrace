@@ -277,7 +277,7 @@ struct quad {
 	float area; // 4 bytes
 	uint material_index; // 4 bytes
 
-	uint triangle_disk_mask; // 0010 = triangle, 0001 = disk // 4 bytes
+	uint triangle_disk_id; // 4 bytes
 };
 quad new_quad(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	quad newQuad;
@@ -511,8 +511,8 @@ bool hit_quad(in uint quad_index, in ray r, in interval ray_t, inout hit_record 
 		vec3 W = quad_hittables[quad_index].w.xyz;
 		float D = quad_hittables[quad_index].D;
 		uint material_index = quad_hittables[quad_index].material_index;
-		bool is_triangle = (quad_hittables[quad_index].triangle_disk_mask & 0x2) == 0x2;
-		bool is_disk = (quad_hittables[quad_index].triangle_disk_mask & 0x1) == 0x1;
+		bool is_triangle = (quad_hittables[quad_index].triangle_disk_id == 1u);
+		bool is_disk = (quad_hittables[quad_index].triangle_disk_id == 2u);
 
 		float denom = dot(Normal, r.direction);
 

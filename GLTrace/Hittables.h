@@ -57,22 +57,22 @@ public:
 	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index = 0) : Q(Q, 0.0f), U(U, 0.0f), V(V, 0.0f), material_index(material_index) {
 		switch (quad_type) {
 		case QUAD:
-			triangle_disk_mask = 0u;
+			triangle_disk_id = 0u;
 			break;
 		case TRIANGLE:
-			triangle_disk_mask = 1u << 1;
+			triangle_disk_id = 1u;
 			break;
 		case DISK:
-			triangle_disk_mask = 1u;
+			triangle_disk_id = 2u;
 			break;
 		}
 		Recalculate();
 	}
 
 	glm::vec3 GetCentre() const {
-		glm::vec3 extent = Q + U + V;
-		if ((triangle_disk_mask & 1u << 1) == 1u << 1) { return extent * 0.3333f; }
-		else { return extent * 0.5f; }
+		glm::vec3 extent = U + V;
+		if (triangle_disk_id == 1) { return glm::vec3(Q) + (extent * 0.3333f); }
+		else { return glm::vec3(Q) + (extent * 0.5f); }
 	}
 
 	void Recalculate() {
@@ -83,9 +83,9 @@ public:
 		Area = glm::length(n);
 	}
 
-	const glm::vec3& GetQ() const { return Q; }
-	const glm::vec3& GetU() const { return U; }
-	const glm::vec3& GetV() const { return V; }
+	const glm::vec4& GetQ() const { return Q; }
+	const glm::vec4& GetU() const { return U; }
+	const glm::vec4& GetV() const { return V; }
 	const glm::vec3& GetNormal() const { return Normal; }
 	const glm::vec3& GetW() const { return W; }
 	const float GetD() const { return D; }
@@ -103,5 +103,5 @@ public:
 	float D;
 	float Area;
 	unsigned int material_index;
-	unsigned int triangle_disk_mask; // 0010 = triangle, 0001 = disk
+	unsigned int triangle_disk_id;
 };

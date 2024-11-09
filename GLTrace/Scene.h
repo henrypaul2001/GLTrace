@@ -85,7 +85,6 @@ public:
 
 			// Buffer data
 			quadSSBO->BufferSubData(&num_quads, sizeof(unsigned int), 0);
-			int quadSize = sizeof(Quad);
 			quadSSBO->BufferSubData(&quads[0], sizeof(Quad) * num_quads, sizeof(unsigned int) * 4);
 		}
 	}

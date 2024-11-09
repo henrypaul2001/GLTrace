@@ -99,17 +99,17 @@ private:
 			const unsigned int quadID = quadIDs[first + i];
 			const Quad& leafQuad = quads[quadID];
 
-			const glm::vec3& Q = leafQuad.GetQ(), U = leafQuad.GetU(), V = leafQuad.GetV();
-			const glm::vec4 QU = glm::vec4(Q + U, 1.0f);
-			const glm::vec4 QV = glm::vec4(Q + V, 1.0f);
-			const glm::vec4 QUV = QU + glm::vec4(V, 1.0f);
+			const glm::vec4& Q = leafQuad.GetQ(), U = leafQuad.GetU(), V = leafQuad.GetV();
+			const glm::vec4 QU = Q + U;
+			const glm::vec4 QV = Q + V;
+			const glm::vec4 QUV = Q + U + V;
 
-			node.aabbMin = glm::min(node.aabbMin, glm::vec4(Q, 1.0f));
+			node.aabbMin = glm::min(node.aabbMin, Q);
 			node.aabbMin = glm::min(node.aabbMin, QU);
 			node.aabbMin = glm::min(node.aabbMin, QV);
 			node.aabbMin = glm::min(node.aabbMin, QUV);
 
-			node.aabbMax = glm::max(node.aabbMax, glm::vec4(Q, 1.0f));
+			node.aabbMax = glm::max(node.aabbMax, Q);
 			node.aabbMax = glm::max(node.aabbMax, QU);
 			node.aabbMax = glm::max(node.aabbMax, QV);
 			node.aabbMax = glm::max(node.aabbMax, QUV);
