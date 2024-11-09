@@ -369,8 +369,8 @@ bool disk_is_interior(in float a, in float b, inout hit_record rec) {
 
 // Scene structure
 // ---------------
-const int max_spheres = 23;
-const int max_quads = 23;
+const int max_spheres = 1000000;
+const int max_quads = 1000000;
 const int max_materials = 10;
 uniform int num_materials;
 uniform material materials[max_materials];

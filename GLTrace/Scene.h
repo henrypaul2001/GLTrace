@@ -5,8 +5,8 @@
 #include "Hittables.h"
 #include "BVH.h"
 
-static const int MAX_SPHERES = 23;
-static const int MAX_QUADS = 23;
+static const int MAX_SPHERES = 1000000;
+static const int MAX_QUADS = 1000000;
 static const int MAX_MATERIALS = 10;
 
 class Scene {

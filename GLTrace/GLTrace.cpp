@@ -17,7 +17,7 @@ int main()
 	Renderer renderer = Renderer(1920, 1080);
 	CameraController camControl;
 
-	Scene* scene = new CornellBoxMirrorScene();
+	Scene* scene = new CornellBoxScene();
 	scene->SetupScene();
 	scene->BuildBVH();
 	scene->BufferBVH(renderer.GetRTCompute());
