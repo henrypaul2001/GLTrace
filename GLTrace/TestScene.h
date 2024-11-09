@@ -137,7 +137,7 @@ public:
 		AddSphere(glm::vec3(6.0f, 1.5f, 0.0f), 1.9f, 5);
 
 		// Quads
-		AddTriangle(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(2.5f, 0.0f, 0.0f), glm::vec3(0.0f, 2.5f, 0.0f), 3);
+		AddQuad(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(2.5f, 0.0f, 0.0f), glm::vec3(0.0f, 2.5f, 0.0f), 3);
 	}
 
 	void UpdateScene(const float dt) override {

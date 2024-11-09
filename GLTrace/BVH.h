@@ -3,7 +3,7 @@
 #include <vector>
 #include "Hittables.h"
 #include "ComputeShader.h"
-
+#include <algorithm>
 struct BVHNode {
 	glm::vec4 aabbMin, aabbMax; // vec4 for 16 byte padding
 	unsigned int leftChild; // rightChild == leftChild + 1
@@ -132,30 +132,64 @@ private:
 
 		// Find biggest extent
 		const glm::vec3 extent = node.aabbMax - node.aabbMin;
-		int axis = 0;
-		if (extent.y > extent.x) { axis = 1; }
-		if (extent.z > extent[axis]) { axis = 2; }
-		const float splitPos = node.aabbMin[axis] + extent[axis] * 0.5f;
+		int biggestAxis[3] = { 0, 1, 2 };
+		std::sort(biggestAxis, biggestAxis + 3, [&](int a, int b) { return extent[a] > extent[b]; });
+
+		int quadI;
+		int sphereI;
+		int bestAxis = -1;
+		for (int i = 0; i < 3; i++) {
+			// Test split without swapping
+			const int axis = biggestAxis[i];
+			const float splitPos = node.aabbMin[axis] + extent[axis] * 0.5f;
+
+			// Split node quads
+			quadI = node.firstQuadPrimitive;
+			int quadJ = quadI + node.quadPrimitiveCount - 1;
+			while (quadI <= quadJ) {
+				if (quads[quadIDs[quadI]].GetCentre()[axis] < splitPos) { quadI++; }
+				else { quadJ--; }
+			}
+			// Split node spheres
+			sphereI = node.firstSpherePrimitive;
+			int sphereJ = sphereI + node.spherePrimitiveCount - 1;
+			while (sphereI <= sphereJ) {
+				if (spheres[sphereIDs[sphereI]].Center[axis] < splitPos) { sphereI++; }
+				else { sphereJ--; }
+			}
+
+			// Check if one side of split is empty
+			int leftQuadCount = quadI - node.firstQuadPrimitive;
+			int leftSphereCount = sphereI - node.firstSpherePrimitive;
+			int totalLeftCount = leftQuadCount + leftSphereCount;
+			if (totalLeftCount > 0 && totalLeftCount < node.quadPrimitiveCount + node.spherePrimitiveCount) {
+				// valid split found
+				bestAxis = axis;
+				break;
+			}
+		}
+		// If no axis found, return. Node cannot be split
+		if (bestAxis == -1) { return; }
+
+		const float splitPos = node.aabbMin[bestAxis] + extent[bestAxis] * 0.5f;
 
 		// Split node quads
-		int quadI = node.firstQuadPrimitive;
+		quadI = node.firstQuadPrimitive;
 		int quadJ = quadI + node.quadPrimitiveCount - 1;
 		while (quadI <= quadJ) {
-			if (quads[quadIDs[quadI]].GetCentre()[axis] < splitPos) { quadI++; }
+			if (quads[quadIDs[quadI]].GetCentre()[bestAxis] < splitPos) { quadI++; }
 			else { std::swap(quadIDs[quadI], quadIDs[quadJ--]); }
 		}
 		// Split node spheres
-		int sphereI = node.firstSpherePrimitive;
+		sphereI = node.firstSpherePrimitive;
 		int sphereJ = sphereI + node.spherePrimitiveCount - 1;
 		while (sphereI <= sphereJ) {
-			if (spheres[sphereIDs[sphereI]].Center[axis] < splitPos) { sphereI++; }
+			if (spheres[sphereIDs[sphereI]].Center[bestAxis] < splitPos) { sphereI++; }
 			else { std::swap(sphereIDs[sphereI], sphereIDs[sphereJ--]); }
 		}
 
-		// Check if one side of split is empty
 		int leftQuadCount = quadI - node.firstQuadPrimitive;
 		int leftSphereCount = sphereI - node.firstSpherePrimitive;
-		if (leftQuadCount + leftSphereCount == 0 || leftQuadCount + leftSphereCount == node.quadPrimitiveCount + node.spherePrimitiveCount) { return; }
 
 		// Create child nodes
 		int leftChildID = ++nodesUsed;
