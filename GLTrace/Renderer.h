@@ -80,12 +80,13 @@ public:
 		rtCompute.Use();
 		const int max_textures = 31;
 		for (int i = 0; i <= max_textures; i++) {
-			rtCompute.setInt("material_textures[" + std::to_string(i) + "]", i + 5);
+			rtCompute.setInt("material_textures[" + std::to_string(i) + "]", i + 6);
 		}
 		rtCompute.AddNewSSBO(1); // BVH buffer
 		rtCompute.AddNewSSBO(2); // Sphere ID buffer
 		rtCompute.AddNewSSBO(3); // Quad ID buffer
 		rtCompute.AddNewSSBO(4); // Sphere buffer
+		rtCompute.AddNewSSBO(5); // Quad buffer
 
 		// Set up screen quad
 		std::vector<Vertex> vertices;

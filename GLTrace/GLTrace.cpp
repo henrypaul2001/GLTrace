@@ -55,6 +55,9 @@ int main()
 		// Update scene
 		camControl.Update(dt);
 		scene->UpdateScene(dt);
+		//scene->BuildBVH();
+		//scene->BufferBVH(renderer.GetRTCompute());
+		//scene->BufferSceneHittables(renderer.GetRTCompute());
 
 		renderer.Render(*scene->GetSceneCamera(), *scene);
 

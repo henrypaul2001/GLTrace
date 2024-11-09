@@ -54,18 +54,29 @@ private:
 };
 class Quad {
 public:
-	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index = 0) : quad_type(quad_type), Q(Q), U(U), V(V), material_index(material_index) {
+	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index = 0) : Q(Q, 0.0f), U(U, 0.0f), V(V, 0.0f), material_index(material_index) {
+		switch (quad_type) {
+		case QUAD:
+			triangle_disk_mask = 0u;
+			break;
+		case TRIANGLE:
+			triangle_disk_mask = 1u << 1;
+			break;
+		case DISK:
+			triangle_disk_mask = 1u;
+			break;
+		}
 		Recalculate();
 	}
 
 	glm::vec3 GetCentre() const {
 		glm::vec3 extent = Q + U + V;
-		if (quad_type == TRIANGLE) { return extent * 0.3333f; }
+		if ((triangle_disk_mask & 1u << 1) == 1u << 1) { return extent * 0.3333f; }
 		else { return extent * 0.5f; }
 	}
 
 	void Recalculate() {
-		glm::vec3 n = glm::cross(U, V);
+		glm::vec4 n = glm::vec4(glm::cross(glm::vec3(U), glm::vec3(V)), 0.0f);
 		Normal = glm::normalize(n);
 		D = glm::dot(Normal, Q);
 		W = n / glm::dot(n, n);
@@ -80,43 +91,17 @@ public:
 	const float GetD() const { return D; }
 	const float GetArea() const { return Area; }
 
-	void SetQ(const glm::vec3& q) { Q = q; Recalculate(); }
-	void SetU(const glm::vec3& u) { U = u; Recalculate(); }
-	void SetV(const glm::vec3& v) { V = v; Recalculate(); }
+	void SetQ(const glm::vec3& q) { Q = glm::vec4(q, 0.0f); Recalculate(); }
+	void SetU(const glm::vec3& u) { U = glm::vec4(u, 0.0f); Recalculate(); }
+	void SetV(const glm::vec3& v) { V = glm::vec4(v, 0.0f); Recalculate(); }
 
-	QUAD_TYPE quad_type;
-	unsigned int material_index;
+	glm::vec4 Q;
+	glm::vec4 U, V;
 
-	void SetUniforms(const AbstractShader& s, const int i) const {
-		std::string i_string = std::to_string(i);
-		s.setVec3("quad_hittables[" + i_string + "].Q", Q);
-		s.setVec3("quad_hittables[" + i_string + "].u", U);
-		s.setVec3("quad_hittables[" + i_string + "].v", V);
-		s.setVec3("quad_hittables[" + i_string + "].w", W);
-		s.setVec3("quad_hittables[" + i_string + "].normal", Normal);
-		s.setFloat("quad_hittables[" + i_string + "].D", D);
-		s.setFloat("quad_hittables[" + i_string + "].area", Area);
-		s.setUInt("quad_hittables[" + i_string + "].material_index", material_index);
-
-		switch (quad_type) {
-		case QUAD:
-			s.setUInt("quad_hittables[" + i_string + "].triangle_disk_mask", 0u);
-			break;
-		case TRIANGLE:
-			s.setUInt("quad_hittables[" + i_string + "].triangle_disk_mask", 1u << 1);
-			break;
-		case DISK:
-			s.setUInt("quad_hittables[" + i_string + "].triangle_disk_mask", 1u);
-			break;
-		}
-	}
-
-protected:
-	glm::vec3 Q;
-	glm::vec3 U, V;
-
-	glm::vec3 W;
-	glm::vec3 Normal;
+	glm::vec4 W;
+	glm::vec4 Normal;
 	float D;
 	float Area;
+	unsigned int material_index;
+	unsigned int triangle_disk_mask; // 0010 = triangle, 0001 = disk
 };

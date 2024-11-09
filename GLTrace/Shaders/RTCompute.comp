@@ -269,10 +269,10 @@ void get_sphere_uv(in vec3 p, inout float u, inout float v) {
 }
 
 struct quad {
-	vec3 Q; // 16 bytes
-	vec3 u, v; // 32 bytes
-	vec3 w; // 16 bytes
-	vec3 normal; // 16 bytes
+	vec4 Q; // 16 bytes
+	vec4 u, v; // 32 bytes
+	vec4 w; // 16 bytes
+	vec4 normal; // 16 bytes
 	float D; // 4 bytes
 	float area; // 4 bytes
 	uint material_index; // 4 bytes
@@ -282,17 +282,17 @@ struct quad {
 quad new_quad(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	quad newQuad;
 	
-	newQuad.Q = Q;
-	newQuad.u = u;
-	newQuad.v = v;
+	newQuad.Q.xyz = Q;
+	newQuad.u.xyz = u;
+	newQuad.v.xyz = v;
 	//newQuad.is_triangle = false;
 	//newQuad.is_disk = false;
 	newQuad.material_index = material_index;
 
 	vec3 n = cross(u, v);
-	newQuad.normal = normalize(n);
-	newQuad.D = dot(newQuad.normal, Q);
-	newQuad.w = n / dot(n, n);
+	newQuad.normal.xyz = normalize(n);
+	newQuad.D = dot(newQuad.normal.xyz, Q);
+	newQuad.w.xyz = n / dot(n, n);
 	newQuad.area = length(n);
 
 	return newQuad;
@@ -300,17 +300,17 @@ quad new_quad(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 quad new_triangle(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	quad newQuad;
 	
-	newQuad.Q = Q;
-	newQuad.u = u;
-	newQuad.v = v;
+	newQuad.Q.xyz = Q;
+	newQuad.u.xyz = u;
+	newQuad.v.xyz = v;
 	//newQuad.is_triangle = true;
 	//newQuad.is_disk = false;
 	newQuad.material_index = material_index;
 
 	vec3 n = cross(u, v);
-	newQuad.normal = normalize(n);
-	newQuad.D = dot(newQuad.normal, Q);
-	newQuad.w = n / dot(n, n);
+	newQuad.normal.xyz = normalize(n);
+	newQuad.D = dot(newQuad.normal.xyz, Q);
+	newQuad.w.xyz = n / dot(n, n);
 	newQuad.area = length(n);
 
 	return newQuad;
@@ -318,17 +318,17 @@ quad new_triangle(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 quad new_disk(in vec3 Q, in vec3 u, in vec3 v, in uint material_index) {
 	quad newQuad;
 	
-	newQuad.Q = Q;
-	newQuad.u = u;
-	newQuad.v = v;
+	newQuad.Q.xyz = Q;
+	newQuad.u.xyz = u;
+	newQuad.v.xyz = v;
 	//newQuad.is_triangle = false;
 	//newQuad.is_disk = true;
 	newQuad.material_index = material_index;
 
 	vec3 n = cross(u, v);
-	newQuad.normal = normalize(n);
-	newQuad.D = dot(newQuad.normal, Q);
-	newQuad.w = n / dot(n, n);
+	newQuad.normal.xyz = normalize(n);
+	newQuad.D = dot(newQuad.normal.xyz, Q);
+	newQuad.w.xyz = n / dot(n, n);
 	newQuad.area = length(n);
 
 	return newQuad;
@@ -370,15 +370,18 @@ bool disk_is_interior(in float a, in float b, inout hit_record rec) {
 const int max_spheres = 23;
 const int max_quads = 23;
 const int max_materials = 10;
-uniform int num_quads;
 uniform int num_materials;
-uniform quad quad_hittables[max_quads];
 uniform material materials[max_materials];
 uniform material_set material_sets[max_materials];
 
 layout (std430, binding = 4) readonly buffer sphereBuffer {
 	uint num_spheres;
 	sphere[] spheres;
+};
+
+layout (std430, binding = 5) readonly buffer quadBuffer {
+	uint num_quads;
+	quad[] quad_hittables;
 };
 
 // Ray intersections
@@ -501,11 +504,11 @@ bool hit_sphere_list(ray r, in interval ray_t, inout hit_record rec, inout float
 
 bool hit_quad(in uint quad_index, in ray r, in interval ray_t, inout hit_record rec) {
 	if (quad_index < num_quads) {
-		vec3 Normal = quad_hittables[quad_index].normal;
-		vec3 Q = quad_hittables[quad_index].Q;
-		vec3 U = quad_hittables[quad_index].u;
-		vec3 V = quad_hittables[quad_index].v;
-		vec3 W = quad_hittables[quad_index].w;
+		vec3 Normal = quad_hittables[quad_index].normal.xyz;
+		vec3 Q = quad_hittables[quad_index].Q.xyz;
+		vec3 U = quad_hittables[quad_index].u.xyz;
+		vec3 V = quad_hittables[quad_index].v.xyz;
+		vec3 W = quad_hittables[quad_index].w.xyz;
 		float D = quad_hittables[quad_index].D;
 		uint material_index = quad_hittables[quad_index].material_index;
 		bool is_triangle = (quad_hittables[quad_index].triangle_disk_mask & 0x2) == 0x2;

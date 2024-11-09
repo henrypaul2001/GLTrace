@@ -21,21 +21,6 @@ public:
 
 	void SetUniforms(const AbstractShader& shader) const {
 		shader.Use();
-		
-		// Set sphere uniforms
-		//shader.setInt("num_spheres", spheres.size());
-		//for (int i = 0; i < spheres.size(); i++) {
-		//	std::string i_string = std::to_string(i);
-		//	shader.setVec3("spheres[" + std::to_string(i) + "].center", spheres[i].Center);
-		//	shader.setFloat("spheres[" + std::to_string(i) + "].radius", spheres[i].Radius);
-		//	shader.setUInt("spheres[" + std::to_string(i) + "].material_index", spheres[i].material_index);
-		//}
-
-		// Set quads
-		shader.setInt("num_quads", quads.size());
-		for (int i = 0; i < quads.size(); i++) {
-			quads[i].SetUniforms(shader, i);
-		}
 
 		// Set materials
 		shader.setInt("num_materials", materials.size());
@@ -77,6 +62,7 @@ public:
 	void BufferBVH(ComputeShader& computeShader) const { bvh.Buffer(computeShader); }
 	void BufferSceneHittables(ComputeShader& computeShader) const {
 		const ShaderStorageBuffer* sphereSSBO = computeShader.GetSSBO(4);
+		const ShaderStorageBuffer* quadSSBO = computeShader.GetSSBO(5);
 		unsigned int num_spheres = spheres.size();
 		unsigned int num_quads = quads.size();
 
@@ -87,10 +73,20 @@ public:
 			sphereSSBO->BufferData(nullptr, (sizeof(unsigned int) * 4) + (sizeof(Sphere) * spheres.size()), GL_STATIC_DRAW);
 
 			// Buffer data
-			unsigned int num_spheres = spheres.size();
 			sphereSSBO->BufferSubData(&num_spheres, sizeof(unsigned int), 0);
-			int sphereSize = sizeof(Sphere);
 			sphereSSBO->BufferSubData(&spheres[0], sizeof(Sphere) * num_spheres, sizeof(unsigned int) * 4);
+		}
+
+		if (num_quads > 0) {
+			// Buffer quads
+			// ------------
+			// Initialise buffer
+			quadSSBO->BufferData(nullptr, (sizeof(unsigned int) * 4) + (sizeof(Quad) * quads.size()), GL_STATIC_DRAW);
+
+			// Buffer data
+			quadSSBO->BufferSubData(&num_quads, sizeof(unsigned int), 0);
+			int quadSize = sizeof(Quad);
+			quadSSBO->BufferSubData(&quads[0], sizeof(Quad) * num_quads, sizeof(unsigned int) * 4);
 		}
 	}
 
