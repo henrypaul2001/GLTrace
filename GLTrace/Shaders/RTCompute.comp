@@ -188,11 +188,13 @@ material volumetric_material(in float density, in vec3 colour) {
 struct ray {
 	vec3 origin;
 	vec3 direction;
+	vec3 rD; // direction reciprocals
 };
 ray new_ray(vec3 origin, vec3 direction) {
 	ray r;
 	r.origin = origin;
 	r.direction = direction;
+	r.rD = 1.0 / direction;
 	return r;
 }
 vec3 at(ray r, float t) {
@@ -583,18 +585,18 @@ bool hit_quad_list(in ray r, in interval ray_t, inout hit_record rec, inout floa
 }
 
 bool hit_aabb(in ray r, in interval t, in vec3 aabbMin, in vec3 aabbMax, inout float hit_distance) {
-	float tx1 = (aabbMin.x - r.origin.x) / r.direction.x;
-	float tx2 = (aabbMax.x - r.origin.x) / r.direction.x;
+	float tx1 = (aabbMin.x - r.origin.x) * r.rD.x;
+	float tx2 = (aabbMax.x - r.origin.x) * r.rD.x;
 	float tmin = min(tx1, tx2);
 	float tmax = max(tx1, tx2);
 
-	float ty1 = (aabbMin.y - r.origin.y) / r.direction.y;
-	float ty2 = (aabbMax.y - r.origin.y) / r.direction.y;
+	float ty1 = (aabbMin.y - r.origin.y) * r.rD.y;
+	float ty2 = (aabbMax.y - r.origin.y) * r.rD.y;
 	tmin = max(tmin, min(ty1, ty2));
 	tmax = min(tmax, max(ty1, ty2));
 
-	float tz1 = (aabbMin.z - r.origin.z) / r.direction.z;
-	float tz2 = (aabbMax.z - r.origin.z)/ r.direction.z;
+	float tz1 = (aabbMin.z - r.origin.z) * r.rD.z;
+	float tz2 = (aabbMax.z - r.origin.z) * r.rD.z;
 	tmin = max(tmin, min(tz1, tz2));
 	tmax = min(tmax, max(tz1, tz2));
 
