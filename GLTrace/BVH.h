@@ -220,56 +220,63 @@ private:
 		return cost > 0 ? cost : 1e30f;
 	}
 
-	void Subdivide(const unsigned int nodeID, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
-		BVHNode& node = tree[nodeID];
-
-		// Determine split axis using SAH
-		int bestAxis = -1;
-		float bestPos = 0.0f, bestCost = 1e30f;
-		for (int axis = 0; axis < 3; axis++) {
+	float FindBestSplitPlane(const BVHNode& node, int& axis, float& splitPos, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
+		float bestCost = 1e30f;
+		for (int a = 0; a < 3; a++) {
 			for (unsigned int i = 0; i < node.quadPrimitiveCount; i++) {
 				const Quad& quad = quads[quadIDs[node.firstQuadPrimitive + i]];
-				float candidatePos = quad.GetCentre()[axis];
-				float cost = EvaluateSAH(node, axis, candidatePos, quads, spheres);
+				float candidatePos = quad.GetCentre()[a];
+				float cost = EvaluateSAH(node, a, candidatePos, quads, spheres);
 				if (cost < bestCost) {
-					bestPos = candidatePos;
-					bestAxis = axis;
+					splitPos = candidatePos;
+					axis = a;
 					bestCost = cost;
 				}
 			}
 			for (unsigned int i = 0; i < node.spherePrimitiveCount; i++) {
 				const Sphere& sphere = spheres[sphereIDs[node.firstSpherePrimitive + i]];
-				float candidatePos = sphere.Center[axis];
-				float cost = EvaluateSAH(node, axis, candidatePos, quads, spheres);
+				float candidatePos = sphere.Center[a];
+				float cost = EvaluateSAH(node, a, candidatePos, quads, spheres);
 				if (cost < bestCost) {
-					bestPos = candidatePos;
-					bestAxis = axis;
+					splitPos = candidatePos;
+					axis = a;
 					bestCost = cost;
 				}
 			}
 		}
-		int axis = bestAxis;
-		float splitPos = bestPos;
+		return bestCost;
+	}
 
-		// Get parent area
+	float CalculateNodeCost(const BVHNode& node) {
 		const glm::vec3 e = node.aabbMax - node.aabbMin;
 		float parentArea = e.x * e.y + e.y * e.z + e.z * e.x;
-		float parentCost = (node.quadPrimitiveCount + node.spherePrimitiveCount) * parentArea;
+		return (node.quadPrimitiveCount + node.spherePrimitiveCount) * parentArea;
+	}
 
-		if (bestCost >= parentCost) { return; } // Further splits will be detrimental. Return
+	void Subdivide(const unsigned int nodeID, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
+		BVHNode& node = tree[nodeID];
+
+		// Determine split axis using SAH
+		int axis;
+		float splitPos;
+		float splitCost = FindBestSplitPlane(node, axis, splitPos, quads, spheres);
+
+		// Get parent area
+		float parentCost = CalculateNodeCost(node);
+		if (splitCost >= parentCost) { return; } // Further splits will be detrimental. Return
 
 		// Split node quads
 		int quadI = node.firstQuadPrimitive;
 		int quadJ = quadI + node.quadPrimitiveCount - 1;
 		while (quadI <= quadJ) {
-			if (quads[quadIDs[quadI]].GetCentre()[bestAxis] < splitPos) { quadI++; }
+			if (quads[quadIDs[quadI]].GetCentre()[axis] < splitPos) { quadI++; }
 			else { std::swap(quadIDs[quadI], quadIDs[quadJ--]); }
 		}
 		// Split node spheres
 		int sphereI = node.firstSpherePrimitive;
 		int sphereJ = sphereI + node.spherePrimitiveCount - 1;
 		while (sphereI <= sphereJ) {
-			if (spheres[sphereIDs[sphereI]].Center[bestAxis] < splitPos) { sphereI++; }
+			if (spheres[sphereIDs[sphereI]].Center[axis] < splitPos) { sphereI++; }
 			else { std::swap(sphereIDs[sphereI], sphereIDs[sphereJ--]); }
 		}
 
