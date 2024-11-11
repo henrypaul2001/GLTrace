@@ -220,6 +220,7 @@ private:
 		return cost > 0 ? cost : 1e30f;
 	}
 
+	/*
 	float FindBestSplitPlane(const BVHNode& node, int& axis, float& splitPos, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
 		float bestCost = 1e30f;
 		for (int a = 0; a < 3; a++) {
@@ -236,6 +237,28 @@ private:
 			for (unsigned int i = 0; i < node.spherePrimitiveCount; i++) {
 				const Sphere& sphere = spheres[sphereIDs[node.firstSpherePrimitive + i]];
 				float candidatePos = sphere.Center[a];
+				float cost = EvaluateSAH(node, a, candidatePos, quads, spheres);
+				if (cost < bestCost) {
+					splitPos = candidatePos;
+					axis = a;
+					bestCost = cost;
+				}
+			}
+		}
+		return bestCost;
+	}
+	*/
+
+	float FindBestSplitPlane(const BVHNode& node, int& axis, float& splitPos, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
+		float bestCost = 1e30f;
+		const int interval = 4;
+		for (int a = 0; a < 3; a++) {
+			float boundsMin = node.aabbMin[a];
+			float boundsMax = node.aabbMax[a];
+			if (boundsMin == boundsMax) { continue; }
+			float scale = (boundsMax - boundsMin) / interval;
+			for (unsigned int i = 1; i < interval; i++) {
+				float candidatePos = boundsMin + i * scale;
 				float cost = EvaluateSAH(node, a, candidatePos, quads, spheres);
 				if (cost < bestCost) {
 					splitPos = candidatePos;

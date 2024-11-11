@@ -35,9 +35,9 @@ public:
 		// Spheres
 		glm::vec3 origin = glm::vec3(0.0f, 0.0f, -10.0f);
 		float offset = 7.5f;
-		for (unsigned int i = 0; i < 20; i++) {
-			for (unsigned int j = 0; j < 20; j++) {
-				for (unsigned int k = 0; k < 20; k++) {
+		for (unsigned int i = 0; i < 50; i++) {
+			for (unsigned int j = 0; j < 50; j++) {
+				for (unsigned int k = 0; k < 50; k++) {
 					glm::vec3 position = origin + glm::vec3(offset * i, offset * j, offset * k);
 					AddSphere(position, 3.0f, 0);
 				}
