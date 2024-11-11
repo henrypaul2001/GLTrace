@@ -3,6 +3,7 @@
 #include "TestScene.h"
 #include "CornellBox.h"
 #include "CornellMirror.h"
+#include "StressTestScene.h"
 #include "CPURTDEBUG.h"
 
 void TestBVH(const BVH_DEBUG_RAY ray, const Scene* scene) {
@@ -17,7 +18,7 @@ int main()
 	Renderer renderer = Renderer(1920, 1080);
 	CameraController camControl;
 
-	Scene* scene = new CornellBoxScene();
+	Scene* scene = new StressTestScene();
 	scene->SetupScene();
 	scene->BuildBVH();
 	scene->BufferBVH(renderer.GetRTCompute());

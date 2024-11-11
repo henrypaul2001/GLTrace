@@ -116,6 +116,9 @@
     <ClInclude Include="CPURTDEBUG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StressTestScene.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\passthrough.vert">
