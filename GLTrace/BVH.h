@@ -4,6 +4,7 @@
 #include "Hittables.h"
 #include "ComputeShader.h"
 #include <algorithm>
+#include <chrono>
 struct BVHNode {
 	glm::vec4 aabbMin, aabbMax; // vec4 for 16 byte padding
 	unsigned int leftChild; // rightChild == leftChild + 1
@@ -19,6 +20,7 @@ public:
 	~BVH() {}
 
 	void BuildBVH(const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
+		auto start = std::chrono::high_resolution_clock::now();
 		totalElements = quads.size() + spheres.size();
 
 		// Initialise hittable IDs
@@ -48,6 +50,24 @@ public:
 
 		// Recursive build
 		Subdivide(rootNodeID, quads, spheres);
+		auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+		// Extract hours, minutes, and seconds from the total duration
+		auto hours = std::chrono::duration_cast<std::chrono::hours>(duration);
+		duration -= hours;
+		auto minutes = std::chrono::duration_cast<std::chrono::minutes>(duration);
+		duration -= minutes;
+		auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
+		duration -= seconds;
+		auto milliseconds = duration;  // Remaining milliseconds
+
+		// Display the time elapsed
+		std::clog << "BVH constructed in: "
+			<< hours.count() << " hours, "
+			<< minutes.count() << " minutes, "
+			<< seconds.count() << " seconds, "
+			<< milliseconds.count() << " milliseconds\r\n";
 	}
 
 	void Buffer(ComputeShader& computeShader) const {
