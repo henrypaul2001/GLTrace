@@ -68,8 +68,8 @@ public:
 			float dist2;
 
 			BVH_DEBUG_INTERVAL ray_interval = BVH_DEBUG_INTERVAL(ray_t.tmin, closest_so_far);
-			bool hit1 = hit_aabb(r, ray_interval, tree[childID1].aabbMin, tree[childID1].aabbMax, dist1);
-			bool hit2 = hit_aabb(r, ray_interval, tree[childID2].aabbMin, tree[childID2].aabbMax, dist2);
+			bool hit1 = hit_aabb(r, ray_interval, tree[childID1].bbox.aabbMin, tree[childID1].bbox.aabbMax, dist1);
+			bool hit2 = hit_aabb(r, ray_interval, tree[childID2].bbox.aabbMin, tree[childID2].bbox.aabbMax, dist2);
 
 			// Get closest hit
 			if (hit1 && hit2 && dist1 > dist2) {

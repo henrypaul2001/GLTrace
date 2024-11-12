@@ -5,8 +5,20 @@
 #include "ComputeShader.h"
 #include <algorithm>
 #include <chrono>
+struct aabb {
+	glm::vec4 aabbMin = glm::vec4(glm::vec3(1e30f), 1.0f), aabbMax = glm::vec4(glm::vec3(-1e30f), 1.0f); // vec4 for 16 byte padding
+	void grow(const glm::vec3& p) {
+		aabbMin = glm::min(aabbMin, glm::vec4(p, 1.0f));
+		aabbMax = glm::max(aabbMax, glm::vec4(p, 1.0f));
+	}
+	float area() const {
+		const glm::vec3 e = aabbMax - aabbMin;
+		return e.x * e.y + e.y * e.z + e.z * e.x;
+	}
+};
+
 struct BVHNode {
-	glm::vec4 aabbMin, aabbMax; // vec4 for 16 byte padding
+	aabb bbox;
 	unsigned int leftChild; // rightChild == leftChild + 1
 	unsigned int firstQuadPrimitive, quadPrimitiveCount;
 	unsigned int firstSpherePrimitive, spherePrimitiveCount;
@@ -113,8 +125,6 @@ public:
 private:
 	void UpdateNodeBounds(const unsigned int nodeID, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
 		BVHNode& node = tree[nodeID];
-		node.aabbMin = glm::vec4(1e30f, 1e30f, 1e30f, 1.0f);
-		node.aabbMax = glm::vec4(-1e30f, -1e30f, -1e30f, 1.0f);
 		for (unsigned int first = node.firstQuadPrimitive, i = 0; i < node.quadPrimitiveCount; i++) {
 			const unsigned int quadID = quadIDs[first + i];
 			const Quad& leafQuad = quads[quadID];
@@ -124,17 +134,12 @@ private:
 			const glm::vec4 QV = Q + V;
 			const glm::vec4 QUV = Q + U + V;
 
-			node.aabbMin = glm::min(node.aabbMin, Q);
-			node.aabbMin = glm::min(node.aabbMin, QU);
-			node.aabbMin = glm::min(node.aabbMin, QV);
-
-			node.aabbMax = glm::max(node.aabbMax, Q);
-			node.aabbMax = glm::max(node.aabbMax, QU);
-			node.aabbMax = glm::max(node.aabbMax, QV);
+			node.bbox.grow(Q);
+			node.bbox.grow(QU);
+			node.bbox.grow(QV);
 
 			if (leafQuad.triangle_disk_id != 1u) { // if not a triangle
-				node.aabbMin = glm::min(node.aabbMin, QUV);
-				node.aabbMax = glm::max(node.aabbMax, QUV);
+				node.bbox.grow(QUV);
 			}
 		}
 		for (unsigned int first = node.firstSpherePrimitive, i = 0; i < node.spherePrimitiveCount; i++) {
@@ -144,14 +149,13 @@ private:
 			const float sphereRadius = leafSphere.Radius;
 			const glm::vec3 sphereMin = glm::vec3(leafSphere.Center) - glm::vec3(sphereRadius), sphereMax = glm::vec3(leafSphere.Center) + glm::vec3(sphereRadius);
 
-			node.aabbMin = glm::min(node.aabbMin, glm::vec4(sphereMin, 1.0f));
-			node.aabbMax = glm::max(node.aabbMax, glm::vec4(sphereMax, 1.0f));
+			node.bbox.grow(sphereMin);
+			node.bbox.grow(sphereMax);
 		}
 	}
 
 	float EvaluateSAH(const BVHNode& node, const int axis, const float pos, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
-		glm::vec3 leftAABBMin = glm::vec3(1e30f), leftAABBMax = glm::vec3(-1e30f);
-		glm::vec3 rightAABBMin = glm::vec3(1e30f), rightAABBMax = glm::vec3(-1e30f);
+		aabb leftAABB, rightAABB;
 		int leftCount = 0, rightCount = 0;
 		for (unsigned int i = 0; i < node.quadPrimitiveCount; i++) {
 			const Quad& quad = quads[quadIDs[node.firstQuadPrimitive + i]];
@@ -163,33 +167,23 @@ private:
 			if (quad.GetCentre()[axis] < pos) {
 				leftCount++;
 
-				leftAABBMin = glm::min(leftAABBMin, Q);
-				leftAABBMin = glm::min(leftAABBMin, QU);
-				leftAABBMin = glm::min(leftAABBMin, QV);
-
-				leftAABBMax = glm::max(leftAABBMax, Q);
-				leftAABBMax = glm::max(leftAABBMax, QU);
-				leftAABBMax = glm::max(leftAABBMax, QV);
+				leftAABB.grow(Q);
+				leftAABB.grow(QU);
+				leftAABB.grow(QV);
 
 				if (quad.triangle_disk_id != 1u) { // if not a triangle
-					leftAABBMin = glm::min(leftAABBMin, QUV);
-					leftAABBMax = glm::max(leftAABBMax, QUV);
+					leftAABB.grow(QUV);
 				}
 			}
 			else {
 				rightCount++;
 
-				rightAABBMin = glm::min(rightAABBMin, Q);
-				rightAABBMin = glm::min(rightAABBMin, QU);
-				rightAABBMin = glm::min(rightAABBMin, QV);
-
-				rightAABBMax = glm::max(rightAABBMax, Q);
-				rightAABBMax = glm::max(rightAABBMax, QU);
-				rightAABBMax = glm::max(rightAABBMax, QV);
+				rightAABB.grow(Q);
+				rightAABB.grow(QU);
+				rightAABB.grow(QV);
 
 				if (quad.triangle_disk_id != 1u) { // if not a triangle
-					rightAABBMin = glm::min(rightAABBMin, QUV);
-					rightAABBMax = glm::max(rightAABBMax, QUV);
+					rightAABB.grow(QUV);
 				}
 			}
 		}
@@ -201,21 +195,19 @@ private:
 
 			if (sphere.Center[axis] < pos) {
 				leftCount++;
-
-				leftAABBMin = glm::min(leftAABBMin, sphereMin);
-				leftAABBMax = glm::max(leftAABBMax, sphereMax);
+				
+				leftAABB.grow(sphereMin);
+				leftAABB.grow(sphereMax);
 			}
 			else {
 				rightCount++;
 
-				rightAABBMin = glm::min(rightAABBMin, sphereMin);
-				rightAABBMax = glm::max(rightAABBMax, sphereMax);
+				rightAABB.grow(sphereMin);
+				rightAABB.grow(sphereMax);
 			}
 		}
-		const glm::vec3 leftExtent = leftAABBMax - leftAABBMin;
-		float leftBoxArea = leftExtent.x * leftExtent.y + leftExtent.y * leftExtent.z + leftExtent.z * leftExtent.x;
-		const glm::vec3 rightExtent = rightAABBMax - rightAABBMin;
-		float rightBoxArea = rightExtent.x * rightExtent.y + rightExtent.y * rightExtent.z + rightExtent.z * rightExtent.x;
+		float leftBoxArea = leftAABB.area();
+		float rightBoxArea = rightAABB.area();
 		float cost = leftCount * leftBoxArea + rightCount * rightBoxArea;
 		return cost > 0 ? cost : 1e30f;
 	}
@@ -253,8 +245,8 @@ private:
 		float bestCost = 1e30f;
 		const int interval = 4;
 		for (int a = 0; a < 3; a++) {
-			float boundsMin = node.aabbMin[a];
-			float boundsMax = node.aabbMax[a];
+			float boundsMin = node.bbox.aabbMin[a];
+			float boundsMax = node.bbox.aabbMax[a];
 			if (boundsMin == boundsMax) { continue; }
 			float scale = (boundsMax - boundsMin) / interval;
 			for (unsigned int i = 1; i < interval; i++) {
@@ -271,8 +263,7 @@ private:
 	}
 
 	float CalculateNodeCost(const BVHNode& node) {
-		const glm::vec3 e = node.aabbMax - node.aabbMin;
-		float parentArea = e.x * e.y + e.y * e.z + e.z * e.x;
+		float parentArea = node.bbox.area();
 		return (node.quadPrimitiveCount + node.spherePrimitiveCount) * parentArea;
 	}
 
