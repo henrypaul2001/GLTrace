@@ -11,10 +11,20 @@ struct aabb {
 		aabbMin = glm::min(aabbMin, glm::vec4(p, 1.0f));
 		aabbMax = glm::max(aabbMax, glm::vec4(p, 1.0f));
 	}
+	void grow(const aabb& bounds) {
+		grow(bounds.aabbMin);
+		grow(bounds.aabbMax);
+	}
 	float area() const {
 		const glm::vec3 e = aabbMax - aabbMin;
 		return e.x * e.y + e.y * e.z + e.z * e.x;
 	}
+};
+
+struct Bin {
+	aabb bounds;
+	int quadCount = 0;
+	int sphereCount = 0;
 };
 
 struct BVHNode {
@@ -241,6 +251,7 @@ private:
 	}
 	*/
 
+	/*
 	float FindBestSplitPlane(const BVHNode& node, int& axis, float& splitPos, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
 		float bestCost = 1e30f;
 		const int interval = 4;
@@ -261,7 +272,90 @@ private:
 		}
 		return bestCost;
 	}
+	*/
+	
+	float FindBestSplitPlane(const BVHNode& node, int& axis, float& splitPos, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
+		float bestCost = 1e30f;
+		for (int a = 0; a < 3; a++) {
+			float boundsMin = 1e30f, boundsMax = -1e30f;
+			for (int i = 0; i < node.quadPrimitiveCount; i++) {
+				const Quad& quad = quads[quadIDs[node.firstQuadPrimitive + i]];
+				boundsMin = std::min(boundsMin, quad.GetCentre()[a]);
+				boundsMax = std::max(boundsMax, quad.GetCentre()[a]);
+			}
+			for (int i = 0; i < node.spherePrimitiveCount; i++) {
+				const Sphere& sphere = spheres[sphereIDs[node.firstSpherePrimitive + i]];
+				boundsMin = std::min(boundsMin, sphere.Center[a]);
+				boundsMax = std::max(boundsMax, sphere.Center[a]);
+			}
+			if (boundsMin == boundsMax) { continue; }
+			// populate bins
+			const int BINS = 4;
+			Bin bin[BINS];
+			float scale = BINS / (boundsMax - boundsMin);
+			// Quads
+			for (unsigned int i = 0; i < node.quadPrimitiveCount; i++) {
+				const Quad& quad = quads[quadIDs[node.firstQuadPrimitive + i]];
+				const int binID = std::min(BINS - 1, (int)((quad.GetCentre()[a] - boundsMin) * scale));
+				bin[binID].quadCount++;
 
+				const glm::vec3& Q = quad.GetQ(), U = quad.GetU(), V = quad.GetV();
+				const glm::vec3 QU = Q + U;
+				const glm::vec3 QV = Q + V;
+				const glm::vec3 QUV = Q + U + V;
+
+				bin[binID].bounds.grow(Q);
+				bin[binID].bounds.grow(QU);
+				bin[binID].bounds.grow(QV);
+
+				if (quad.triangle_disk_id != 1u) { // if not a triangle
+					bin[binID].bounds.grow(QUV);
+				}
+			}
+			// Spheres
+			for (unsigned int i = 0; i < node.spherePrimitiveCount; i++) {
+				const Sphere& sphere = spheres[sphereIDs[node.firstSpherePrimitive + i]];
+				const int binID = std::min(BINS - 1, (int)((sphere.Center[a] - boundsMin) * scale));
+				bin[binID].sphereCount++;
+
+				const glm::vec3 sphereRadius = glm::vec3(sphere.Radius);
+				//const float sphereRadius = sphere.Radius;
+				const glm::vec3 sphereMin = glm::vec3(sphere.Center) - sphereRadius;
+				const glm::vec3 sphereMax = glm::vec3(sphere.Center) + sphereRadius;
+
+				bin[binID].bounds.grow(sphereMin);
+				bin[binID].bounds.grow(sphereMax);
+			}
+			// gather data for planes between bins
+			float leftArea[BINS - 1], rightArea[BINS - 1];
+			int leftCount[BINS - 1], rightCount[BINS - 1];
+			aabb leftBox, rightBox;
+			int leftSum = 0, rightSum = 0;
+			for (int i = 0; i < BINS - 1; i++) {
+				leftSum += bin[i].quadCount + bin[i].sphereCount;
+				leftCount[i] = leftSum;
+				leftBox.grow(bin[i].bounds);
+				leftArea[i] = leftBox.area();
+
+				rightSum += bin[BINS - 1 - i].quadCount + bin[BINS - 1 - i].sphereCount;
+				rightCount[BINS - 2 - i] = rightSum;
+				rightBox.grow(bin[BINS - 1 - i].bounds);
+				rightArea[BINS - 2 - i] = rightBox.area();
+			}
+			// calculate SAH cost for planes
+			scale = (boundsMax - boundsMin) / BINS;
+			for (int i = 0; i < BINS - 1; i++) {
+				float planeCost = leftCount[i] * leftArea[i] + rightCount[i] * rightArea[i];
+				if (planeCost < bestCost) {
+					axis = a;
+					splitPos = boundsMin + scale * (i + 1);
+					bestCost = planeCost;
+				}
+			}
+		}
+		return bestCost;
+	}
+	
 	float CalculateNodeCost(const BVHNode& node) {
 		float parentArea = node.bbox.area();
 		return (node.quadPrimitiveCount + node.spherePrimitiveCount) * parentArea;
@@ -280,9 +374,15 @@ private:
 		if (splitCost >= parentCost) { return; } // Further splits will be detrimental. Return
 
 		// Split node quads
+		//const int BINS = 8;
+		//const float scale = BINS / (node.bbox.aabbMax[axis] - node.bbox.aabbMin[axis]);
+
 		int quadI = node.firstQuadPrimitive;
 		int quadJ = quadI + node.quadPrimitiveCount - 1;
 		while (quadI <= quadJ) {
+			//const int binID = std::min(BINS - 1, (int)((quads[quadIDs[quadI]].GetCentre()[axis] - node.bbox.aabbMin[axis]) * scale));
+			//if (binID < splitPos) { quadI++; }
+			//else { std::swap(quadIDs[quadI], quadIDs[quadJ--]); }
 			if (quads[quadIDs[quadI]].GetCentre()[axis] < splitPos) { quadI++; }
 			else { std::swap(quadIDs[quadI], quadIDs[quadJ--]); }
 		}
@@ -290,12 +390,17 @@ private:
 		int sphereI = node.firstSpherePrimitive;
 		int sphereJ = sphereI + node.spherePrimitiveCount - 1;
 		while (sphereI <= sphereJ) {
+			//const int binID = std::min(BINS - 1, (int)((spheres[sphereIDs[sphereI]].Center[axis] - node.bbox.aabbMin[axis]) * scale));
+			//if (binID < splitPos) { sphereI++; }
+			//else { std::swap(sphereIDs[sphereI], sphereIDs[sphereJ--]); }
 			if (spheres[sphereIDs[sphereI]].Center[axis] < splitPos) { sphereI++; }
 			else { std::swap(sphereIDs[sphereI], sphereIDs[sphereJ--]); }
 		}
 
 		int leftQuadCount = quadI - node.firstQuadPrimitive;
 		int leftSphereCount = sphereI - node.firstSpherePrimitive;
+
+		//if (leftQuadCount + leftSphereCount == 0) { return; }
 
 		// Create child nodes
 		int leftChildID = ++nodesUsed;
