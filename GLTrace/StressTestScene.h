@@ -33,6 +33,7 @@ public:
 		AddMaterial(white); // 0
 
 		// Spheres
+		int count = 0;
 		glm::vec3 origin = glm::vec3(0.0f, 0.0f, -10.0f);
 		float offset = 7.5f;
 		for (unsigned int i = 0; i < 50; i++) {
@@ -40,9 +41,11 @@ public:
 				for (unsigned int k = 0; k < 50; k++) {
 					glm::vec3 position = origin + glm::vec3(offset * i, offset * j, offset * k);
 					AddSphere(position, 3.0f, 0);
+					count++;
 				}
 			}
 		}
+		std::clog << "Spheres created: " << count << "\r\n";
 
 		// Quads
 	}
