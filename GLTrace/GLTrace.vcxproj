@@ -163,6 +163,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="StressTestScene.h" />
+    <ClInclude Include="TestModelScene.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Texture2DArray.h" />

@@ -1,15 +1,15 @@
 #pragma once
 #include "Scene.h"
 
-class StressTestScene : public Scene {
+class TestModelScene : public Scene {
 public:
-	StressTestScene() {}
-	~StressTestScene() {}
+	TestModelScene() {}
+	~TestModelScene() {}
 
 	void SetupScene() override {
 		// Setup camera
 		sceneCamera.vfov = 80.0f;
-		sceneCamera.lookfrom = glm::vec3(0.0f, 25.0f, 0.0f);
+		sceneCamera.lookfrom = glm::vec3(0.0f, 0.0f, 0.0f);
 		sceneCamera.lookat = glm::vec3(0.0f, 0.0f, -1.0f);
 		sceneCamera.vup = glm::vec3(0.0f, 1.0f, 0.0f);
 		sceneCamera.samples_per_pixel = 2;
@@ -33,22 +33,20 @@ public:
 		AddMaterial(white); // 0
 
 		// Spheres
-		int count = 0;
-		glm::vec3 origin = glm::vec3(0.0f, 0.0f, -10.0f);
-		float offset = 7.5f;
-		for (unsigned int i = 0; i < 50; i++) {
-			for (unsigned int j = 0; j < 50; j++) {
-				for (unsigned int k = 0; k < 50; k++) {
-					glm::vec3 position = origin + glm::vec3(offset * i, offset * j, offset * k);
-					AddSphere(position, 3.0f, 0);
-					//AddTriangle(position, glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(0.0f, 3.0f, 0.0f), 0);
-					count++;
-				}
-			}
-		}
-		std::clog << "Spheres created: " << count << "\r\n";
 
 		// Quads
+		const int N = 12582;
+		FILE* file;
+		fopen_s(&file, "Models/unity.tri", "r");
+		float a, b, c, d, e, f, g, h, i;
+		for (int t = 0; t < N; t++) {
+			fscanf_s(file, "%f %f %f %f %f %f %f %f %f\n", &a, &b, &c, &d, &e, &f, &g, &h, &i);
+			const glm::vec3 origin = glm::vec3(a, b, c);
+			const glm::vec3 u = glm::vec3(d, e, f) - origin;
+			const glm::vec3 v = glm::vec3(g, h, i) - origin;
+			AddTriangle(origin, u, v, 0);
+		}
+		fclose(file);
 	}
 
 	void UpdateScene(const float dt) override {

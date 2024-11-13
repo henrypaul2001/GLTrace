@@ -12,8 +12,10 @@ struct aabb {
 		aabbMax = glm::max(aabbMax, glm::vec4(p, 1.0f));
 	}
 	void grow(const aabb& bounds) {
-		grow(bounds.aabbMin);
-		grow(bounds.aabbMax);
+		if (bounds.aabbMin.x != 1e30f) {
+			grow(bounds.aabbMin);
+			grow(bounds.aabbMax);
+		}
 	}
 	float area() const {
 		const glm::vec3 e = aabbMax - aabbMin;
@@ -274,6 +276,7 @@ private:
 	}
 	*/
 	
+
 	float FindBestSplitPlane(const BVHNode& node, int& axis, float& splitPos, const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
 		float bestCost = 1e30f;
 		for (int a = 0; a < 3; a++) {
@@ -290,7 +293,7 @@ private:
 			}
 			if (boundsMin == boundsMax) { continue; }
 			// populate bins
-			const int BINS = 4;
+			const int BINS = 8;
 			Bin bin[BINS];
 			float scale = BINS / (boundsMax - boundsMin);
 			// Quads
@@ -400,7 +403,7 @@ private:
 		int leftQuadCount = quadI - node.firstQuadPrimitive;
 		int leftSphereCount = sphereI - node.firstSpherePrimitive;
 
-		//if (leftQuadCount + leftSphereCount == 0) { return; }
+		if (leftQuadCount + leftSphereCount == 0) { return; }
 
 		// Create child nodes
 		int leftChildID = ++nodesUsed;
