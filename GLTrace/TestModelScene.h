@@ -12,12 +12,12 @@ public:
 		sceneCamera.lookfrom = glm::vec3(0.0f, 0.0f, 0.0f);
 		sceneCamera.lookat = glm::vec3(0.0f, 0.0f, -1.0f);
 		sceneCamera.vup = glm::vec3(0.0f, 1.0f, 0.0f);
-		sceneCamera.samples_per_pixel = 2;
+		sceneCamera.samples_per_pixel = 5;
 		sceneCamera.max_bounces = 10;
 		sceneCamera.focus_dist = 1.0f;
 		sceneCamera.defocus_angle = 0.0f;
-		//sceneCamera.sky_colour_min_y = glm::vec3(0.0f);
-		//sceneCamera.sky_colour_max_y = glm::vec3(0.0f);
+		sceneCamera.sky_colour_min_y = glm::vec3(0.0f);
+		sceneCamera.sky_colour_max_y = glm::vec3(0.0f);
 
 		// Load material sets
 
@@ -32,9 +32,26 @@ public:
 		white.Metal = 0.0f;
 		AddMaterial(white); // 0
 
+		Material light;
+		light.Albedo = glm::vec3(1.0f);
+		light.Roughness = 0.0f;
+		light.Metal = 0.0f;
+		light.EmissiveColour = light.Albedo;
+		light.EmissivePower = 10.5f;
+		AddMaterial(light); // 1
+
+		Material mirror;
+		mirror.Albedo = glm::vec3(1.0f);
+		mirror.Roughness = 0.1f;
+		mirror.Metal = 1.0f;
+		AddMaterial(mirror); // 2
+
 		// Spheres
+		AddSphere(glm::vec3(5.5f, 10.0f, -5.5f), 3.25f, 1);
 
 		// Quads
+		AddQuad(glm::vec3(-100.0f, -1.2f, -100.0f), glm::vec3(200.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 200.0f), 2);
+
 		const int N = 12582;
 		FILE* file;
 		fopen_s(&file, "Models/unity.tri", "r");
