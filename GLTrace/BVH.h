@@ -46,8 +46,11 @@ public:
 	void BuildBVH(const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
 		auto start = std::chrono::high_resolution_clock::now();
 		totalElements = quads.size() + spheres.size();
+		nodesUsed = 2;
 
 		// Initialise hittable IDs
+		quadIDs.clear();
+		sphereIDs.clear();
 		quadIDs.reserve(quads.size());
 		sphereIDs.reserve(spheres.size());
 		for (unsigned int i = 0; i < quads.size(); i++) {
@@ -87,11 +90,11 @@ public:
 		auto milliseconds = duration;  // Remaining milliseconds
 
 		// Display the time elapsed
-		std::clog << "BVH constructed in: "
-			<< hours.count() << " hours, "
-			<< minutes.count() << " minutes, "
-			<< seconds.count() << " seconds, "
-			<< milliseconds.count() << " milliseconds\r\n";
+		//std::clog << "BVH constructed in: "
+		//	<< hours.count() << " hours, "
+		//	<< minutes.count() << " minutes, "
+		//	<< seconds.count() << " seconds, "
+		//	<< milliseconds.count() << " milliseconds\r\n";
 	}
 
 	void Buffer(ComputeShader& computeShader) const {
@@ -102,7 +105,7 @@ public:
 		// BVH buffer
 		// ----------
 		// Initialise buffer
-		bvhSSBO->BufferData(nullptr, (sizeof(BVHNode) * (nodesUsed + 1)) + (sizeof(unsigned int) * 4), GL_STATIC_DRAW);
+		bvhSSBO->BufferData(nullptr, (sizeof(BVHNode) * (nodesUsed + 1)) + (sizeof(unsigned int) * 4), GL_STREAM_COPY);
 
 		// Buffer data
 		bvhSSBO->BufferSubData(&totalElements, sizeof(unsigned int), 0);
@@ -113,17 +116,17 @@ public:
 		// ----------------
 		if (sphereIDs.size() > 0) {
 			// Initialise buffer
-			sphereSSBO->BufferData(nullptr, sizeof(unsigned int) * sphereIDs.size(), GL_STATIC_DRAW);
+			sphereSSBO->BufferData(nullptr, sizeof(unsigned int) * sphereIDs.size(), GL_STREAM_COPY);
 
 			// Buffer data
-			sphereSSBO->BufferData(&sphereIDs[0], sizeof(unsigned int) * sphereIDs.size(), GL_STATIC_DRAW);
+			sphereSSBO->BufferData(&sphereIDs[0], sizeof(unsigned int) * sphereIDs.size(), GL_STREAM_COPY);
 		}
 
 		// Quad ID buffer
 		// --------------
 		if (quadIDs.size() > 0) {
 			// Initialise buffer
-			quadSSBO->BufferData(nullptr, sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
+			quadSSBO->BufferData(nullptr, sizeof(unsigned int) * quadIDs.size(), GL_STREAM_COPY);
 
 			// Buffer data
 			quadSSBO->BufferData(&quadIDs[0], sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
