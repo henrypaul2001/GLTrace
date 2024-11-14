@@ -5,6 +5,7 @@
 #include "CornellMirror.h"
 #include "StressTestScene.h"
 #include "TestModelScene.h"
+#include "BigBen.h"
 #include "CPURTDEBUG.h"
 
 void TestBVH(const BVH_DEBUG_RAY ray, const Scene* scene) {
@@ -19,7 +20,7 @@ int main()
 	Renderer renderer = Renderer(1920, 1080);
 	CameraController camControl;
 
-	Scene* scene = new TestModelScene();
+	Scene* scene = new BigBenScene();
 	scene->SetupScene();
 	scene->BuildBVH();
 	scene->BufferBVH(renderer.GetRTCompute());
@@ -38,6 +39,7 @@ int main()
 	float lastFrame = static_cast<float>(glfwGetTime());
 	float currentFrame;
 	float dt = 0.0f;
+	renderer.ToggleAccumulation();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -57,10 +59,11 @@ int main()
 		// Update scene
 		camControl.Update(dt);
 		scene->UpdateScene(dt);
-		//scene->BuildBVH();
-		//scene->BufferBVH(renderer.GetRTCompute());
-		//scene->BufferSceneHittables(renderer.GetRTCompute());
 
+		scene->BufferBVH(renderer.GetRTCompute());
+		scene->BufferSceneHittables(renderer.GetRTCompute());
+
+		// Render
 		renderer.Render(*scene->GetSceneCamera(), *scene);
 
 		glfwSwapBuffers(window);

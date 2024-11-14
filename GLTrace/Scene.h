@@ -51,7 +51,9 @@ public:
 	}
 
 	virtual void SetupScene() = 0;
-	virtual void UpdateScene(const float dt) {}
+	virtual void UpdateScene(const float dt) {
+		BuildBVH();
+	}
 
 	Camera* GetSceneCamera() { return &sceneCamera; }
 	const std::vector<Sphere>& GetSpheres() const { return spheres; }
@@ -146,6 +148,9 @@ protected:
 			material_sets.push_back(mat_set);
 		}
 	}
+
+	void ClearQuadList() { quads.clear(); }
+	void SetQuadList(const std::vector<Quad>& newQuads) { this->quads = newQuads; }
 
 	Camera sceneCamera;
 private:
