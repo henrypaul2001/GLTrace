@@ -52,7 +52,8 @@ public:
 
 	virtual void SetupScene() = 0;
 	virtual void UpdateScene(const float dt) {
-		BuildBVH();
+		//BuildBVH();
+		RefitBVH();
 	}
 
 	Camera* GetSceneCamera() { return &sceneCamera; }
@@ -61,6 +62,7 @@ public:
 	const BVH& GetBVH() const { return bvh; }
 
 	void BuildBVH() { bvh.BuildBVH(quads, spheres); }
+	void RefitBVH() { bvh.RefitBVH(quads, spheres); }
 	void BufferBVH(ComputeShader& computeShader) const { bvh.Buffer(computeShader); }
 	void BufferSceneHittables(ComputeShader& computeShader) const {
 		const ShaderStorageBuffer* sphereSSBO = computeShader.GetSSBO(4);

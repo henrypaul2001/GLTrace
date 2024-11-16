@@ -53,6 +53,7 @@ public:
 
 		r = 0.0f;
 	}
+
 	void UpdateScene(const float dt) override {
 		std::vector<Quad> animatedQuads = originalQuads;
 		if ((r += 0.05f) > 2 * pi) { r -= 2 * pi; }

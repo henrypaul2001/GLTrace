@@ -43,6 +43,23 @@ public:
 	BVH() {}
 	~BVH() {}
 
+	void RefitBVH(const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
+		for (int i = nodesUsed - 1; i >= 0; i--) {
+			if (i != 1) {
+				BVHNode& node = tree[i];
+				if (node.isLeaf()) {
+					UpdateNodeBounds(i, quads, spheres);
+					continue;
+				}
+				// not leaf node, adjust to child node bounds
+				BVHNode& leftChild = tree[node.leftChild];
+				BVHNode& rightChild = tree[node.leftChild + 1];
+				node.bbox.aabbMin = glm::min(leftChild.bbox.aabbMin, rightChild.bbox.aabbMin);
+				node.bbox.aabbMax = glm::max(leftChild.bbox.aabbMax, rightChild.bbox.aabbMax);
+			}
+		}
+	}
+
 	void BuildBVH(const std::vector<Quad>& quads, const std::vector<Sphere>& spheres) {
 		auto start = std::chrono::high_resolution_clock::now();
 		totalElements = quads.size() + spheres.size();
