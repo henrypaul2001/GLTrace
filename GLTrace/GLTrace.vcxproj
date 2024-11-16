@@ -137,6 +137,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Linking\include\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\Linking\include\imgui\backends\imgui_impl_opengl2.cpp" />
+    <ClCompile Include="..\Linking\include\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\Linking\include\imgui\imgui.cpp" />
+    <ClCompile Include="..\Linking\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\Linking\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\Linking\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\Linking\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\Linking\include\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="CPURTDEBUG.cpp" />
     <ClCompile Include="glad.c" />
@@ -146,7 +155,17 @@
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Linking\include\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="..\Linking\include\imgui\backends\imgui_impl_opengl2.h" />
+    <ClInclude Include="..\Linking\include\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\Linking\include\imgui\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="..\Linking\include\imgui\imconfig.h" />
     <ClInclude Include="..\Linking\include\imgui\imgui.h" />
+    <ClInclude Include="..\Linking\include\imgui\imgui_internal.h" />
+    <ClInclude Include="..\Linking\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\Linking\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\Linking\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\Linking\include\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="AbstractShader.h" />
     <ClInclude Include="BigBen.h" />
     <ClInclude Include="BVH.h" />

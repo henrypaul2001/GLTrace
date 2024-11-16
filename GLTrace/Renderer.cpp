@@ -111,5 +111,24 @@ bool Renderer::Initialise()
 
 	std::cout << "OpenGL initialised" << std::endl;
 
+	if (InitIMGUI()) { std::cout << "ImGui initialised" << std::endl; }
+	else { std::cout << "Failed to initialise ImGui" << std::endl; }
+
+	return true;
+}
+
+bool Renderer::InitIMGUI()
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		// Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// Enable docking
+
+	// Setup platform backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
+
 	return true;
 }

@@ -10,8 +10,9 @@
 #include "InputManager.h"
 #include "Scene.h"
 
-//#include "imgui/imgui.h"
-#include <imgui/backends/imgui_impl_glfw.h>
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
 
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
 	// ignore warning codes or insignificant errors
@@ -187,6 +188,7 @@ public:
 	ComputeShader& GetRTCompute() { return rtCompute; }
 private:
 	bool Initialise();
+	bool InitIMGUI();
 
 	Texture2DArray screenBuffers;
 	MeshData screenQuad;
