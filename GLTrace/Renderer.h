@@ -9,6 +9,10 @@
 #include "Camera.h"
 #include "InputManager.h"
 #include "Scene.h"
+
+//#include "imgui/imgui.h"
+#include <imgui/backends/imgui_impl_glfw.h>
+
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
 	// ignore warning codes or insignificant errors
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
