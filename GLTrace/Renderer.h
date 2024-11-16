@@ -131,6 +131,9 @@ public:
 
 	~Renderer() {
 		glfwTerminate();
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 	}
 
 	void Render(Camera& activeCamera, const Scene& activeScene);
@@ -159,6 +162,16 @@ public:
 		if (key == GLFW_KEY_ESCAPE) { glfwSetWindowShouldClose(window, true); }
 		if (action == GLFW_RELEASE) {
 			InputManager::OnKeyUp(key);
+			if (key == GLFW_KEY_C) {
+				if (mouseIsFree) {
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+					mouseIsFree = false;
+				}
+				else {
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+					mouseIsFree = true;
+				}
+			}
 		}
 		else if (action == GLFW_PRESS) {
 			InputManager::OnKeyDown(key);
@@ -184,7 +197,7 @@ public:
 	const glm::vec2& MousePos() const { return mousePos; }
 	const double MouseScrollOffsetX() const { return scrollOffsetX; }
 	const double MouseScrollOffsetY() const { return scrollOffsetY; }
-
+	static const bool IsMouseFree() { return mouseIsFree; }
 	ComputeShader& GetRTCompute() { return rtCompute; }
 private:
 	bool Initialise();
@@ -200,4 +213,5 @@ private:
 	glm::vec2 mousePos;
 	double scrollOffsetX, scrollOffsetY;
 	bool accumulate_frames;
+	static bool mouseIsFree;
 };

@@ -16,7 +16,7 @@ public:
 	}
 
 	void Update(const float dt) {
-		if (activeCamera) {
+		if (activeCamera && !Renderer::IsMouseFree()) {
 
 			// Update view vectors
 			glm::vec3 front;

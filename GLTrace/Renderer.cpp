@@ -1,4 +1,5 @@
 #include "Renderer.h"
+bool Renderer::mouseIsFree = false;
 void Renderer::Render(Camera& activeCamera, const Scene& activeScene)
 {
 	glViewport(SCR_X_POS, SCR_Y_POS, SCR_WIDTH, SCR_HEIGHT);
@@ -27,6 +28,9 @@ void Renderer::Render(Camera& activeCamera, const Scene& activeScene)
 
 		if (accumulate_frames) { accumulation_frame_index++; }
 	}
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	scrollOffsetX = 0.0;
 	scrollOffsetY = 0.0;
@@ -113,7 +117,6 @@ bool Renderer::Initialise()
 
 	if (InitIMGUI()) { std::cout << "ImGui initialised" << std::endl; }
 	else { std::cout << "Failed to initialise ImGui" << std::endl; }
-
 	return true;
 }
 

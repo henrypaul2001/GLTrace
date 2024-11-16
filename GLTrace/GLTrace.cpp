@@ -49,6 +49,12 @@ int main()
 
 		std::clog << "Delta time: " << dt << " || FPS: " << 1.0 / dt << "										\r" << std::flush;
 
+		// ImGui frame start
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow();
+
 		// Process inputs
 		const glm::vec2& mousePos = renderer.MousePos();
 		camControl.ProcessMouseMovement(mousePos.x, mousePos.y);
