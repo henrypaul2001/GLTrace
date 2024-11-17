@@ -47,7 +47,7 @@ int main()
 		dt = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		std::clog << "Delta time: " << dt << " || FPS: " << 1.0 / dt << "										\r" << std::flush;
+		//std::clog << "Delta time: " << dt << " || FPS: " << 1.0 / dt << "										\r" << std::flush;
 
 		// Process inputs
 		const glm::vec2& mousePos = renderer.MousePos();
@@ -64,7 +64,7 @@ int main()
 		scene->BufferSceneHittables(renderer.GetRTCompute());
 
 		// Render
-		renderer.Render(*scene->GetSceneCamera(), *scene);
+		renderer.Render(*scene->GetSceneCamera(), *scene, dt);
 
 		glfwSwapBuffers(window);
 

@@ -38,7 +38,7 @@ public:
 			fCode = fShaderStream.str();
 		}
 		catch (std::ifstream::failure e) {
-			std::cout << "ERROR::SHADER::FILE_NOT_READ_SUCCESFULLY" << std::endl;
+			Logger::LogError("SHADER::FILE_NOT_READ_SUCCESFULLY");
 			setupStatus = MISSING_FILE;
 			return false;
 		}
@@ -61,7 +61,8 @@ public:
 		glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+			std::string message = "SHADER::VERTEX::COMPILATION_FAILED\n" + std::string(infoLog);
+			Logger::LogError(message.c_str());
 			setupStatus = COMPILATION_FAILED;
 			glDeleteShader(vertex);
 			return false;
@@ -77,7 +78,8 @@ public:
 		glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+			std::string message = "SHADER::FRAGMENT::COMPILATION_FAILED\n" + std::string(infoLog);
+			Logger::LogError(message.c_str());
 			glDeleteShader(vertex);
 			glDeleteShader(fragment);
 			setupStatus = COMPILATION_FAILED;
@@ -94,7 +96,8 @@ public:
 		glGetProgramiv(ID, GL_LINK_STATUS, &success);
 		if (!success) {
 			glGetProgramInfoLog(ID, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+			std::string message = "SHADER::PROGRAM::LINKING_FAILED\n" + std::string(infoLog);
+			Logger::LogError(message.c_str());
 			setupStatus = COMPILED_NOT_LINKED;
 			glDeleteShader(vertex);
 			glDeleteShader(fragment);
@@ -142,7 +145,7 @@ public:
 			geometryCode = gShaderStream.str();
 		}
 		catch (std::ifstream::failure e) {
-			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+			Logger::LogError("SHADER::FILE_NOT_SUCCESFULLY_READ");
 			setupStatus = MISSING_FILE;
 			return false;
 		}
@@ -166,7 +169,8 @@ public:
 		glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+			std::string message = "SHADER::VERTEX::COMPILATION_FAILED\n" + std::string(infoLog);
+			Logger::LogError(message.c_str());
 			setupStatus = COMPILATION_FAILED;
 			glDeleteShader(vertex);
 			return false;
@@ -181,7 +185,8 @@ public:
 		glGetShaderiv(geometry, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(geometry, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n" << infoLog << std::endl;
+			std::string message = "SHADER::GEOMETRY::COMPILATION_FAILED\n" + std::string(infoLog);
+			Logger::LogError(message.c_str());
 			glDeleteShader(vertex);
 			glDeleteShader(geometry);
 			setupStatus = COMPILATION_FAILED;
@@ -198,7 +203,8 @@ public:
 		glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+			std::string message = "SHADER::FRAGMENT::COMPILATION_FAILED\n" + std::string(infoLog);
+			Logger::LogError(message.c_str());
 			glDeleteShader(vertex);
 			glDeleteShader(fragment);
 			glDeleteShader(geometry);
@@ -217,7 +223,8 @@ public:
 		glGetProgramiv(ID, GL_LINK_STATUS, &success);
 		if (!success) {
 			glGetProgramInfoLog(ID, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+			std::string message = "SHADER::PROGRAM::LINKING_FAILED\n" + std::string(infoLog);
+			Logger::LogError(message.c_str());
 			setupStatus = COMPILED_NOT_LINKED;
 			glDeleteShader(vertex);
 			glDeleteShader(fragment);

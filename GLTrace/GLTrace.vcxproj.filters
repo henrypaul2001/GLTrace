@@ -84,6 +84,9 @@
     <ClCompile Include="..\Linking\include\imgui\misc\cpp\imgui_stdlib.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="Logging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
@@ -187,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="..\Linking\include\imgui\misc\cpp\imgui_stdlib.h">
       <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

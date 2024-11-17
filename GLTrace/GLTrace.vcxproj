@@ -151,6 +151,7 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLTrace.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Logging.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
@@ -178,6 +179,7 @@
     <ClInclude Include="GLTMath.h" />
     <ClInclude Include="Hittables.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Logging.h" />
     <ClInclude Include="MeshData.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />

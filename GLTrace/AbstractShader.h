@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "Logging.h"
 
 enum ShaderSetupStatus {
 	SETUP_NOT_STARTED,
