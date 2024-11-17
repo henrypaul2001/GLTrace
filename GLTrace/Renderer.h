@@ -123,8 +123,17 @@ public:
 
 		screenBuffers = Texture2DArray(4);
 		screenBuffers.GenerateTexture();
+		finalImage = Texture2D();
+		finalImage.GenerateTexture();
 		ResizeWindow(SCR_WIDTH, SCR_HEIGHT);
 		//screenTexture.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
+
+		// Set up framebuffer
+		finalImageFBO = 0;
+		glGenFramebuffers(1, &finalImageFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, finalImageFBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalImage.ID(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		InputManager::ClearInputs();
 	}
@@ -151,6 +160,7 @@ public:
 			SCR_HEIGHT = height - heightR;
 		}
 		screenBuffers.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
+		finalImage.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
 		glfwSetWindowSize(window, SCR_WIDTH, SCR_HEIGHT);
 	}
 
@@ -207,6 +217,7 @@ private:
 	void SetupUI();
 
 	Texture2DArray screenBuffers;
+	Texture2D finalImage;
 	MeshData screenQuad;
 	Shader screenQuadShader;
 	ComputeShader rtCompute;
@@ -214,6 +225,7 @@ private:
 	GLFWwindow* window;
 	unsigned int SCR_WIDTH, SCR_HEIGHT, SCR_X_POS, SCR_Y_POS, accumulation_frame_index;
 	unsigned int viewport_width, viewport_height;
+	unsigned int finalImageFBO;
 	glm::vec2 mousePos;
 	double scrollOffsetX, scrollOffsetY;
 	bool accumulate_frames;

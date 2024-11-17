@@ -44,9 +44,12 @@ void Renderer::RenderScene(Camera& activeCamera, const Scene& activeScene)
 		rtCompute.DispatchCompute(SCR_WIDTH / WORK_GROUP_SIZE, SCR_HEIGHT / WORK_GROUP_SIZE, 1, GL_ALL_BARRIER_BITS);
 
 		// Render screen quad
-		//screenQuadShader.Use();
-		//screenBuffers.BindToSlot(0);
-		//screenQuad.DrawMeshData();
+		glBindFramebuffer(GL_FRAMEBUFFER, finalImageFBO);
+		glClear(GL_COLOR_BUFFER_BIT);
+		screenQuadShader.Use();
+		screenBuffers.BindToSlot(0);
+		screenQuad.DrawMeshData();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		if (accumulate_frames) { accumulation_frame_index++; }
 	}
@@ -96,7 +99,7 @@ void Renderer::SetupUI()
 	ImGui::Begin("Viewport");
 	viewport_width = ImGui::GetContentRegionAvail().x;
 	viewport_height = ImGui::GetContentRegionAvail().y;
-	//ImGui::Image((ImTextureID)(intptr_t)screenBuffers.ID(), ImVec2(viewport_width, viewport_height));
+	ImGui::Image((ImTextureID)(intptr_t)finalImage.ID(), ImVec2(viewport_width, viewport_height), ImVec2(0.0, 1.0), ImVec2(1.0, 0.0));
 	ImGui::End();
 
 	if (viewport_width != SCR_WIDTH || viewport_height != SCR_HEIGHT) {
@@ -114,6 +117,7 @@ void Renderer::SetupUI()
 			SCR_HEIGHT = height - heightR;
 		}
 		screenBuffers.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
+		finalImage.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
 	}
 }
 
