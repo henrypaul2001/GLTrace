@@ -1,5 +1,6 @@
 #pragma once
 #include <vcruntime_string.h>
+#include "Logging.h"
 class InputManager {
 public:
 	static void OnKeyDown(int key) { keysPressed[key] = true; }

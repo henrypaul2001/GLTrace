@@ -14,60 +14,64 @@
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
+#include "Logging.h"
+
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
 	// ignore warning codes or insignificant errors
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
-	std::cout << "---------------" << std::endl;
-	std::cout << "Debug message (" << id << "): " << message << std::endl;
+	std::string stringMessage = "---------------\n";
+	stringMessage += std::string("Debug message (" + std::to_string(id) + "): " + message + "\r\n");
 
 	switch (source) {
 	case GL_DEBUG_SOURCE_API:
-		std::cout << "Source: API"; break;
+		stringMessage += "source: API\r\n"; break;
 	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-		std::cout << "Source: Window System"; break;
+		stringMessage += "Source: Window System\r\n"; break;
 	case GL_DEBUG_SOURCE_SHADER_COMPILER:
-		std::cout << "Source: Shader Compiler"; break;
+		stringMessage += "Source: Shader Compiler\r\n"; break;
 	case GL_DEBUG_SOURCE_THIRD_PARTY:
-		std::cout << "Source: Third Party"; break;
+		stringMessage += "Source: Third Party\r\n"; break;
 	case GL_DEBUG_SOURCE_APPLICATION:
-		std::cout << "Source: Application"; break;
+		stringMessage += "Source: Application\r\n"; break;
 	case GL_DEBUG_SOURCE_OTHER:
-		std::cout << "Source: Other"; break;
-	} std::cout << std::endl;
+		stringMessage += "Source: Other\r\n"; break;
+	}
 
 	switch (type) {
 	case GL_DEBUG_TYPE_ERROR:
-		std::cout << "Type: Error"; break;
+		stringMessage += "Type: Error\r\n"; break;
 	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		std::cout << "Type: Deprecated Behaviour"; break;
+		stringMessage += "Type: Deprecated Behaviour\r\n"; break;
 	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		std::cout << "Type: Undefined Behaviour"; break;
+		stringMessage += "Type: Undefined Behaviour\r\n"; break;
 	case GL_DEBUG_TYPE_PORTABILITY:
-		std::cout << "Type: Portability"; break;
+		stringMessage += "Type: Portability\r\n"; break;
 	case GL_DEBUG_TYPE_PERFORMANCE:
-		std::cout << "Type: Performance"; break;
+		stringMessage += "Type: Performance\r\n"; break;
 	case GL_DEBUG_TYPE_MARKER:
-		std::cout << "Type: Marker"; break;
+		stringMessage += "Type: Marker\r\n"; break;
 	case GL_DEBUG_TYPE_PUSH_GROUP:
-		std::cout << "Type: Push Group"; break;
+		stringMessage += "Type: Push Group\r\n"; break;
 	case GL_DEBUG_TYPE_POP_GROUP:
-		std::cout << "Type: Pop Group"; break;
+		stringMessage += "Type: Pop Group\r\n"; break;
 	case GL_DEBUG_TYPE_OTHER:
-		std::cout << "Type: Other"; break;
-	}	std::cout << std::endl;
+		stringMessage += "Type: Other\r\n"; break;
+	}
 
 	switch (severity)
 	{
 	case GL_DEBUG_SEVERITY_HIGH:
-		std::cout << "Severity: high"; break;
+		stringMessage += "Severity: high\r\n"; break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
-		std::cout << "Severity: medium"; break;
+		stringMessage += "Severity: medium\r\n"; break;
 	case GL_DEBUG_SEVERITY_LOW:
-		std::cout << "Severity: low"; break;
+		stringMessage += "Severity: low\r\n"; break;
 	case GL_DEBUG_SEVERITY_NOTIFICATION:
-		std::cout << "Severity: notification"; break;
-	} std::cout << std::endl;
+		stringMessage += "Severity: notification\r\n"; break;
+	}
+
+	Logger::LogError(stringMessage.c_str());
 }
 
 const unsigned int WORK_GROUP_SIZE = 32u;
@@ -145,7 +149,7 @@ public:
 		ImGui::DestroyContext();
 	}
 
-	void Render(Camera& activeCamera, const Scene& activeScene);
+	void Render(Camera& activeCamera, const Scene& activeScene, const float dt);
 
 	void ResizeWindow(const unsigned int width, const unsigned int height) {
 		unsigned int widthR = width % WORK_GROUP_SIZE;
@@ -214,7 +218,7 @@ private:
 	bool InitIMGUI();
 
 	void RenderScene(Camera& activeCamera, const Scene& activeScene);
-	void SetupUI();
+	void SetupUI(const float dt);
 
 	Texture2DArray screenBuffers;
 	Texture2D finalImage;

@@ -20,18 +20,18 @@ private:
 static class Logger {
 public:
 	static void Log(const char* message) {
-		const char* logType = "[Log] ";
+		const char* logType = "[Log]     ";
 		entries.push_back(LogEntry(logType, message, glm::vec4(1.0f), glm::vec4(1.0f)));
 		std::cout << logType << message << std::endl;
 	}
 	static void LogError(const char* message) {
-		const char* logType = "[ERROR] ";
+		const char* logType = "[ERROR]   ";
 		entries.push_back(LogEntry(logType, message, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)));
 		std::cout << logType << message << std::endl;
 	}
 	static void LogWarning(const char* message) {
 		const char* logType = "[Warning] ";
-		entries.push_back(LogEntry("[Warning] ", message, glm::vec4(1.0f, 0.27f, 0.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+		entries.push_back(LogEntry(logType, message, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
 		std::cout << logType << message << std::endl;
 	}
 	static void CustomLog(const char* logType, const char* message, const glm::vec4& typeColour, const glm::vec4& logColour) {
@@ -41,6 +41,7 @@ public:
 	static void ClearLog() {
 		entries.clear();
 	}
+	static const std::vector<LogEntry>& GetEntries() { return entries; }
 private:
 	static std::vector<LogEntry> entries;
 };

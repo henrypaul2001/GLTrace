@@ -1,9 +1,9 @@
 #include "Renderer.h"
 bool Renderer::mouseIsFree = false;
-void Renderer::Render(Camera& activeCamera, const Scene& activeScene)
+void Renderer::Render(Camera& activeCamera, const Scene& activeScene, const float dt)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-	SetupUI();
+	SetupUI(dt);
 	RenderScene(activeCamera, activeScene);
 
 	// Render UI
@@ -55,14 +55,15 @@ void Renderer::RenderScene(Camera& activeCamera, const Scene& activeScene)
 	}
 }
 
-void Renderer::SetupUI()
+void Renderer::SetupUI(const float dt)
 {
 	// ImGui frame start
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	// Menu
+	// - Menu -
+	// --------
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
 			if (ImGui::MenuItem("Close")) {
@@ -74,6 +75,7 @@ void Renderer::SetupUI()
 	}
 
 	// Create docking environment
+	// --------------------------
 	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
@@ -96,25 +98,70 @@ void Renderer::SetupUI()
 	ImGui::End();
 
 	// Scene view
-	ImGui::Begin("Viewport");
+	// ----------
+	ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoCollapse);
 	viewport_width = ImGui::GetContentRegionAvail().x;
 	viewport_height = ImGui::GetContentRegionAvail().y;
 	ImGui::Image((ImTextureID)(intptr_t)finalImage.ID(), ImVec2(viewport_width, viewport_height), ImVec2(0.0, 1.0), ImVec2(1.0, 0.0));
 	ImGui::End();
 
-	if (viewport_width != SCR_WIDTH || viewport_height != SCR_HEIGHT) {
-		unsigned int width = viewport_width;
-		unsigned int height = viewport_height;
-		unsigned int widthR = width % WORK_GROUP_SIZE;
-		unsigned int heightR = height % WORK_GROUP_SIZE;
+	// - Log -
+	// -------
+	ImGui::Begin("Log");
+	ImVec2 logDimensions = ImGui::GetContentRegionAvail();
+	std::string dt_string = "Delta time: " + std::to_string(dt);
+	std::string fps_string = "FPS: " + std::to_string(1.0 / dt);
+	ImGui::Text(dt_string.c_str());
+	ImGui::Text(fps_string.c_str());
+	ImGui::Separator();
+	if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
+		if (ImGui::BeginPopupContextWindow()) {
+			if (ImGui::Selectable("Clear")) {
+				// Clear log
+				Logger::ClearLog();
+			}
+			ImGui::EndPopup();
+		}
 
-		SCR_WIDTH = width;
-		SCR_HEIGHT = height;
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 4));
+		const std::vector<LogEntry>& entries = Logger::GetEntries();
+		for (const LogEntry& entry : entries) {
+			const glm::vec4& typeCol = entry.GetTypeColour();
+			const glm::vec4& logCol = entry.GetLogColour();
+			ImVec4 typeColour = ImVec4(typeCol.r, typeCol.g, typeCol.b, typeCol.a);
+			ImVec4 logColour = ImVec4(logCol.r, logCol.g, logCol.b, logCol.a);
+
+			ImGui::PushStyleColor(ImGuiCol_Text, typeColour);
+			ImGui::Text(entry.GetTypeName());
+			ImGui::PopStyleColor(1);
+
+			ImGui::SameLine();
+
+			ImGui::PushStyleColor(ImGuiCol_Text, logColour);
+			ImGui::Text(entry.GetLog());
+			ImGui::PopStyleColor(1);
+		}
+		
+		if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
+			ImGui::SetScrollHereY(1.0f);
+		}
+
+		ImGui::PopStyleVar(1);
+	}
+	ImGui::EndChild();
+	ImGui::End();
+
+	if (viewport_width != SCR_WIDTH || viewport_height != SCR_HEIGHT) {
+		unsigned int widthR = viewport_width % WORK_GROUP_SIZE;
+		unsigned int heightR = viewport_height % WORK_GROUP_SIZE;
+
+		SCR_WIDTH = viewport_width;
+		SCR_HEIGHT = viewport_height;
 		if (widthR != 0) {
-			SCR_WIDTH = width - widthR;
+			SCR_WIDTH = viewport_width - widthR;
 		}
 		if (heightR != 0) {
-			SCR_HEIGHT = height - heightR;
+			SCR_HEIGHT = viewport_height - heightR;
 		}
 		screenBuffers.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
 		finalImage.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
@@ -141,7 +188,7 @@ bool Renderer::Initialise()
 	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "GLTrace", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	if (window == NULL) {
-		std::cout << "Failed to create GLFW window" << std::endl;
+		Logger::LogError("Failed to create GLFW window");
 		glfwTerminate();
 		return false;
 	}
@@ -179,7 +226,7 @@ bool Renderer::Initialise()
 	// glad: load OpenGL function pointers
 	// -----------------------------------
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize GLAD" << std::endl;
+		Logger::LogError("Failed to initialize GLAD");
 		glfwTerminate();
 		return false;
 	}
@@ -198,10 +245,10 @@ bool Renderer::Initialise()
 
 	ComputeShader::InitOpenGLConstants();
 
-	std::cout << "OpenGL initialised" << std::endl;
+	Logger::Log("OpenGL initialised");
 
-	if (InitIMGUI()) { std::cout << "ImGui initialised" << std::endl; }
-	else { std::cout << "Failed to initialise ImGui" << std::endl; }
+	if (InitIMGUI()) { Logger::Log("ImGui initialised"); }
+	else { Logger::LogError("Failed to initialise ImGui"); }
 	return true;
 }
 
