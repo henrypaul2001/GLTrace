@@ -203,6 +203,9 @@ private:
 	bool Initialise();
 	bool InitIMGUI();
 
+	void RenderScene(Camera& activeCamera, const Scene& activeScene);
+	void SetupUI();
+
 	Texture2DArray screenBuffers;
 	MeshData screenQuad;
 	Shader screenQuadShader;
@@ -210,6 +213,7 @@ private:
 
 	GLFWwindow* window;
 	unsigned int SCR_WIDTH, SCR_HEIGHT, SCR_X_POS, SCR_Y_POS, accumulation_frame_index;
+	unsigned int viewport_width, viewport_height;
 	glm::vec2 mousePos;
 	double scrollOffsetX, scrollOffsetY;
 	bool accumulate_frames;

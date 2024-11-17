@@ -2,6 +2,28 @@
 bool Renderer::mouseIsFree = false;
 void Renderer::Render(Camera& activeCamera, const Scene& activeScene)
 {
+	glClear(GL_COLOR_BUFFER_BIT);
+	SetupUI();
+	RenderScene(activeCamera, activeScene);
+
+	// Render UI
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+		glfwMakeContextCurrent(window);
+	}
+
+	scrollOffsetX = 0.0;
+	scrollOffsetY = 0.0;
+}
+
+void Renderer::RenderScene(Camera& activeCamera, const Scene& activeScene)
+{
 	glViewport(SCR_X_POS, SCR_Y_POS, SCR_WIDTH, SCR_HEIGHT);
 
 	if (SCR_WIDTH > 0 && SCR_HEIGHT > 0) {
@@ -22,18 +44,77 @@ void Renderer::Render(Camera& activeCamera, const Scene& activeScene)
 		rtCompute.DispatchCompute(SCR_WIDTH / WORK_GROUP_SIZE, SCR_HEIGHT / WORK_GROUP_SIZE, 1, GL_ALL_BARRIER_BITS);
 
 		// Render screen quad
-		screenQuadShader.Use();
-		screenBuffers.BindToSlot(0);
-		screenQuad.DrawMeshData();
+		//screenQuadShader.Use();
+		//screenBuffers.BindToSlot(0);
+		//screenQuad.DrawMeshData();
 
 		if (accumulate_frames) { accumulation_frame_index++; }
 	}
+}
 
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+void Renderer::SetupUI()
+{
+	// ImGui frame start
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 
-	scrollOffsetX = 0.0;
-	scrollOffsetY = 0.0;
+	// Menu
+	if (ImGui::BeginMainMenuBar()) {
+		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("Close")) {
+				glfwSetWindowShouldClose(window, true);
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+
+	// Create docking environment
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
+		ImGuiWindowFlags_NoBackground;
+
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->WorkPos);
+	ImGui::SetNextWindowSize(viewport->WorkSize);
+	ImGui::SetNextWindowViewport(viewport->ID);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("InvisibleWindow", nullptr, windowFlags);
+	ImGui::PopStyleVar(3);
+
+	ImGuiID dockSpaceID = ImGui::GetID("InvisibleWindowDockSpace");
+
+	ImGui::DockSpace(dockSpaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+	ImGui::End();
+
+	// Scene view
+	ImGui::Begin("Viewport");
+	viewport_width = ImGui::GetContentRegionAvail().x;
+	viewport_height = ImGui::GetContentRegionAvail().y;
+	//ImGui::Image((ImTextureID)(intptr_t)screenBuffers.ID(), ImVec2(viewport_width, viewport_height));
+	ImGui::End();
+
+	if (viewport_width != SCR_WIDTH || viewport_height != SCR_HEIGHT) {
+		unsigned int width = viewport_width;
+		unsigned int height = viewport_height;
+		unsigned int widthR = width % WORK_GROUP_SIZE;
+		unsigned int heightR = height % WORK_GROUP_SIZE;
+
+		SCR_WIDTH = width;
+		SCR_HEIGHT = height;
+		if (widthR != 0) {
+			SCR_WIDTH = width - widthR;
+		}
+		if (heightR != 0) {
+			SCR_HEIGHT = height - heightR;
+		}
+		screenBuffers.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
+	}
 }
 
 bool Renderer::Initialise()
@@ -128,6 +209,7 @@ bool Renderer::InitIMGUI()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		// Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// Enable docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;			// Enable multi-viewport
 
 	// Setup platform backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
