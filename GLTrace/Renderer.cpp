@@ -3,7 +3,7 @@ bool Renderer::mouseIsFree = false;
 void Renderer::Render(Camera& activeCamera, const Scene& activeScene, const float dt)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-	SetupUI(dt);
+	SetupUI(activeCamera, dt);
 	RenderScene(activeCamera, activeScene);
 
 	// Render UI
@@ -55,7 +55,7 @@ void Renderer::RenderScene(Camera& activeCamera, const Scene& activeScene)
 	}
 }
 
-void Renderer::SetupUI(const float dt)
+void Renderer::SetupUI(Camera& activeCamera, const float dt)
 {
 	// ImGui frame start
 	ImGui_ImplOpenGL3_NewFrame();
@@ -144,6 +144,49 @@ void Renderer::SetupUI(const float dt)
 		
 		if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
 			ImGui::SetScrollHereY(1.0f);
+		}
+
+		ImGui::PopStyleVar(1);
+	}
+	ImGui::EndChild();
+	ImGui::End();
+
+	// Properties
+	// ----------
+	ImGui::Begin("Properties");
+	
+	// Camera
+	// ------
+	ImGui::Text("Active Camera");
+	ImGui::Separator();
+	if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 6));
+
+		if (ImGui::TreeNode("Dimensions")) {
+			ImGui::BeginDisabled();
+
+			int width = activeCamera.GetImageWidth();
+			int height = activeCamera.GetImageHeight();
+			float aspect = activeCamera.GetAspectRatio();
+
+			ImGui::DragInt("Image width", &width);
+			ImGui::DragInt("Image height", &height);
+			ImGui::InputFloat("Aspect ratio", &aspect);
+			
+			ImGui::EndDisabled();
+		
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("Ray Properties")) {
+
+			ImGui::InputInt("Samples per pixel", &activeCamera.samples_per_pixel, 1, 2);
+			ImGui::SetItemTooltip("The number of rays fired from each pixel in a frame.\r\nEach ray will contribute to the final colour of that pixel by calculating an average.\r\nHigh values can significantly impact performance.");
+
+			ImGui::InputInt("Max bounces", &activeCamera.max_bounces);
+			ImGui::SetItemTooltip("Maximum times a ray can bounce off of scene geometry.\r\nHigher values will increase visual accuracy at expense of performance.");
+
+			ImGui::TreePop();
 		}
 
 		ImGui::PopStyleVar(1);

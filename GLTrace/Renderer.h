@@ -218,7 +218,7 @@ private:
 	bool InitIMGUI();
 
 	void RenderScene(Camera& activeCamera, const Scene& activeScene);
-	void SetupUI(const float dt);
+	void SetupUI(Camera& activeCamera, const float dt);
 
 	Texture2DArray screenBuffers;
 	Texture2D finalImage;
