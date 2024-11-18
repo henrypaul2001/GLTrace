@@ -186,6 +186,16 @@ void Renderer::SetupUI(Camera& activeCamera, const float dt)
 			ImGui::InputInt("Max bounces", &activeCamera.max_bounces);
 			ImGui::SetItemTooltip("Maximum times a ray can bounce off of scene geometry.\r\nHigher values will increase visual accuracy at expense of performance.");
 
+			ImGui::BeginChild("Sky Colour");
+			ImGui::SeparatorText("Sky Colour Gradiant");
+
+			ImGui::ColorEdit3("Min-y colour", &activeCamera.sky_colour_min_y[0]);
+			ImGui::SetItemTooltip("When a ray misses the scene (hits the sky) and ray Y = 0, this colour will be used.");
+
+			ImGui::ColorEdit3("Max-y colour", &activeCamera.sky_colour_max_y[0]);
+			ImGui::SetItemTooltip("When a ray misses the scene (hits the sky) and ray Y = 1, this colour will be used.");
+			ImGui::EndChild();
+
 			ImGui::TreePop();
 		}
 
