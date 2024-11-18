@@ -23,7 +23,7 @@ public:
 	void Initialise(const unsigned int viewWidth, const unsigned int viewHeight) {
 		image_width = viewWidth;
 		image_height = viewHeight;
-		aspect_ratio = image_width / image_height;
+		aspect_ratio = (float)image_width / (float)image_height;
 		
 		pixel_samples_scale = 1.0f / samples_per_pixel;
 		
@@ -95,6 +95,10 @@ public:
 
 	void SetCameraHasMoved(const bool moved) { camera_has_moved = moved; }
 	const bool HasCameraMoved() const { return camera_has_moved; }
+
+	const unsigned int GetImageWidth() const { return image_width; }
+	const unsigned int GetImageHeight() const { return image_height; }
+	const float GetAspectRatio() const { return aspect_ratio; }
 private:
 	unsigned int image_width, image_height;	// Rendered image width and height in pixel count
 	float aspect_ratio;						// Ratio of image width over height
