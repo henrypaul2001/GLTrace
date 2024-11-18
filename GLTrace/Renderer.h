@@ -79,7 +79,7 @@ const unsigned int WORK_GROUP_SIZE = 32u;
 class Renderer
 {
 public:
-	Renderer(const unsigned int width = 600u, const unsigned int height = 600u, unsigned int xPos = 0u, unsigned int yPos = 0u) : SCR_WIDTH(width), SCR_HEIGHT(height), SCR_X_POS(xPos), SCR_Y_POS(yPos), accumulation_frame_index(1), accumulate_frames(true) {
+	Renderer(const unsigned int width = 600u, const unsigned int height = 600u, unsigned int xPos = 0u, unsigned int yPos = 0u) : SCR_WIDTH(width), SCR_HEIGHT(height), SCR_X_POS(xPos), SCR_Y_POS(yPos), accumulation_frame_index(1), accumulate_frames(true), auto_reset_accumulation(true) {
 		Initialise(); 
 
 		// Load shaders
@@ -206,6 +206,7 @@ public:
 
 	void ResetAccumulation() { accumulation_frame_index = 1; }
 	void ToggleAccumulation() { accumulate_frames = !accumulate_frames; ResetAccumulation(); }
+	void ToggleAutoResetAccumulation() { auto_reset_accumulation = !auto_reset_accumulation; }
 
 	GLFWwindow* GetWindow() { return window; }
 	const glm::vec2& MousePos() const { return mousePos; }
@@ -233,5 +234,6 @@ private:
 	glm::vec2 mousePos;
 	double scrollOffsetX, scrollOffsetY;
 	bool accumulate_frames;
+	bool auto_reset_accumulation;
 	static bool mouseIsFree;
 };

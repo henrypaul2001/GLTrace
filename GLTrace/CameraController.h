@@ -17,7 +17,6 @@ public:
 
 	void Update(const float dt) {
 		if (activeCamera && !Renderer::IsMouseFree()) {
-
 			// Update view vectors
 			glm::vec3 front;
 			front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -60,47 +59,54 @@ public:
 
 			activeCamera->vfov = zoom;
 		}
+		else {
+			Initialise();
+		}
 	}
 
 	void ProcessMouseMovement(const double xpos, const double ypos) {
-		if (firstMouse) {
+		if (!Renderer::IsMouseFree()) {
+			if (firstMouse) {
+				lastMouseX = xpos;
+				lastMouseY = ypos;
+				firstMouse = false;
+			}
+
+			float xoffset = xpos - lastMouseX;
+			float yoffset = lastMouseY - ypos;
+
+			if ((abs(xoffset) > 0.0f || abs(yoffset) > 0.0f)) { activeCamera->SetCameraHasMoved(true); }
+
+			xoffset *= mouseSensitivity;
+			yoffset *= mouseSensitivity;
+
 			lastMouseX = xpos;
 			lastMouseY = ypos;
-			firstMouse = false;
-		}
 
-		float xoffset = xpos - lastMouseX;
-		float yoffset = lastMouseY - ypos;
+			yaw += xoffset;
+			pitch += yoffset;
 
-		if (abs(xoffset) > 0.0f || abs(yoffset) > 0.0f) { activeCamera->SetCameraHasMoved(true); }
-
-		lastMouseX = xpos;
-		lastMouseY = ypos;
-
-		xoffset *= mouseSensitivity;
-		yoffset *= mouseSensitivity;
-
-		yaw += xoffset;
-		pitch += yoffset;
-
-		if (pitch > 89.0f) {
-			pitch = 89.0f;
-		}
-		if (pitch < -89.0f) {
-			pitch = -89.0f;
+			if (pitch > 89.0f) {
+				pitch = 89.0f;
+			}
+			if (pitch < -89.0f) {
+				pitch = -89.0f;
+			}
 		}
 	}
 
 	void ProcessMouseScroll(const double yoffset) {
-		zoom -= (float)yoffset;
-		if (zoom < 1.0f) {
-			zoom = 1.0f;
-		}
-		else if (zoom > 120.0f) {
-			zoom = 120.0f;
-		}
+		if (!Renderer::IsMouseFree()) {
+			zoom -= (float)yoffset;
+			if (zoom < 1.0f) {
+				zoom = 1.0f;
+			}
+			else if (zoom > 120.0f) {
+				zoom = 120.0f;
+			}
 
-		if (abs(yoffset) > 0.0f) { activeCamera->SetCameraHasMoved(true); }
+			if (abs(yoffset) > 0.0f) { activeCamera->SetCameraHasMoved(true); }
+		}
 	}
 
 private:

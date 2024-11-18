@@ -39,7 +39,6 @@ int main()
 	float lastFrame = static_cast<float>(glfwGetTime());
 	float currentFrame;
 	float dt = 0.0f;
-	renderer.ToggleAccumulation();
 
 	while (!glfwWindowShouldClose(window))
 	{

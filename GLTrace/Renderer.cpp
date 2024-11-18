@@ -28,7 +28,7 @@ void Renderer::RenderScene(Camera& activeCamera, const Scene& activeScene)
 
 	if (SCR_WIDTH > 0 && SCR_HEIGHT > 0) {
 		// Update camera
-		if (activeCamera.HasCameraMoved()) {
+		if (activeCamera.HasCameraMoved() && auto_reset_accumulation) {
 			ResetAccumulation();
 			activeCamera.SetCameraHasMoved(false);
 		}
@@ -162,22 +162,59 @@ void Renderer::SetupUI(Camera& activeCamera, const float dt)
 	if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 6));
 
+		ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+		if (ImGui::TreeNode("Physical Properties")) {
+
+			ImGui::Text("Space");
+			glm::vec3 position = activeCamera.lookfrom;
+			glm::vec3 lookat = activeCamera.lookat;
+			glm::vec3 vup = activeCamera.vup;
+			ImGui::InputFloat3("Position", &position[0]);
+			ImGui::InputFloat3("Look at", &lookat[0]);
+			ImGui::InputFloat3("Up", &vup[0]);
+			ImGui::SetItemTooltip("Up direction relative to camera.");
+
+			if (position != activeCamera.lookfrom || lookat != activeCamera.lookat || vup != activeCamera.vup) {
+				activeCamera.lookfrom = position;
+				activeCamera.lookat = lookat;
+				activeCamera.vup = vup;
+				activeCamera.SetCameraHasMoved(true);
+			}
+
+			ImGui::Text("Lens");
+			if (ImGui::SliderFloat("FOV", &activeCamera.vfov, 1.0f, 120.0f)) {
+				ResetAccumulation();
+			}
+
+			if (ImGui::InputFloat("De-focus Angle", &activeCamera.defocus_angle, 0.25f, 1.0f)) {
+				ResetAccumulation();
+			}
+			ImGui::SetItemTooltip("Variation angle of rays through each pixel. Higher value produces blurrier results for out of focus objects.");
+			if (ImGui::InputFloat("Focus Distance", &activeCamera.focus_dist, 0.25f, 1.0f)) {
+				ResetAccumulation();
+			}
+			ImGui::SetItemTooltip("Distance from camera lookfrom point to plane of perfect focus");
+
+			ImGui::TreePop();
+			ImGui::Separator();
+		}
+
+		ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 		if (ImGui::TreeNode("Dimensions")) {
-			ImGui::BeginDisabled();
 
 			int width = activeCamera.GetImageWidth();
 			int height = activeCamera.GetImageHeight();
 			float aspect = activeCamera.GetAspectRatio();
 
-			ImGui::DragInt("Image width", &width);
-			ImGui::DragInt("Image height", &height);
-			ImGui::InputFloat("Aspect ratio", &aspect);
-			
-			ImGui::EndDisabled();
+			ImGui::InputInt("Image width", &width, 0, 0, ImGuiInputTextFlags_ReadOnly);
+			ImGui::InputInt("Image height", &height, 0, 0, ImGuiInputTextFlags_ReadOnly);
+			ImGui::InputFloat("Aspect ratio", &aspect, 0.0f, 0.0f, "%.3f", ImGuiInputTextFlags_ReadOnly);
 		
 			ImGui::TreePop();
+			ImGui::Separator();
 		}
 
+		ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 		if (ImGui::TreeNode("Ray Properties")) {
 
 			ImGui::InputInt("Samples per pixel", &activeCamera.samples_per_pixel, 1, 2);
@@ -186,17 +223,35 @@ void Renderer::SetupUI(Camera& activeCamera, const float dt)
 			ImGui::InputInt("Max bounces", &activeCamera.max_bounces);
 			ImGui::SetItemTooltip("Maximum times a ray can bounce off of scene geometry.\r\nHigher values will increase visual accuracy at expense of performance.");
 
-			ImGui::BeginChild("Sky Colour");
-			ImGui::SeparatorText("Sky Colour Gradiant");
+			ImGui::Checkbox("Accumulation", &accumulate_frames);
+			ImGui::SetItemTooltip("When enabled, final render will use an accumulation of previous frames, effectively gathering samples over multiple frames.\r\nWorks best with static scenes.");
+			if (accumulate_frames) {
+				ImGui::SameLine();
+				ImGui::Checkbox("Auto-Reset", &auto_reset_accumulation);
+				ImGui::SetItemTooltip("When enabled, camera movement will reset accumulation");
+			}
+			else {
+				ResetAccumulation();
+			}
 
-			ImGui::ColorEdit3("Min-y colour", &activeCamera.sky_colour_min_y[0]);
+			if (ImGui::Button("Reset Accumulation")) {
+				ResetAccumulation();
+			}
+
+			ImGui::Text("Sky Colour Gradient");
+
+			if (ImGui::ColorEdit3("Min-y colour", &activeCamera.sky_colour_min_y[0])) {
+				ResetAccumulation();
+			}
 			ImGui::SetItemTooltip("When a ray misses the scene (hits the sky) and ray Y = 0, this colour will be used.");
 
-			ImGui::ColorEdit3("Max-y colour", &activeCamera.sky_colour_max_y[0]);
+			if (ImGui::ColorEdit3("Max-y colour", &activeCamera.sky_colour_max_y[0])) {
+				ResetAccumulation();
+			}
 			ImGui::SetItemTooltip("When a ray misses the scene (hits the sky) and ray Y = 1, this colour will be used.");
-			ImGui::EndChild();
 
 			ImGui::TreePop();
+			ImGui::Separator();
 		}
 
 		ImGui::PopStyleVar(1);
@@ -204,20 +259,16 @@ void Renderer::SetupUI(Camera& activeCamera, const float dt)
 	ImGui::EndChild();
 	ImGui::End();
 
-	if (viewport_width != SCR_WIDTH || viewport_height != SCR_HEIGHT) {
-		unsigned int widthR = viewport_width % WORK_GROUP_SIZE;
-		unsigned int heightR = viewport_height % WORK_GROUP_SIZE;
+	viewport_width -= viewport_width % WORK_GROUP_SIZE;
+	viewport_height -= viewport_height % WORK_GROUP_SIZE;
 
+	if (viewport_width != SCR_WIDTH || viewport_height != SCR_HEIGHT) {
 		SCR_WIDTH = viewport_width;
 		SCR_HEIGHT = viewport_height;
-		if (widthR != 0) {
-			SCR_WIDTH = viewport_width - widthR;
-		}
-		if (heightR != 0) {
-			SCR_HEIGHT = viewport_height - heightR;
-		}
+
 		screenBuffers.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
 		finalImage.ResizeTexture(SCR_WIDTH, SCR_HEIGHT);
+		activeCamera.SetCameraHasMoved(true);
 	}
 }
 
