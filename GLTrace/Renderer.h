@@ -173,7 +173,7 @@ public:
 	}
 
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		if (key == GLFW_KEY_ESCAPE) { glfwSetWindowShouldClose(window, true); }
+		//if (key == GLFW_KEY_ESCAPE) { glfwSetWindowShouldClose(window, true); }
 		if (action == GLFW_RELEASE) {
 			InputManager::OnKeyUp(key);
 			if (key == GLFW_KEY_C) {
