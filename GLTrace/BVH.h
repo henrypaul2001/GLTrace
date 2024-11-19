@@ -79,8 +79,8 @@ public:
 
 		// Create root node
 		tree.clear();
-		tree.reserve(totalElements * 2 - 1);
-		for (unsigned int i = 0; i < totalElements * 2 - 1; i++) {
+		tree.reserve(totalElements * 2 + 2);
+		for (unsigned int i = 0; i < totalElements * 2 + 2; i++) {
 			tree.push_back(BVHNode());
 		}
 		BVHNode& root = tree[0];
