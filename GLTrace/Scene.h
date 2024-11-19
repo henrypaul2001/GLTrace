@@ -60,6 +60,8 @@ public:
 	Camera* GetSceneCamera() { return &sceneCamera; }
 	const std::vector<Sphere>& GetSpheres() const { return spheres; }
 	const std::vector<Quad>& GetQuads() const { return quads; }
+	const std::string& GetSphereName(const unsigned int index) const { return sphere_names[index]; }
+	const std::string& GetQuadName(const unsigned int index) const { return quad_names[index]; }
 	const BVH& GetBVH() const { return bvh; }
 
 	void BuildBVH() { bvh.BuildBVH(quads, spheres); }

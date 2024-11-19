@@ -20,7 +20,7 @@ int main()
 	Renderer renderer = Renderer(1920, 1080);
 	CameraController camControl;
 
-	Scene* scene = new TestModelScene();
+	Scene* scene = new TestScene();
 	scene->SetupScene();
 	scene->BuildBVH();
 	scene->BufferBVH(renderer.GetRTCompute());

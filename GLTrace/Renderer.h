@@ -149,7 +149,7 @@ public:
 		ImGui::DestroyContext();
 	}
 
-	void Render(Camera& activeCamera, const Scene& activeScene, const float dt);
+	void Render(Camera& activeCamera, Scene& activeScene, const float dt);
 
 	void ResizeWindow(const unsigned int width, const unsigned int height) {
 		unsigned int widthR = width % WORK_GROUP_SIZE;
@@ -219,7 +219,7 @@ private:
 	bool InitIMGUI();
 
 	void RenderScene(Camera& activeCamera, const Scene& activeScene);
-	void SetupUI(Camera& activeCamera, const float dt);
+	void SetupUI(Camera& activeCamera, Scene& activeScene, const float dt);
 
 	Texture2DArray screenBuffers;
 	Texture2D finalImage;
