@@ -40,7 +40,7 @@ public:
 			for (unsigned int j = 0; j < 50; j++) {
 				for (unsigned int k = 0; k < 50; k++) {
 					glm::vec3 position = origin + glm::vec3(offset * i, offset * j, offset * k);
-					AddSphere("Sphere " + std::to_string(i), position, 3.0f, 0);
+					AddSphere("Sphere " + std::to_string(count), position, 3.0f, 0);
 					//AddTriangle(position, glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(0.0f, 3.0f, 0.0f), 0);
 					count++;
 				}
