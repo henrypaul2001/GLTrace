@@ -4,6 +4,7 @@
 #include "TextureLoader.h"
 #include "Hittables.h"
 #include "BVH.h"
+#include <unordered_map>
 
 static const int MAX_SPHERES = 1000000;
 static const int MAX_QUADS = 1000000;
@@ -94,31 +95,71 @@ public:
 	}
 
 protected:
-	Sphere& AddSphere(const glm::vec3& position, const float radius, const unsigned int material_index) {
-		if (spheres.size() < MAX_SPHERES) {
-			spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, material_index));
+	Sphere& AddSphere(const std::string& name, const glm::vec3& position, const float radius, const unsigned int material_index) {
+		if (sphere_map.find(name) == sphere_map.end()) {
+			if (spheres.size() < MAX_SPHERES) {
+				spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, material_index));
+				sphere_names.push_back(name);
+				sphere_map[name] = spheres.size() - 1;
+			}
+			else {
+				Logger::LogWarning("Maximum sphere count reached");
+			}
+			return spheres.back();
 		}
-		return spheres.back();
-	}
-	Quad& AddQuad(const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
-		if (quads.size() < MAX_QUADS) {
-			quads.push_back(Quad(QUAD, Q, U, V, material_index));
+		else {
+			Logger::LogError("Sphere name already exists");
 		}
-		return quads.back();
 	}
-	Quad& AddTriangle(const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
-		if (quads.size() < MAX_QUADS) {
-			quads.push_back(Quad(TRIANGLE, Q, U, V, material_index));
+	Quad& AddQuad(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
+		if (quad_map.find(name) == quad_map.end()) {
+			if (quads.size() < MAX_QUADS) {
+				quads.push_back(Quad(QUAD, Q, U, V, material_index));
+				quad_names.push_back(name);
+				quad_map[name] = quads.size() - 1;
+			}
+			else {
+				Logger::LogWarning("Maximum quad count reached");
+			}
+			return quads.back();
 		}
-		return quads.back();
-	}
-	Quad& AddDisk(const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
-		if (quads.size() < MAX_QUADS) {
-			quads.push_back(Quad(DISK, Q, U, V, material_index));
+		else {
+			Logger::LogError("Quad name already exists");
 		}
-		return quads.back();
 	}
-	std::vector<Quad*> AddBox(const glm::vec3& a, const glm::vec3& b, const unsigned int material_index) {
+	Quad& AddTriangle(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
+		if (quad_map.find(name) == quad_map.end()) {
+			if (quads.size() < MAX_QUADS) {
+				quads.push_back(Quad(TRIANGLE, Q, U, V, material_index));
+				quad_names.push_back(name);
+				quad_map[name] = quads.size() - 1;
+			}
+			else {
+				Logger::LogWarning("Maximum quad count reached");
+			}
+			return quads.back();
+		}
+		else {
+			Logger::LogError("Quad name already exists");
+		}
+	}
+	Quad& AddDisk(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
+		if (quad_map.find(name) == quad_map.end()) {
+			if (quads.size() < MAX_QUADS) {
+				quads.push_back(Quad(DISK, Q, U, V, material_index));
+				quad_names.push_back(name);
+				quad_map[name] = quads.size() - 1;
+			}
+			else {
+				Logger::LogWarning("Maximum quad count reached");
+			}
+			return quads.back();
+		}
+		else {
+			Logger::LogError("Quad name already exists");
+		}
+	}
+	std::vector<Quad*> AddBox(const std::string& name, const glm::vec3& a, const glm::vec3& b, const unsigned int material_index) {
 		std::vector<Quad*> sides;
 		sides.reserve(6);
 
@@ -129,12 +170,12 @@ protected:
 		glm::vec3 dy = glm::vec3(0.0f, max.y - min.y, 0.0f);
 		glm::vec3 dz = glm::vec3(0.0f, 0.0f, max.z - min.z);
 
-		sides.push_back(&AddQuad(glm::vec3(min.x, min.y, max.z), dx, dy, material_index)); // front
-		sides.push_back(&AddQuad(glm::vec3(max.x, min.y, max.z), -dz, dy, material_index)); // right
-		sides.push_back(&AddQuad(glm::vec3(max.x, min.y, min.z), -dx, dy, material_index)); // back
-		sides.push_back(&AddQuad(glm::vec3(min.x, min.y, min.z), dz, dy, material_index)); // left
-		sides.push_back(&AddQuad(glm::vec3(min.x, max.y, max.z), dx, -dz, material_index)); // top
-		sides.push_back(&AddQuad(glm::vec3(min.x, min.y, min.z), dx, dz, material_index)); // bottom
+		sides.push_back(&AddQuad(name + "_front", glm::vec3(min.x, min.y, max.z), dx, dy, material_index)); // front
+		sides.push_back(&AddQuad(name + "_right", glm::vec3(max.x, min.y, max.z), -dz, dy, material_index)); // right
+		sides.push_back(&AddQuad(name + "_back", glm::vec3(max.x, min.y, min.z), -dx, dy, material_index)); // back
+		sides.push_back(&AddQuad(name + "_left", glm::vec3(min.x, min.y, min.z), dz, dy, material_index)); // left
+		sides.push_back(&AddQuad(name + "_top", glm::vec3(min.x, max.y, max.z), dx, -dz, material_index)); // top
+		sides.push_back(&AddQuad(name + "_bottom", glm::vec3(min.x, min.y, min.z), dx, dz, material_index)); // bottom
 
 		return sides;
 	}
@@ -156,8 +197,14 @@ protected:
 
 	Camera sceneCamera;
 private:
+	std::unordered_map<std::string, unsigned int> sphere_map;
+	std::vector<std::string> sphere_names;
 	std::vector<Sphere> spheres;
+
+	std::unordered_map<std::string, unsigned int> quad_map;
+	std::vector<std::string> quad_names;
 	std::vector<Quad> quads;
+
 	std::vector<Material> materials;
 	std::vector<MaterialSet> material_sets;
 

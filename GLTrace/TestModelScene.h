@@ -47,10 +47,10 @@ public:
 		AddMaterial(mirror); // 2
 
 		// Spheres
-		AddSphere(glm::vec3(5.5f, 10.0f, -5.5f), 3.25f, 1);
+		AddSphere("Light", glm::vec3(5.5f, 10.0f, -5.5f), 3.25f, 1);
 
 		// Quads
-		AddQuad(glm::vec3(-100.0f, -1.2f, -100.0f), glm::vec3(200.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 200.0f), 2);
+		AddQuad("Floor", glm::vec3(-100.0f, -1.2f, -100.0f), glm::vec3(200.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 200.0f), 2);
 
 		const int N = 12582;
 		FILE* file;
@@ -61,7 +61,8 @@ public:
 			const glm::vec3 origin = glm::vec3(a, b, c);
 			const glm::vec3 u = glm::vec3(d, e, f) - origin;
 			const glm::vec3 v = glm::vec3(g, h, i) - origin;
-			AddTriangle(origin, u, v, 0);
+			std::string triName = std::string("Triangle") + std::to_string(t);
+			AddTriangle(triName.c_str(), origin, u, v, 0);
 		}
 		fclose(file);
 	}

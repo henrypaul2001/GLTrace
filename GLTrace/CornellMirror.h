@@ -67,25 +67,25 @@ public:
 		AddMaterial(glass); // 5
 
 		// Spheres
-		AddSphere(glm::vec3(-16.5f, 35.0f, -26.5f), 7.5f, 3);
+		AddSphere("Light", glm::vec3(-16.5f, 35.0f, -26.5f), 7.5f, 3);
 
 		glm::vec3 spherePosition = glm::vec3(-27.75f, 4.0f, -11.0f);
-		AddSphere(spherePosition, 4.0f, 5);
-		AddSphere(spherePosition + glm::vec3(12.5f, 0.0f, 10.0f), 4.0f, 5);
-		AddSphere(spherePosition + glm::vec3(-10.0f, 0.0f, 11.0f), 4.0f, 5);
+		AddSphere("Glass Ball 1", spherePosition, 4.0f, 5);
+		AddSphere("Glass Ball 2", spherePosition + glm::vec3(12.5f, 0.0f, 10.0f), 4.0f, 5);
+		AddSphere("Glass Ball 3", spherePosition + glm::vec3(-10.0f, 0.0f, 11.0f), 4.0f, 5);
 
 		// Quads
 		// Cornell box
-		AddQuad(glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 2); // left
-		AddQuad(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 1); // Right
-		AddQuad(glm::vec3(-55.5f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Top
-		AddQuad(glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Bottom
-		AddQuad(glm::vec3(-55.5f, 0.0f, -55.5f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), 0); // Back
-		//AddQuad(glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), 0); // Front
+		AddQuad("Left", glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 2); // left
+		AddQuad("Right", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 1); // Right
+		AddQuad("Top", glm::vec3(-55.5f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Top
+		AddQuad("Bottom", glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Bottom
+		AddQuad("Back", glm::vec3(-55.5f, 0.0f, -55.5f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), 0); // Back
+		//AddQuad("Front", glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), 0); // Front
 
 		// Geometry
-		AddQuad(glm::vec3(-36.5f, 27.5f, -25.0f), glm::vec3(25.0f, 0.0f, 30.0f), glm::vec3(10.0f, -35.0f, 0.0f), 0); // Light blocker
-		AddQuad(glm::vec3(-40.0f, 10.0f, -45.0f), glm::vec3(-5.5f, 0.0f, 15.0f) * 2.5f, glm::vec3(10.0f, 40.0f, 0.0f), 4); // mirror
+		AddQuad("Light Blocker", glm::vec3(-36.5f, 27.5f, -25.0f), glm::vec3(25.0f, 0.0f, 30.0f), glm::vec3(10.0f, -35.0f, 0.0f), 0); // Light blocker
+		AddQuad("Mirror", glm::vec3(-40.0f, 10.0f, -45.0f), glm::vec3(-5.5f, 0.0f, 15.0f) * 2.5f, glm::vec3(10.0f, 40.0f, 0.0f), 4); // mirror
 	}
 
 	void UpdateScene(const float dt) override {

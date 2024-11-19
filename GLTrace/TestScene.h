@@ -130,14 +130,14 @@ public:
 		AddMaterial(volume); // 6
 
 		// Spheres
-		AddSphere(glm::vec3(150.0f, 30.0f, -55.0f), 50.0f, 0);
-		AddSphere(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f, 1);
-		AddSphere(glm::vec3(0.0f, 1.5f, 0.0f), 2.0f, 6);
-		AddSphere(glm::vec3(6.0f, 1.5f, 0.0f), 2.0f, 4);
-		AddSphere(glm::vec3(6.0f, 1.5f, 0.0f), 1.9f, 5);
+		AddSphere("Sun", glm::vec3(150.0f, 30.0f, -55.0f), 50.0f, 0);
+		AddSphere("Ground", glm::vec3(0.0f, -100.5f, -1.0f), 100.0f, 1);
+		AddSphere("Smoke", glm::vec3(0.0f, 1.5f, 0.0f), 2.0f, 6);
+		AddSphere("Glass Ball 1", glm::vec3(6.0f, 1.5f, 0.0f), 2.0f, 4);
+		AddSphere("Glass Ball 2", glm::vec3(6.0f, 1.5f, 0.0f), 1.9f, 5);
 
 		// Quads
-		AddQuad(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(2.5f, 0.0f, 0.0f), glm::vec3(0.0f, 2.5f, 0.0f), 3);
+		AddQuad("Test Quad", glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(2.5f, 0.0f, 0.0f), glm::vec3(0.0f, 2.5f, 0.0f), 3);
 	}
 
 	void UpdateScene(const float dt) override {

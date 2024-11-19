@@ -55,17 +55,17 @@ public:
 		// Spheres
 
 		// Quads
-		AddQuad(glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 2); // left
-		AddQuad(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 1); // Right
-		AddQuad(glm::vec3(-55.5f + 18.5f, 55.4f, -18.5f), glm::vec3(0.0f, 0.0f, -18.5f), glm::vec3(18.5f, 0.0f, 0.0f), 3); // Light
-		AddQuad(glm::vec3(-55.5f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Top
-		AddQuad(glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Bottom
-		AddQuad(glm::vec3(-55.5f, 0.0f, -55.5f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), 0); // Back
-		AddQuad(glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), 0); // Front
+		AddQuad("Left", glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 2); // left
+		AddQuad("Right", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 1); // Right
+		AddQuad("Light", glm::vec3(-55.5f + 18.5f, 55.4f, -18.5f), glm::vec3(0.0f, 0.0f, -18.5f), glm::vec3(18.5f, 0.0f, 0.0f), 3); // Light
+		AddQuad("Top", glm::vec3(-55.5f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Top
+		AddQuad("Bottom", glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -55.5f), 0); // Bottom
+		AddQuad("Back", glm::vec3(-55.5f, 0.0f, -55.5f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), 0); // Back
+		AddQuad("Front", glm::vec3(-55.5f, 0.0f, 0.0f), glm::vec3(0.0f, 55.5f, 0.0f), glm::vec3(55.5f, 0.0f, 0.0f), 0); // Front
 
 		// Boxes
-		AddBox(glm::vec3(-40.0f, 0.0f, -40.0f), glm::vec3(-25.0f, 35.0f, -30.0f), 0);
-		AddBox(glm::vec3(-15.0f, 0.0f, -15.0f), glm::vec3(-20.0f, 15.0f, -20.0f), 0);
+		AddBox("Tall Box", glm::vec3(-40.0f, 0.0f, -40.0f), glm::vec3(-25.0f, 35.0f, -30.0f), 0);
+		AddBox("Small Box", glm::vec3(-15.0f, 0.0f, -15.0f), glm::vec3(-20.0f, 15.0f, -20.0f), 0);
 	}
 
 	void UpdateScene(const float dt) override {
