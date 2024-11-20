@@ -62,6 +62,11 @@ public:
 	const std::vector<Quad>& GetQuads() const { return quads; }
 	const std::string& GetSphereName(const unsigned int index) const { return sphere_names[index]; }
 	const std::string& GetQuadName(const unsigned int index) const { return quad_names[index]; }
+	Sphere* GetSphere(const unsigned int index) { if (index < spheres.size()) { return &spheres[index]; } else { Logger::LogError("Sphere index out of bounds"); return nullptr; } }
+	Quad* GetQuad(const unsigned int index) { if (index < quads.size()) { return &quads[index]; } else { Logger::LogError("Quad index out of bounds"); return nullptr; } }
+
+	const std::vector<Material>& GetMaterials() const { return materials; }
+
 	const BVH& GetBVH() const { return bvh; }
 
 	void BuildBVH() { bvh.BuildBVH(quads, spheres); }

@@ -152,8 +152,10 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	ImGui::End();
 
 	static int selected = 0;
-	int num_spheres = activeScene.GetSpheres().size();
-	int num_quads = activeScene.GetQuads().size();
+	static int selected_material = 0;
+	const int num_spheres = activeScene.GetSpheres().size();
+	const int num_quads = activeScene.GetQuads().size();
+	const int num_materials = activeScene.GetMaterials().size();
 
 	// Scene details
 	// -------------
@@ -319,6 +321,59 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			ImGui::PopStyleVar(1);
 		}
 		ImGui::EndChild();
+	}
+	else if (selected > 0) {
+		int sphereID = selected - 1;
+		int quadID = selected - (num_spheres + 1);
+
+		if (sphereID < num_spheres) {
+			// Sphere selected
+			Sphere* sphere = activeScene.GetSphere(sphereID);
+			const std::string& sphereName = activeScene.GetSphereName(sphereID);
+
+			ImGui::Text(sphereName.c_str());
+			ImGui::Separator();
+			if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 6));
+
+				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+				if (ImGui::TreeNode("Physical Properties")) {
+					ImGui::Text("Position");
+					ImGui::DragFloat("x", &sphere->Center[0]);
+					ImGui::DragFloat("y", &sphere->Center[1]);
+					ImGui::DragFloat("z", &sphere->Center[2]);
+					ImGui::Spacing();
+					ImGui::DragFloat("Radius", &sphere->Radius);
+
+					selected_material = sphere->material_index;
+					ImGui::Spacing();
+					if (ImGui::BeginCombo("Material", std::to_string(selected_material).c_str())) {
+						for (int i = 0; i < num_materials; i++) {
+							if (ImGui::Selectable(std::to_string(i).c_str(), selected_material == i)) {
+								selected_material = i;
+							}
+
+							if (selected_material == i) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+					sphere->material_index = selected_material;
+
+					ImGui::TreePop();
+					ImGui::Separator();
+				}
+
+				ImGui::PopStyleVar(1);
+			}
+			ImGui::EndChild();
+		}
+		else if (quadID < num_quads) {
+			// Quad selected
+			Quad* quad = activeScene.GetQuad(quadID);
+			const std::string& quadName = activeScene.GetQuadName(quadID);
+		}
 	}
 	ImGui::End();
 
