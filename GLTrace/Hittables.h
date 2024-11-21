@@ -72,6 +72,7 @@ public:
 	glm::vec3 GetCentre() const {
 		glm::vec3 extent = U + V;
 		if (triangle_disk_id == 1) { return glm::vec3(Q) + (extent * 0.3333f); }
+		if (triangle_disk_id == 2) { return glm::vec3(Q); }
 		else { return glm::vec3(Q) + (extent * 0.5f); }
 	}
 
