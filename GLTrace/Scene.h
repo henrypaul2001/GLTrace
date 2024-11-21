@@ -53,8 +53,8 @@ public:
 
 	virtual void SetupScene() = 0;
 	virtual void UpdateScene(const float dt) {
-		//BuildBVH();
-		RefitBVH();
+		BuildBVH();
+		//RefitBVH();
 	}
 
 	Camera* GetSceneCamera() { return &sceneCamera; }

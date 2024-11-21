@@ -153,6 +153,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 	static int selected = 0;
 	static int selected_material = 0;
+	static int selected_quad_type = 0;
 	const int num_spheres = activeScene.GetSpheres().size();
 	const int num_quads = activeScene.GetQuads().size();
 	const int num_materials = activeScene.GetMaterials().size();
@@ -373,6 +374,76 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			// Quad selected
 			Quad* quad = activeScene.GetQuad(quadID);
 			const std::string& quadName = activeScene.GetQuadName(quadID);
+			bool quad_has_changed = false;
+			ImGui::Text(quadName.c_str());
+			ImGui::Separator();
+			if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 6));
+
+				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+				if (ImGui::TreeNode("Physical Properties")) {
+					if (ImGui::DragFloat3("Position", &quad->Q[0])) { quad_has_changed = true; }
+					ImGui::Spacing();
+					if (ImGui::DragFloat3("Horizontal extent", &quad->U[0])) { quad_has_changed = true; }
+					ImGui::Spacing();
+					if (ImGui::DragFloat3("Vertical extent", &quad->V[0])) { quad_has_changed = true; }
+					
+					if (quad_has_changed) { quad->Recalculate(); }
+
+					selected_quad_type = quad->triangle_disk_id;
+					const char* quad_types[3] = { "Quad", "Triangle", "Disk" };
+					ImGui::Spacing();
+					if (ImGui::BeginCombo("Quad Type", quad_types[selected_quad_type])) {
+						for (unsigned int i = 0; i < 3; i++) {
+							if (ImGui::Selectable(quad_types[i], selected_quad_type == i)) {
+								selected_quad_type = i;
+							}
+
+							if (selected_quad_type == i) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+					quad->triangle_disk_id = selected_quad_type;
+
+					selected_material = quad->material_index;
+					ImGui::Spacing();
+					if (ImGui::BeginCombo("Material", std::to_string(selected_material).c_str())) {
+						for (int i = 0; i < num_materials; i++) {
+							if (ImGui::Selectable(std::to_string(i).c_str(), selected_material == i)) {
+								selected_material = i;
+							}
+
+							if (selected_material == i) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+					quad->material_index = selected_material;
+
+					ImGui::TreePop();
+					ImGui::Separator();
+				}
+
+				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+				if (ImGui::TreeNode("Physical Constants")) {
+
+					ImGuiInputTextFlags readonlyFlag = ImGuiInputTextFlags_ReadOnly;
+
+					ImGui::InputFloat3("W", &quad->W[0], "%.3f", readonlyFlag);
+					ImGui::InputFloat3("Normal", &quad->Normal[0], "%.3f", readonlyFlag);
+					ImGui::InputFloat("D", &quad->D, 0.0f, 0.0f, "%.3f", readonlyFlag);
+					ImGui::InputFloat("Area", &quad->Area, 0.0f, 0.0f, "%.3f", readonlyFlag);
+
+					ImGui::TreePop();
+					ImGui::Separator();
+				}
+
+				ImGui::PopStyleVar(1);
+			}
+			ImGui::EndChild();
 		}
 	}
 	ImGui::End();
