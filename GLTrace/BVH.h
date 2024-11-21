@@ -170,8 +170,15 @@ private:
 			node.bbox.grow(QU);
 			node.bbox.grow(QV);
 
-			if (leafQuad.triangle_disk_id != 1u) { // if not a triangle
+			if (leafQuad.triangle_disk_id != 1u) { // if not a triangleh
 				node.bbox.grow(QUV);
+			}
+
+			if (leafQuad.triangle_disk_id == 2u) {
+				node.bbox.grow(Q - U);
+				node.bbox.grow(Q - V);
+				node.bbox.grow(Q - (U + V));
+				node.bbox.grow(Q - (U - V));
 			}
 		}
 		for (unsigned int first = node.firstSpherePrimitive, i = 0; i < node.spherePrimitiveCount; i++) {
@@ -203,8 +210,15 @@ private:
 				leftAABB.grow(QU);
 				leftAABB.grow(QV);
 
-				if (quad.triangle_disk_id != 1u) { // if not a triangle
+				if (quad.triangle_disk_id != 1u) { // if not a triangleh
 					leftAABB.grow(QUV);
+				}
+
+				if (quad.triangle_disk_id == 2u) {
+					leftAABB.grow(Q - U);
+					leftAABB.grow(Q - V);
+					leftAABB.grow(Q - (U + V));
+					leftAABB.grow(Q - (U - V));
 				}
 			}
 			else {
@@ -214,8 +228,15 @@ private:
 				rightAABB.grow(QU);
 				rightAABB.grow(QV);
 
-				if (quad.triangle_disk_id != 1u) { // if not a triangle
+				if (quad.triangle_disk_id != 1u) { // if not a triangleh
 					rightAABB.grow(QUV);
+				}
+
+				if (quad.triangle_disk_id == 2u) {
+					rightAABB.grow(Q - U);
+					rightAABB.grow(Q - V);
+					rightAABB.grow(Q - (U + V));
+					rightAABB.grow(Q - (U - V));
 				}
 			}
 		}
@@ -331,8 +352,15 @@ private:
 				bin[binID].bounds.grow(QU);
 				bin[binID].bounds.grow(QV);
 
-				if (quad.triangle_disk_id != 1u) { // if not a triangle
+				if (quad.triangle_disk_id != 1u) { // if not a triangleh
 					bin[binID].bounds.grow(QUV);
+				}
+
+				if (quad.triangle_disk_id == 2u) {
+					bin[binID].bounds.grow(Q - U);
+					bin[binID].bounds.grow(Q - V);
+					bin[binID].bounds.grow(Q - (U + V));
+					bin[binID].bounds.grow(Q - (U - V));
 				}
 			}
 			// Spheres
