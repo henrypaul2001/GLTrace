@@ -506,10 +506,10 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			if (ImGui::ColorEdit3("Albedo", &mat.Albedo[0])) {
 				ResetAccumulation();
 			}
-			if (ImGui::DragFloat("Roughness", &mat.Roughness)) {
+			if (ImGui::DragFloat("Roughness", &mat.Roughness, 0.01f, 0.0f, 1.0f)) {
 				ResetAccumulation();
 			}
-			if (ImGui::DragFloat("Metalness", &mat.Metal)) {
+			if (ImGui::DragFloat("Metalness", &mat.Metal, 0.01f, 0.0f, 1.0f)) {
 				ResetAccumulation();
 			}
 
@@ -524,7 +524,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				ResetAccumulation();
 			}
 			if (isTransparent) {
-				if (ImGui::DragFloat("Refractive index", &mat.refractive_index)) {
+				if (ImGui::DragFloat("Refractive index", &mat.refractive_index, 0.01f)) {
 					ResetAccumulation();
 				}
 			}
@@ -534,7 +534,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			if (ImGui::ColorEdit3("Emissive Colour", &mat.EmissiveColour[0])) {
 				ResetAccumulation();
 			}
-			if (ImGui::DragFloat("Emissive power", &mat.EmissivePower)) {
+			if (ImGui::DragFloat("Emissive power", &mat.EmissivePower, 0.01f)) {
 				ResetAccumulation();
 			}
 
