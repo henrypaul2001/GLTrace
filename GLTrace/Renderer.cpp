@@ -341,11 +341,19 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Physical Properties")) {
 					ImGui::Text("Position");
-					ImGui::DragFloat("x", &sphere->Center[0]);
-					ImGui::DragFloat("y", &sphere->Center[1]);
-					ImGui::DragFloat("z", &sphere->Center[2]);
+					if (ImGui::DragFloat("x", &sphere->Center[0])) {
+						ResetAccumulation();
+					}
+					if (ImGui::DragFloat("y", &sphere->Center[1])) {
+						ResetAccumulation();
+					}
+					if (ImGui::DragFloat("z", &sphere->Center[2])) {
+						ResetAccumulation();
+					}
 					ImGui::Spacing();
-					ImGui::DragFloat("Radius", &sphere->Radius);
+					if (ImGui::DragFloat("Radius", &sphere->Radius)) {
+						ResetAccumulation();
+					}
 
 					selected_material = sphere->material_index;
 					ImGui::Spacing();
@@ -361,8 +369,10 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 						}
 						ImGui::EndCombo();
 					}
-					sphere->material_index = selected_material;
-
+					if (sphere->material_index != selected_material) {
+						sphere->material_index = selected_material;
+						ResetAccumulation();
+					}
 					ImGui::TreePop();
 					ImGui::Separator();
 				}
@@ -406,7 +416,10 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 						}
 						ImGui::EndCombo();
 					}
-					quad->triangle_disk_id = selected_quad_type;
+					if (quad->triangle_disk_id != selected_quad_type) {
+						quad->triangle_disk_id = selected_quad_type;
+						ResetAccumulation();
+					}
 
 					selected_material = quad->material_index;
 					ImGui::Spacing();
@@ -422,7 +435,10 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 						}
 						ImGui::EndCombo();
 					}
-					quad->material_index = selected_material;
+					if (quad->material_index != selected_material) {
+						quad->material_index = selected_material;
+						ResetAccumulation();
+					}
 
 					ImGui::TreePop();
 					ImGui::Separator();
