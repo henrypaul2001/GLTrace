@@ -154,6 +154,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	static int selected = 0;
 	static int selected_material = 0;
 	static int selected_quad_type = 0;
+	static int selected_edit_material = 0;
 	const int num_spheres = activeScene.GetSpheres().size();
 	const int num_quads = activeScene.GetQuads().size();
 	const int num_materials = activeScene.GetMaterials().size();
@@ -446,6 +447,39 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			ImGui::EndChild();
 		}
 	}
+	ImGui::End();
+
+	// Material browser
+	// ----------------
+	ImGui::Begin("Materials");
+	ImGui::Text("Material count: %d", num_materials);
+	ImGui::Text("Maximum materials: %d", MAX_MATERIALS);
+	ImGui::Separator();
+	if (num_materials > 0) {
+		if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 8));
+
+			ImGuiListClipper clipper;
+			clipper.Begin(num_materials);
+			while (clipper.Step()) {
+				for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+					if (ImGui::Selectable(activeScene.GetMaterialName(i).c_str(), selected_edit_material == i)) {
+						selected_edit_material = i;
+					}
+				}
+			}
+
+			ImGui::PopStyleVar(1);
+		}
+		ImGui::EndChild();
+		ImGui::Separator();
+	}
+	ImGui::End();
+
+	ImGui::Begin("Material Properties");
+	const char* mat_name = activeScene.GetMaterialName(selected_edit_material).c_str();
+	ImGui::Text(mat_name);
+	ImGui::Separator();
 	ImGui::End();
 
 	viewport_width -= viewport_width % WORK_GROUP_SIZE;
