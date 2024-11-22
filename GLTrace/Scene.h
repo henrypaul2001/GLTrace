@@ -66,6 +66,7 @@ public:
 	Quad* GetQuad(const unsigned int index) { if (index < quads.size()) { return &quads[index]; } else { Logger::LogError("Quad index out of bounds"); return nullptr; } }
 
 	const std::vector<Material>& GetMaterials() const { return materials; }
+	const std::string& GetMaterialName(const unsigned int index) const { return material_names[index]; }
 
 	const BVH& GetBVH() const { return bvh; }
 

@@ -348,9 +348,9 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 					selected_material = sphere->material_index;
 					ImGui::Spacing();
-					if (ImGui::BeginCombo("Material", std::to_string(selected_material).c_str())) {
+					if (ImGui::BeginCombo("Material", activeScene.GetMaterialName(selected_material).c_str())) {
 						for (int i = 0; i < num_materials; i++) {
-							if (ImGui::Selectable(std::to_string(i).c_str(), selected_material == i)) {
+							if (ImGui::Selectable(activeScene.GetMaterialName(i).c_str(), selected_material == i)) {
 								selected_material = i;
 							}
 
@@ -409,9 +409,9 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 					selected_material = quad->material_index;
 					ImGui::Spacing();
-					if (ImGui::BeginCombo("Material", std::to_string(selected_material).c_str())) {
+					if (ImGui::BeginCombo("Material", activeScene.GetMaterialName(selected_material).c_str())) {
 						for (int i = 0; i < num_materials; i++) {
-							if (ImGui::Selectable(std::to_string(i).c_str(), selected_material == i)) {
+							if (ImGui::Selectable(activeScene.GetMaterialName(i).c_str(), selected_material == i)) {
 								selected_material = i;
 							}
 
