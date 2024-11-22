@@ -388,7 +388,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 					if (ImGui::DragFloat3("Horizontal extent", &quad->U[0])) { quad_has_changed = true; }
 					ImGui::Spacing();
 					if (ImGui::DragFloat3("Vertical extent", &quad->V[0])) { quad_has_changed = true; }
-					
+
 					if (quad_has_changed) { quad->Recalculate(); }
 
 					selected_quad_type = quad->triangle_disk_id;
@@ -477,9 +477,71 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	ImGui::End();
 
 	ImGui::Begin("Material Properties");
-	const char* mat_name = activeScene.GetMaterialName(selected_edit_material).c_str();
-	ImGui::Text(mat_name);
-	ImGui::Separator();
+	if (num_materials > 0) {
+		const char* mat_name = activeScene.GetMaterialName(selected_edit_material).c_str();
+		ImGui::Text(mat_name);
+		ImGui::Separator();
+		Material& mat = activeScene.GetMaterial(selected_edit_material);
+		if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 8));
+
+			// Surface
+			ImGui::SeparatorText("Surface");
+			if (ImGui::ColorEdit3("Albedo", &mat.Albedo[0])) {
+				ResetAccumulation();
+			}
+			if (ImGui::DragFloat("Roughness", &mat.Roughness)) {
+				ResetAccumulation();
+			}
+			if (ImGui::DragFloat("Metalness", &mat.Metal)) {
+				ResetAccumulation();
+			}
+
+			ImGui::Text("Material set combo box will go here:");
+
+			// Transparency
+			ImGui::SeparatorText("Transparency");
+			bool isTransparent = mat.is_transparent;
+			ImGui::Checkbox("Transparent", &isTransparent);
+			if (isTransparent != mat.is_transparent) {
+				mat.is_transparent = isTransparent;
+				ResetAccumulation();
+			}
+			if (isTransparent) {
+				if (ImGui::DragFloat("Refractive index", &mat.refractive_index)) {
+					ResetAccumulation();
+				}
+			}
+
+			// Emission
+			ImGui::SeparatorText("Emission");
+			if (ImGui::ColorEdit3("Emissive Colour", &mat.EmissiveColour[0])) {
+				ResetAccumulation();
+			}
+			if (ImGui::DragFloat("Emissive power", &mat.EmissivePower)) {
+				ResetAccumulation();
+			}
+
+			// Volumetric
+			ImGui::SeparatorText("Volumetric");
+			bool isVolume = mat.is_constant_medium;
+			ImGui::Checkbox("Volumetric", &isVolume);
+			if (isVolume != mat.is_constant_medium) {
+				mat.is_constant_medium = isVolume;
+				ResetAccumulation();
+			}
+			if (isVolume) {
+				float density = -1.0f / mat.neg_inv_density;
+				if (ImGui::DragFloat("Density", &density, 0.001f, 0.00001f)) {
+					mat.neg_inv_density = -1.0f / density;
+					ResetAccumulation();
+				}
+			}
+
+			ImGui::PopStyleVar(1);
+		}
+		ImGui::EndChild();
+	}
 	ImGui::End();
 
 	viewport_width -= viewport_width % WORK_GROUP_SIZE;
