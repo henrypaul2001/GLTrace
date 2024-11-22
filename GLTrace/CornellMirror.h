@@ -30,19 +30,19 @@ public:
 		white.Albedo = glm::vec3(0.73f);
 		white.Roughness = 1.0f;
 		white.Metal = 0.0f;
-		AddMaterial(white); // 0
+		AddMaterial("White", white); // 0
 
 		Material red;
 		red.Albedo = glm::vec3(0.65f, 0.05f, 0.05f);
 		red.Roughness = 1.0f;
 		red.Metal = 0.0f;
-		AddMaterial(red); // 1
+		AddMaterial("Red", red); // 1
 
 		Material green;
 		green.Albedo = glm::vec3(0.12f, 0.45f, 0.15f);
 		green.Roughness = 1.0f;
 		green.Metal = 0.0f;
-		AddMaterial(green); // 2
+		AddMaterial("Green", green); // 2
 
 		Material light;
 		light.Albedo = glm::vec3(3.0f, 0.85f, 0.1f);
@@ -50,13 +50,13 @@ public:
 		light.Metal = 0.0f;
 		light.EmissivePower = 2.5f;
 		light.EmissiveColour = glm::vec3(3.0f, 0.85f, 0.1f);
-		AddMaterial(light); // 3
+		AddMaterial("Light", light); // 3
 
 		Material mirror;
 		mirror.Albedo = glm::vec3(1.0f);
 		mirror.Roughness = 0.0f;
 		mirror.Metal = 1.0f;
-		AddMaterial(mirror); // 4
+		AddMaterial("Mirror", mirror); // 4
 
 		Material glass;
 		glass.Albedo = glm::vec3(1.0f);
@@ -64,7 +64,7 @@ public:
 		glass.Metal = 0.0f;
 		glass.is_transparent = true;
 		glass.refractive_index = 1.5f;
-		AddMaterial(glass); // 5
+		AddMaterial("Glass", glass); // 5
 
 		// Spheres
 		AddSphere("Light", glm::vec3(-16.5f, 35.0f, -26.5f), 7.5f, 3);

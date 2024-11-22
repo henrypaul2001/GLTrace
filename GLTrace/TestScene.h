@@ -72,7 +72,7 @@ public:
 		sun.EmissivePower = 1.0f;
 		sun.is_transparent = false;
 		sun.refractive_index = 1.5f;
-		AddMaterial(sun); // 0
+		AddMaterial("Sun", sun); // 0
 
 		Material ground;
 		ground.Albedo = glm::vec3(1.0f);
@@ -82,7 +82,7 @@ public:
 		ground.EmissivePower = 0.0f;
 		ground.is_transparent = false;
 		ground.refractive_index = 1.5f;
-		AddMaterial(ground); // 1
+		AddMaterial("Ground", ground); // 1
 
 		Material emissive_earth;
 		emissive_earth.Albedo = glm::vec3(1.0f);
@@ -93,7 +93,7 @@ public:
 		emissive_earth.is_transparent = false;
 		emissive_earth.refractive_index = 1.5f;
 		emissive_earth.material_set_index = 0;
-		AddMaterial(emissive_earth); // 2
+		AddMaterial("Emissive Earth", emissive_earth); // 2
 
 		Material space_blanket;
 		space_blanket.Albedo = glm::vec3(1.0f);
@@ -104,7 +104,7 @@ public:
 		space_blanket.is_transparent = false;
 		space_blanket.refractive_index = 1.5f;
 		space_blanket.material_set_index = 1;
-		AddMaterial(space_blanket); // 3
+		AddMaterial("Space Blanket", space_blanket); // 3
 
 		Material glass;
 		glass.Albedo = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -114,7 +114,7 @@ public:
 		glass.EmissivePower = 0.0f;
 		glass.is_transparent = true;
 		glass.refractive_index = 1.5f;
-		AddMaterial(glass); // 4
+		AddMaterial("Glass", glass); // 4
 
 		Material bubble;
 		bubble.Albedo = glm::vec3(1.0f);
@@ -124,10 +124,10 @@ public:
 		bubble.EmissivePower = 0.0f;
 		bubble.is_transparent = true;
 		bubble.refractive_index = 1.0f / 1.5f;
-		AddMaterial(bubble); // 5
+		AddMaterial("Glass Bubble", bubble); // 5
 
 		Material volume = Material(0.5, glm::vec3(0.15f));
-		AddMaterial(volume); // 6
+		AddMaterial("Volume", volume); // 6
 
 		// Spheres
 		AddSphere("Sun", glm::vec3(150.0f, 30.0f, -55.0f), 50.0f, 0);

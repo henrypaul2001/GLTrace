@@ -30,7 +30,7 @@ public:
 		white.Albedo = glm::vec3(0.73f);
 		white.Roughness = 1.0f;
 		white.Metal = 0.0f;
-		AddMaterial(white); // 0
+		AddMaterial("White", white); // 0
 
 		Material light;
 		light.Albedo = glm::vec3(1.0f);
@@ -38,13 +38,13 @@ public:
 		light.Metal = 0.0f;
 		light.EmissiveColour = light.Albedo;
 		light.EmissivePower = 10.5f;
-		AddMaterial(light); // 1
+		AddMaterial("Light", light); // 1
 
 		Material mirror;
 		mirror.Albedo = glm::vec3(1.0f);
 		mirror.Roughness = 0.1f;
 		mirror.Metal = 1.0f;
-		AddMaterial(mirror); // 2
+		AddMaterial("Mirror", mirror); // 2
 
 		// Spheres
 		AddSphere("Light", glm::vec3(5.5f, 10.0f, -5.5f), 3.25f, 1);

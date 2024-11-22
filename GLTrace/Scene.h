@@ -187,9 +187,19 @@ protected:
 		return sides;
 	}
 
-	void AddMaterial(const Material& mat) {
-		if (materials.size() < MAX_MATERIALS) {
-			materials.push_back(mat);
+	void AddMaterial(const std::string& name, const Material& mat) {
+		if (material_map.find(name) == material_map.end()) {
+			if (materials.size() < MAX_MATERIALS) {
+				materials.push_back(mat);
+				material_names.push_back(name);
+				material_map[name] = materials.size() - 1;
+			}
+			else {
+				Logger::LogWarning("Maximum quad count reached");
+			}
+		}
+		else {
+			Logger::LogError("Quad name already exists");
 		}
 	}
 
@@ -212,7 +222,10 @@ private:
 	std::vector<std::string> quad_names;
 	std::vector<Quad> quads;
 
+	std::unordered_map<std::string, unsigned int> material_map;
+	std::vector<std::string> material_names;
 	std::vector<Material> materials;
+
 	std::vector<MaterialSet> material_sets;
 
 	BVH bvh;

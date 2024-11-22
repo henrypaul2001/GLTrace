@@ -30,7 +30,7 @@ public:
 		white.Albedo = glm::vec3(0.73f);
 		white.Roughness = 1.0f;
 		white.Metal = 0.0f;
-		AddMaterial(white); // 0
+		AddMaterial("White", white); // 0
 
 		// Spheres
 
