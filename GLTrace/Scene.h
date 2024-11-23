@@ -68,6 +68,7 @@ public:
 	const std::vector<Material>& GetMaterials() const { return materials; }
 	const std::string& GetMaterialName(const unsigned int index) const { return material_names[index]; }
 	Material& GetMaterial(const unsigned int index) { return materials[index]; }
+	const std::vector<MaterialSet>& GetMaterialSets() const { return material_sets; }
 
 	const BVH& GetBVH() const { return bvh; }
 

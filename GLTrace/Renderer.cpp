@@ -155,9 +155,11 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	static int selected_material = 0;
 	static int selected_quad_type = 0;
 	static int selected_edit_material = 0;
+	static int selected_material_set = 0;
 	const int num_spheres = activeScene.GetSpheres().size();
 	const int num_quads = activeScene.GetQuads().size();
 	const int num_materials = activeScene.GetMaterials().size();
+	const int num_material_sets = activeScene.GetMaterialSets().size();
 
 	// Scene details
 	// -------------
@@ -513,7 +515,24 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				ResetAccumulation();
 			}
 
-			ImGui::Text("Material set combo box will go here:");
+			selected_material_set = mat.material_set_index;
+			ImGui::Spacing();
+			if (ImGui::BeginCombo("Texture set", std::to_string(selected_material_set).c_str())) {
+				for (int i = -1; i < num_material_sets; i++) {
+					if (ImGui::Selectable(std::to_string(i).c_str(), selected_material_set == i)) {
+						selected_material_set = i;
+					}
+
+					if (selected_material_set == i) {
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+			}
+			if (mat.material_set_index != selected_material_set) {
+				mat.material_set_index = selected_material_set;
+				ResetAccumulation();
+			}
 
 			// Transparency
 			ImGui::SeparatorText("Transparency");
