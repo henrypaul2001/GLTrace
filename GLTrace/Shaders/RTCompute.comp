@@ -792,7 +792,8 @@ ray bounce_ray(in ray current_ray, in vec3 hit_normal, in vec3 hit_point, in boo
 
 		// Blend specular (metal) direction with diffuse direction based on material metalness
 		vec3 diffuse_to_specular = specular_direction - diffuse_direction;
-		direction = diffuse_direction + (diffuse_to_specular * metal);
+		//direction = diffuse_direction + (diffuse_to_specular * metal);
+		direction = specular_direction;
 
 		// Trasparency
 		if (is_transparent) {
@@ -891,6 +892,9 @@ vec3 ray_colour_iterative(in camera self, ray r) {
 			get_material_properties(material_index, material_colour, metal, roughness, is_transparent, refractive_index, colour_from_emission, vec2(rec.u, rec.v), is_constant_medium, neg_inv_density);
 
 			//material_colour *= metal;
+			//material_colour *= (1.0 - metal);
+			//vec3 metal_material_colour = material_colour * (1.0 - metal);
+			//material_colour = mix(material_colour, metal_material_colour, metal);
 
 			if (colour_from_emission.x > 0.0 || colour_from_emission.y > 0.0 || colour_from_emission.z > 0.0) {
 				return current_attenuation * (colour_from_emission + material_colour);
@@ -901,6 +905,7 @@ vec3 ray_colour_iterative(in camera self, ray r) {
 			if (i == 0) { firstBounceDirection = current_ray.direction; firstBounceNormal = rec.normal; }
 
 			current_attenuation *= material_colour;
+			//current_attenuation += current_attenuation * material_colour;
 		}
 		else {
 			if (i == 0) { firstBounceDirection = vec3(0.0); firstBounceNormal = vec3(0.0); }
