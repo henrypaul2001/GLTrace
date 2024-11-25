@@ -104,7 +104,6 @@ public:
 		}
 	}
 
-protected:
 	Sphere& AddSphere(const std::string& name, const glm::vec3& position, const float radius, const unsigned int material_index) {
 		if (sphere_map.find(name) == sphere_map.end()) {
 			if (spheres.size() < MAX_SPHERES) {
@@ -190,6 +189,24 @@ protected:
 		return sides;
 	}
 
+	void RemoveSphere(const unsigned int sphereIndex) {
+		if (sphereIndex < spheres.size()) {
+			const std::string sphereName = sphere_names[sphereIndex];
+			sphere_names.erase(sphere_names.begin() + sphereIndex);
+			spheres.erase(spheres.begin() + sphereIndex);
+			sphere_map.erase(sphereName);
+		}
+	}
+
+	void RemoveQuad(const unsigned int quadIndex) {
+		if (quadIndex < quads.size()) {
+			const std::string quadName = quad_names[quadIndex];
+			quad_names.erase(quad_names.begin() + quadIndex);
+			quads.erase(quads.begin() + quadIndex);
+			quad_map.erase(quadName);
+		}
+	}
+
 	void AddMaterial(const std::string& name, const Material& mat) {
 		if (material_map.find(name) == material_map.end()) {
 			if (materials.size() < MAX_MATERIALS) {
@@ -211,6 +228,7 @@ protected:
 			material_sets.push_back(mat_set);
 		}
 	}
+protected:
 
 	void ClearQuadList() { quads.clear(); }
 	void SetQuadList(const std::vector<Quad>& newQuads) { this->quads = newQuads; }
