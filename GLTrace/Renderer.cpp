@@ -182,7 +182,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 		static float radius = 5.0f;
 		static unsigned int material_index = 0;
 
-		ImGui::InputText("Sphere name", &sphereName, sizeof(char) * 1000);
+		ImGui::InputText("Sphere name", &sphereName, sizeof(char) * 100);
 		ImGui::DragFloat3("Position", &spherePos[0]);
 		ImGui::DragFloat("Radius", &radius);
 		
@@ -200,10 +200,12 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			ImGui::EndCombo();
 		}
 
-		if (ImGui::Button("Create")) {
-			activeScene.AddSphere(std::string(&sphereName), spherePos, radius, material_index);
-			ResetAccumulation();
-			ImGui::CloseCurrentPopup();
+		if (ImGui::Button("Confirm")) {
+			Sphere* new_sphere = activeScene.AddSphere(std::string(&sphereName), spherePos, radius, material_index);
+			if (new_sphere != nullptr) {
+				ResetAccumulation();
+				ImGui::CloseCurrentPopup();
+			}
 		}
 		ImGui::SetItemDefaultFocus();
 		ImGui::SameLine();
