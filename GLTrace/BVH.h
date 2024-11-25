@@ -65,6 +65,10 @@ public:
 		totalElements = quads.size() + spheres.size();
 		nodesUsed = 2;
 
+		if (totalElements <= 0) {
+			return;
+		}
+
 		// Initialise hittable IDs
 		quadIDs.clear();
 		sphereIDs.clear();

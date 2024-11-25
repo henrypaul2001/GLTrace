@@ -81,25 +81,23 @@ public:
 		unsigned int num_spheres = spheres.size();
 		unsigned int num_quads = quads.size();
 
+		// Buffer spheres
+		// --------------
+		// Initialise buffer
+		sphereSSBO->BufferData(nullptr, (sizeof(unsigned int) * 4) + (sizeof(Sphere) * spheres.size()), GL_STATIC_DRAW);
+		// Buffer data
+		sphereSSBO->BufferSubData(&num_spheres, sizeof(unsigned int), 0);
 		if (num_spheres > 0) {
-			// Buffer spheres
-			// --------------
-			// Initialise buffer
-			sphereSSBO->BufferData(nullptr, (sizeof(unsigned int) * 4) + (sizeof(Sphere) * spheres.size()), GL_STATIC_DRAW);
-
-			// Buffer data
-			sphereSSBO->BufferSubData(&num_spheres, sizeof(unsigned int), 0);
 			sphereSSBO->BufferSubData(&spheres[0], sizeof(Sphere) * num_spheres, sizeof(unsigned int) * 4);
 		}
 
+		// Buffer quads
+		// ------------
+		// Initialise buffer
+		quadSSBO->BufferData(nullptr, (sizeof(unsigned int) * 4) + (sizeof(Quad) * quads.size()), GL_STATIC_DRAW);
+		// Buffer data
+		quadSSBO->BufferSubData(&num_quads, sizeof(unsigned int), 0);
 		if (num_quads > 0) {
-			// Buffer quads
-			// ------------
-			// Initialise buffer
-			quadSSBO->BufferData(nullptr, (sizeof(unsigned int) * 4) + (sizeof(Quad) * quads.size()), GL_STATIC_DRAW);
-
-			// Buffer data
-			quadSSBO->BufferSubData(&num_quads, sizeof(unsigned int), 0);
 			quadSSBO->BufferSubData(&quads[0], sizeof(Quad) * num_quads, sizeof(unsigned int) * 4);
 		}
 	}
