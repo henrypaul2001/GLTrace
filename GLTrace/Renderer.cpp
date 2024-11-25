@@ -337,6 +337,11 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 			ImGui::Text(sphereName.c_str());
 			ImGui::SameLine();
+
+			float buttonWidth = ImGui::CalcTextSize("Delete sphere").x + ImGui::GetStyle().FramePadding.x * 2;
+			float spaceAvailable = ImGui::GetContentRegionAvail().x;
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + spaceAvailable - buttonWidth);
+
 			if (ImGui::Button("Delete sphere")) {
 				activeScene.RemoveSphere(sphereID);
 				selected--;
@@ -396,8 +401,12 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			const std::string& quadName = activeScene.GetQuadName(quadID);
 			bool quad_has_changed = false;
 			ImGui::Text(quadName.c_str());
-			
 			ImGui::SameLine();
+
+			float buttonWidth = ImGui::CalcTextSize("Delete quad").x + ImGui::GetStyle().FramePadding.x * 2;
+			float spaceAvailable = ImGui::GetContentRegionAvail().x;
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + spaceAvailable - buttonWidth);
+
 			if (ImGui::Button("Delete quad")) {
 				activeScene.RemoveQuad(quadID);
 				selected--;
