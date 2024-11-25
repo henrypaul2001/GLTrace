@@ -792,8 +792,8 @@ ray bounce_ray(in ray current_ray, in vec3 hit_normal, in vec3 hit_point, in boo
 
 		// Blend specular (metal) direction with diffuse direction based on material metalness
 		vec3 diffuse_to_specular = specular_direction - diffuse_direction;
-		//direction = diffuse_direction + (diffuse_to_specular * metal);
-		direction = specular_direction;
+		direction = diffuse_direction + (diffuse_to_specular * (1.0 - roughness));
+		//direction = specular_direction;
 
 		// Trasparency
 		if (is_transparent) {
