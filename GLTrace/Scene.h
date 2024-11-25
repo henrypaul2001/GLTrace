@@ -102,7 +102,7 @@ public:
 		}
 	}
 
-	Sphere& AddSphere(const std::string& name, const glm::vec3& position, const float radius, const unsigned int material_index) {
+	Sphere* AddSphere(const std::string& name, const glm::vec3& position, const float radius, const unsigned int material_index) {
 		if (sphere_map.find(name) == sphere_map.end()) {
 			if (spheres.size() < MAX_SPHERES) {
 				spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, material_index));
@@ -111,14 +111,16 @@ public:
 			}
 			else {
 				Logger::LogWarning("Maximum sphere count reached");
+				return nullptr;
 			}
-			return spheres.back();
+			return &spheres.back();
 		}
 		else {
 			Logger::LogError("Sphere name already exists");
+			return nullptr;
 		}
 	}
-	Quad& AddQuad(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
+	Quad* AddQuad(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
 		if (quad_map.find(name) == quad_map.end()) {
 			if (quads.size() < MAX_QUADS) {
 				quads.push_back(Quad(QUAD, Q, U, V, material_index));
@@ -127,14 +129,16 @@ public:
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
+				return nullptr;
 			}
-			return quads.back();
+			return &quads.back();
 		}
 		else {
 			Logger::LogError("Quad name already exists");
+			return nullptr;
 		}
 	}
-	Quad& AddTriangle(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
+	Quad* AddTriangle(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
 		if (quad_map.find(name) == quad_map.end()) {
 			if (quads.size() < MAX_QUADS) {
 				quads.push_back(Quad(TRIANGLE, Q, U, V, material_index));
@@ -143,14 +147,16 @@ public:
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
+				return nullptr;
 			}
-			return quads.back();
+			return &quads.back();
 		}
 		else {
 			Logger::LogError("Quad name already exists");
+			return nullptr;
 		}
 	}
-	Quad& AddDisk(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
+	Quad* AddDisk(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
 		if (quad_map.find(name) == quad_map.end()) {
 			if (quads.size() < MAX_QUADS) {
 				quads.push_back(Quad(DISK, Q, U, V, material_index));
@@ -159,11 +165,13 @@ public:
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
+				return nullptr;
 			}
-			return quads.back();
+			return &quads.back();
 		}
 		else {
 			Logger::LogError("Quad name already exists");
+			return nullptr;
 		}
 	}
 	std::vector<Quad*> AddBox(const std::string& name, const glm::vec3& a, const glm::vec3& b, const unsigned int material_index) {
@@ -177,12 +185,12 @@ public:
 		glm::vec3 dy = glm::vec3(0.0f, max.y - min.y, 0.0f);
 		glm::vec3 dz = glm::vec3(0.0f, 0.0f, max.z - min.z);
 
-		sides.push_back(&AddQuad(name + "_front", glm::vec3(min.x, min.y, max.z), dx, dy, material_index)); // front
-		sides.push_back(&AddQuad(name + "_right", glm::vec3(max.x, min.y, max.z), -dz, dy, material_index)); // right
-		sides.push_back(&AddQuad(name + "_back", glm::vec3(max.x, min.y, min.z), -dx, dy, material_index)); // back
-		sides.push_back(&AddQuad(name + "_left", glm::vec3(min.x, min.y, min.z), dz, dy, material_index)); // left
-		sides.push_back(&AddQuad(name + "_top", glm::vec3(min.x, max.y, max.z), dx, -dz, material_index)); // top
-		sides.push_back(&AddQuad(name + "_bottom", glm::vec3(min.x, min.y, min.z), dx, dz, material_index)); // bottom
+		sides.push_back(AddQuad(name + "_front", glm::vec3(min.x, min.y, max.z), dx, dy, material_index)); // front
+		sides.push_back(AddQuad(name + "_right", glm::vec3(max.x, min.y, max.z), -dz, dy, material_index)); // right
+		sides.push_back(AddQuad(name + "_back", glm::vec3(max.x, min.y, min.z), -dx, dy, material_index)); // back
+		sides.push_back(AddQuad(name + "_left", glm::vec3(min.x, min.y, min.z), dz, dy, material_index)); // left
+		sides.push_back(AddQuad(name + "_top", glm::vec3(min.x, max.y, max.z), dx, -dz, material_index)); // top
+		sides.push_back(AddQuad(name + "_bottom", glm::vec3(min.x, min.y, min.z), dx, dz, material_index)); // bottom
 
 		return sides;
 	}
