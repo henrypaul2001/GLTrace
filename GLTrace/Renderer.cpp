@@ -164,6 +164,55 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	// Scene details
 	// -------------
 	ImGui::Begin("Scene");
+	if (ImGui::Button("Add Sphere")) {
+		ImGui::OpenPopup("Create Sphere");
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Add Quad")) {
+		//ImGui::OpenPopup("Create Quad");
+	}
+
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	if (ImGui::BeginPopupModal("Create Sphere", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::SeparatorText("Sphere properties");
+
+		static char sphereName;
+		static glm::vec3 spherePos = glm::vec3(0.0f);
+		static float radius = 5.0f;
+		static unsigned int material_index = 0;
+
+		ImGui::InputText("Sphere name", &sphereName, sizeof(char) * 1000);
+		ImGui::DragFloat3("Position", &spherePos[0]);
+		ImGui::DragFloat("Radius", &radius);
+		
+		ImGui::Spacing();
+		if (ImGui::BeginCombo("Material", activeScene.GetMaterialName(material_index).c_str())) {
+			for (int i = 0; i < num_materials; i++) {
+				if (ImGui::Selectable(activeScene.GetMaterialName(i).c_str(), material_index == i)) {
+					material_index = i;
+				}
+
+				if (material_index == i) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		if (ImGui::Button("Create")) {
+			activeScene.AddSphere(std::string(&sphereName), spherePos, radius, material_index);
+			ResetAccumulation();
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
 	ImGui::SeparatorText("SceneName");
 	if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 8));
