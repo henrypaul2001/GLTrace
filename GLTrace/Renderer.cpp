@@ -336,6 +336,13 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			const std::string& sphereName = activeScene.GetSphereName(sphereID);
 
 			ImGui::Text(sphereName.c_str());
+			ImGui::SameLine();
+			if (ImGui::Button("Delete sphere")) {
+				activeScene.RemoveSphere(sphereID);
+				selected--;
+				ResetAccumulation();
+			}
+
 			ImGui::Separator();
 			if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 6));
@@ -389,6 +396,14 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			const std::string& quadName = activeScene.GetQuadName(quadID);
 			bool quad_has_changed = false;
 			ImGui::Text(quadName.c_str());
+			
+			ImGui::SameLine();
+			if (ImGui::Button("Delete quad")) {
+				activeScene.RemoveQuad(quadID);
+				selected--;
+				ResetAccumulation();
+			}
+
 			ImGui::Separator();
 			if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 6));
