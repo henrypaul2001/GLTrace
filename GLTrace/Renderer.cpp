@@ -169,9 +169,11 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Add Quad")) {
-		//ImGui::OpenPopup("Create Quad");
+		ImGui::OpenPopup("Create Quad");
 	}
 
+	// Create sphere menu
+	// ------------------
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 	if (ImGui::BeginPopupModal("Create Sphere", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -182,6 +184,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 		static float radius = 5.0f;
 		static unsigned int material_index = 0;
 
+		ImGui::Spacing();
 		ImGui::InputText("Sphere name", &sphereName, sizeof(char) * 100);
 		ImGui::DragFloat3("Position", &spherePos[0]);
 		ImGui::DragFloat("Radius", &radius);
@@ -203,6 +206,80 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 		if (ImGui::Button("Confirm")) {
 			Sphere* new_sphere = activeScene.AddSphere(std::string(&sphereName), spherePos, radius, material_index);
 			if (new_sphere != nullptr) {
+				ResetAccumulation();
+				ImGui::CloseCurrentPopup();
+			}
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+	// Create quad menu
+	// ----------------
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	if (ImGui::BeginPopupModal("Create Quad", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::SeparatorText("Quad properties");
+
+		static char quadName;
+		static glm::vec3 q = glm::vec3(0.0f);
+		static glm::vec3 u = glm::vec3(1.0f, 0.0f, 0.0f);
+		static glm::vec3 v = glm::vec3(0.0f, 1.0f, 0.0f);
+		static unsigned int material_index = 0;
+		static unsigned int quad_type = 0;
+
+		ImGui::Spacing();
+		ImGui::InputText("Quad name", &quadName, sizeof(char) * 100);
+		ImGui::DragFloat3("Origin", &q[0]);
+		ImGui::DragFloat3("U extent", &u[0]);
+		ImGui::DragFloat3("V extent", &v[0]);
+
+		ImGui::Spacing();
+		const char* quad_types[3] = { "Quad", "Triangle", "Disk" };
+		if (ImGui::BeginCombo("Type", quad_types[quad_type])) {
+			for (unsigned int i = 0; i < 3; i++) {
+				if (ImGui::Selectable(quad_types[i], quad_type == i)) {
+					quad_type = i;
+				}
+
+				if (quad_type == i) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::Spacing();
+		if (ImGui::BeginCombo("Material", activeScene.GetMaterialName(material_index).c_str())) {
+			for (int i = 0; i < num_materials; i++) {
+				if (ImGui::Selectable(activeScene.GetMaterialName(i).c_str(), material_index == i)) {
+					material_index = i;
+				}
+
+				if (material_index == i) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		if (ImGui::Button("Confirm")) {
+			Quad* new_quad = nullptr;
+			switch (quad_type) {
+			case 0:
+				new_quad = activeScene.AddQuad(std::string(&quadName), q, u, v, material_index);
+				break;
+			case 1:
+				new_quad = activeScene.AddTriangle(std::string(&quadName), q, u, v, material_index);
+				break;
+			case 2:
+				new_quad = activeScene.AddDisk(std::string(&quadName), q, u, v, material_index);
+				break;
+			}
+			if (new_quad != nullptr) {
 				ResetAccumulation();
 				ImGui::CloseCurrentPopup();
 			}
