@@ -553,7 +553,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 					ImGui::Spacing();
 					if (ImGui::DragFloat3("Vertical extent", &quad->V[0])) { quad_has_changed = true; }
 
-					if (quad_has_changed) { quad->Recalculate(); }
+					if (quad_has_changed) { quad->Recalculate(); ResetAccumulation(); }
 
 					selected_quad_type = quad->triangle_disk_id;
 					const char* quad_types[3] = { "Quad", "Triangle", "Disk" };
