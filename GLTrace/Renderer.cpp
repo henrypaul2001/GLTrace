@@ -362,20 +362,16 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			if (ImGui::TreeNode("Physical Properties")) {
 
 				ImGui::Text("Space");
-				glm::vec3 position = activeCamera.lookfrom;
-				glm::vec3 lookat = activeCamera.lookat;
-				glm::vec3 vup = activeCamera.vup;
-				ImGui::InputFloat3("Position", &position[0]);
-				ImGui::InputFloat3("Look at", &lookat[0]);
-				ImGui::InputFloat3("Up", &vup[0]);
-				ImGui::SetItemTooltip("Up direction relative to camera.");
-
-				if (position != activeCamera.lookfrom || lookat != activeCamera.lookat || vup != activeCamera.vup) {
-					activeCamera.lookfrom = position;
-					activeCamera.lookat = lookat;
-					activeCamera.vup = vup;
-					activeCamera.SetCameraHasMoved(true);
+				if (ImGui::DragFloat3("Position", &activeCamera.lookfrom[0])) {
+					ResetAccumulation();
 				}
+				if (ImGui::DragFloat3("Look at", &activeCamera.lookat[0])) {
+					ResetAccumulation();
+				}
+				if (ImGui::DragFloat3("Up", &activeCamera.vup[0])) {
+					ResetAccumulation();
+				}
+				ImGui::SetItemTooltip("Up direction relative to camera.");
 
 				ImGui::Text("Lens");
 				if (ImGui::SliderFloat("FOV", &activeCamera.vfov, 1.0f, 120.0f)) {
