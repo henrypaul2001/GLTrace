@@ -2,6 +2,13 @@
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 #include "Shader.h"
+
+struct HittableTransform {
+	glm::vec3 translation = glm::vec3(0.0f);
+	glm::vec3 euler_rotation = glm::vec3(0.0f); // Degrees
+	glm::vec3 scale = glm::vec3(1.0f);
+};
+
 struct MaterialSet {
 	int albedo_index = -1;
 	int normal_index = -1;
@@ -44,6 +51,10 @@ class Sphere {
 public:
 	Sphere(const glm::vec4& center, const float radius, const unsigned int material_index = 0) : Center(center), Radius(radius), padding(0.0f, 0.0f), material_index(material_index) {}
 	~Sphere() {}
+
+	void Transform(const glm::mat4& transform) {
+		Center = transform * Center;
+	}
 
 	glm::vec4 Center;
 	float Radius;

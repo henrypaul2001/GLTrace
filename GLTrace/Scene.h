@@ -52,6 +52,7 @@ public:
 	}
 
 	virtual void SetupScene() = 0;
+
 	virtual void UpdateScene(const float dt) {
 		BuildBVH();
 		//RefitBVH();
@@ -64,6 +65,8 @@ public:
 	const std::string& GetQuadName(const unsigned int index) const { return quad_names[index]; }
 	Sphere* GetSphere(const unsigned int index) { if (index < spheres.size()) { return &spheres[index]; } else { Logger::LogError("Sphere index out of bounds"); return nullptr; } }
 	Quad* GetQuad(const unsigned int index) { if (index < quads.size()) { return &quads[index]; } else { Logger::LogError("Quad index out of bounds"); return nullptr; } }
+	HittableTransform* GetSphereTransform(const unsigned int index) { if (index < sphere_transforms.size()) { return &sphere_transforms[index]; } else { Logger::LogError("Transform index out of bounds"); return nullptr; } }
+	HittableTransform* GetQuadTransform(const unsigned int index) { if (index < quad_transforms.size()) { return &quad_transforms[index]; } else { Logger::LogError("Transform index out of bounds"); return nullptr; } }
 
 	const std::vector<Material>& GetMaterials() const { return materials; }
 	const std::string& GetMaterialName(const unsigned int index) const { return material_names[index]; }
@@ -108,6 +111,7 @@ public:
 				spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, material_index));
 				sphere_names.push_back(name);
 				sphere_map[name] = spheres.size() - 1;
+				sphere_transforms.push_back(HittableTransform());
 			}
 			else {
 				Logger::LogWarning("Maximum sphere count reached");
@@ -126,6 +130,7 @@ public:
 				quads.push_back(Quad(QUAD, Q, U, V, material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
+				quad_transforms.push_back(HittableTransform());
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
@@ -144,6 +149,7 @@ public:
 				quads.push_back(Quad(TRIANGLE, Q, U, V, material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
+				quad_transforms.push_back(HittableTransform());
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
@@ -162,6 +168,7 @@ public:
 				quads.push_back(Quad(DISK, Q, U, V, material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
+				quad_transforms.push_back(HittableTransform());
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
@@ -201,6 +208,7 @@ public:
 			sphere_names.erase(sphere_names.begin() + sphereIndex);
 			spheres.erase(spheres.begin() + sphereIndex);
 			sphere_map.erase(sphereName);
+			sphere_transforms.erase(sphere_transforms.begin() + sphereIndex);
 		}
 	}
 
@@ -210,6 +218,7 @@ public:
 			quad_names.erase(quad_names.begin() + quadIndex);
 			quads.erase(quads.begin() + quadIndex);
 			quad_map.erase(quadName);
+			quad_transforms.erase(quad_transforms.begin() + quadIndex);
 		}
 	}
 
@@ -254,6 +263,9 @@ private:
 	std::vector<Material> materials;
 
 	std::vector<MaterialSet> material_sets;
+
+	std::vector<HittableTransform> sphere_transforms;
+	std::vector<HittableTransform> quad_transforms;
 
 	BVH bvh;
 };
