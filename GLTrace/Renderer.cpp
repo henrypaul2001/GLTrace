@@ -483,13 +483,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Physical Properties")) {
 					ImGui::Text("Position");
-					if (ImGui::DragFloat("x", &sphere->Center[0])) {
-						ResetAccumulation();
-					}
-					if (ImGui::DragFloat("y", &sphere->Center[1])) {
-						ResetAccumulation();
-					}
-					if (ImGui::DragFloat("z", &sphere->Center[2])) {
+					if (ImGui::DragFloat3("Center", &sphere->Center[0])) {
 						ResetAccumulation();
 					}
 					ImGui::Spacing();
