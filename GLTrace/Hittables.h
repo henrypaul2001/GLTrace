@@ -65,7 +65,7 @@ private:
 };
 class Quad {
 public:
-	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index = 0) : Q(Q, 0.0f), U(U, 0.0f), V(V, 0.0f), material_index(material_index) {
+	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index = 0) : Q(Q, 1.0f), U(U, 1.0f), V(V, 1.0f), material_index(material_index) {
 		switch (quad_type) {
 		case QUAD:
 			triangle_disk_id = 0u;
@@ -87,6 +87,24 @@ public:
 		else { return glm::vec3(Q) + (extent * 0.5f); }
 	}
 
+	void Transform(const glm::mat4& transform) {
+		// Get world space vertices
+		glm::vec4 worldQ = Q;
+		glm::vec4 worldU = glm::vec4(glm::vec3(worldQ + U), 1.0f);
+		glm::vec4 worldV = glm::vec4(glm::vec3(worldQ + V), 1.0f);
+
+		// Transform vertices
+		glm::vec4 transformedWorldQ = transform * worldQ;
+		glm::vec4 transformedWorldU = transform * worldU;
+		glm::vec4 transformedWorldV = transform * worldV;
+	
+		Q = transformedWorldQ;
+		U = transformedWorldU - transformedWorldQ;
+		V = transformedWorldV - transformedWorldQ;
+
+		Recalculate();
+	}
+
 	void Recalculate() {
 		glm::vec4 n = glm::vec4(glm::cross(glm::vec3(U), glm::vec3(V)), 0.0f);
 		Normal = glm::normalize(n);
@@ -103,9 +121,9 @@ public:
 	const float GetD() const { return D; }
 	const float GetArea() const { return Area; }
 
-	void SetQ(const glm::vec3& q) { Q = glm::vec4(q, 0.0f); Recalculate(); }
-	void SetU(const glm::vec3& u) { U = glm::vec4(u, 0.0f); Recalculate(); }
-	void SetV(const glm::vec3& v) { V = glm::vec4(v, 0.0f); Recalculate(); }
+	void SetQ(const glm::vec3& q) { Q = glm::vec4(q, 1.0f); Recalculate(); }
+	void SetU(const glm::vec3& u) { U = glm::vec4(u, 1.0f); Recalculate(); }
+	void SetV(const glm::vec3& v) { V = glm::vec4(v, 1.0f); Recalculate(); }
 
 	glm::vec4 Q;
 	glm::vec4 U, V;
