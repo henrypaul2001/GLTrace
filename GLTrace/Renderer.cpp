@@ -508,6 +508,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 					ImGui::TreePop();
 					ImGui::Separator();
 				}
+				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Physical Properties")) {
 					ImGui::Text("Position");
 					if (ImGui::DragFloat3("Center", &sphere->Center[0])) {
@@ -566,6 +567,38 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 6));
 
+				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+				if (ImGui::TreeNode("Transform")) {
+					HittableTransform* transform = activeScene.GetQuadTransform(quadID);
+
+					if (transform) {
+						glm::vec3 translation = transform->translation;
+						glm::vec3 euler_rotation = transform->euler_rotation;
+						glm::vec3 scale = transform->scale;
+
+						// Find the difference between previous transform state and new one
+						if (ImGui::DragFloat3("Translation", &transform->translation[0])) {
+							translation = transform->translation - translation;
+							ResetAccumulation();
+							quad->Transform(create_transform(translation, glm::vec3(0.0f), glm::vec3(1.0f)));
+						}
+						if (ImGui::DragFloat3("Rotation", &transform->euler_rotation[0])) {
+							euler_rotation = transform->euler_rotation - euler_rotation;
+							ResetAccumulation();
+							quad->Transform(create_transform(glm::vec3(0.0f), euler_rotation, glm::vec3(1.0f)));
+						}
+						ImGui::BeginDisabled();
+						if (ImGui::InputFloat3("Scale", &transform->scale[0], "%.3f", ImGuiInputTextFlags_ReadOnly)) {
+							scale = (transform->scale - scale) + scale;
+							ResetAccumulation();
+							quad->Transform(create_transform(glm::vec3(0.0f), glm::vec3(0.0f), scale));
+						}
+						ImGui::EndDisabled();
+					}
+
+					ImGui::TreePop();
+					ImGui::Separator();
+				}
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Physical Properties")) {
 					if (ImGui::DragFloat3("Position", &quad->Q[0])) { quad_has_changed = true; }
