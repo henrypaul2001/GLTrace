@@ -479,7 +479,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Transform")) {
 					//HittableTransform* transform = activeScene.GetSphereTransform(sphereID);
-					glm::mat4* transform = activeScene.GetTransform(sphere->transformID);
+					glm::mat4* transform = activeScene.GetSphereTransform(sphereID);
 					
 					/*
 					if (transform) {
@@ -572,7 +572,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Transform")) {
 					//HittableTransform* transform = activeScene.GetQuadTransform(quadID);
-					glm::mat4* transform = activeScene.GetTransform(quad->GetTransformID());
+					glm::mat4* transform = activeScene.GetQuadTransform(quadID);
 					/*
 					if (transform) {
 						glm::vec3 translation = transform->translation;

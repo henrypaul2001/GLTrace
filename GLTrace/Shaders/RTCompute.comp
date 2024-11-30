@@ -253,8 +253,7 @@ struct sphere {
 	vec4 center;
 	float radius;
 	uint material_index;
-	uint transformID;
-	float padding;
+	vec2 padding;
 };
 sphere new_sphere(vec3 position, float radius, uint material_index) {
 	sphere s;
@@ -275,7 +274,7 @@ struct quad {
 	vec4 Q; // 16 bytes
 	vec4 u, v; // 32 bytes
 	vec4 w; // 16 bytes
-	vec4 normal; // 16 bytes, transformID packed into normal.w
+	vec4 normal; // 16 bytes
 	float D; // 4 bytes
 	float area; // 4 bytes
 	uint material_index; // 4 bytes

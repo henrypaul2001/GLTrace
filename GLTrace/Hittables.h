@@ -49,7 +49,7 @@ enum QUAD_TYPE {
 };
 class Sphere {
 public:
-	Sphere(const glm::vec4& center, const float radius, const unsigned int material_index = 0) : Center(center), Radius(radius), padding(0.0f), material_index(material_index) {}
+	Sphere(const glm::vec4& center, const float radius, const unsigned int material_index = 0) : Center(center), Radius(radius), padding(0.0f, 0.0f), material_index(material_index) {}
 	~Sphere() {}
 
 	void Transform(const glm::mat4& transform) {
@@ -59,10 +59,9 @@ public:
 	glm::vec4 Center;
 	float Radius;
 	unsigned int material_index;
-	unsigned int transformID;
 
 private:
-	float padding;
+	glm::vec2 padding;
 };
 class Quad {
 public:
@@ -113,8 +112,6 @@ public:
 		W = n / glm::dot(n, n);
 		Area = glm::length(n);
 	}
-
-	const int GetTransformID() const { return Normal.w; }
 
 	const glm::vec4& GetQ() const { return Q; }
 	const glm::vec4& GetU() const { return U; }

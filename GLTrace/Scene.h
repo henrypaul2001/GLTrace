@@ -75,6 +75,18 @@ public:
 
 	const BVH& GetBVH() const { return bvh; }
 
+	glm::mat4* GetSphereTransform(const unsigned int sphereID) {
+		if (sphereID < spheres.size()) {
+			return &transformBuffer[sphereID];
+		}
+	}
+
+	glm::mat4* GetQuadTransform(const unsigned int quadID) {
+		if (quadID < quads.size()) {
+			return &transformBuffer[quadID + spheres.size()];
+		}
+	}
+
 	void BuildBVH() { bvh.BuildBVH(quads, spheres); }
 	void RefitBVH() { bvh.RefitBVH(quads, spheres); }
 	void BufferBVH(ComputeShader& computeShader) const { bvh.Buffer(computeShader); }
@@ -122,6 +134,7 @@ public:
 				spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, material_index));
 				sphere_names.push_back(name);
 				sphere_map[name] = spheres.size() - 1;
+				transformBuffer.push_back(glm::mat4(1.0f));
 			}
 			else {
 				Logger::LogWarning("Maximum sphere count reached");
@@ -140,6 +153,7 @@ public:
 				quads.push_back(Quad(QUAD, Q, U, V, material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
+				transformBuffer.push_back(glm::mat4(1.0f));
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
@@ -158,6 +172,7 @@ public:
 				quads.push_back(Quad(TRIANGLE, Q, U, V, material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
+				transformBuffer.push_back(glm::mat4(1.0f));
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
@@ -176,6 +191,7 @@ public:
 				quads.push_back(Quad(DISK, Q, U, V, material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
+				transformBuffer.push_back(glm::mat4(1.0f));
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
@@ -215,6 +231,7 @@ public:
 			sphere_names.erase(sphere_names.begin() + sphereIndex);
 			spheres.erase(spheres.begin() + sphereIndex);
 			sphere_map.erase(sphereName);
+			transformBuffer.erase(transformBuffer.begin() + sphereIndex);
 		}
 	}
 	void RemoveQuad(const unsigned int quadIndex) {
@@ -223,6 +240,7 @@ public:
 			quad_names.erase(quad_names.begin() + quadIndex);
 			quads.erase(quads.begin() + quadIndex);
 			quad_map.erase(quadName);
+			transformBuffer.erase(transformBuffer.begin() + spheres.size() + quadIndex);
 		}
 	}
 
