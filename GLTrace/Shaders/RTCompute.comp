@@ -253,7 +253,8 @@ struct sphere {
 	vec4 center;
 	float radius;
 	uint material_index;
-	vec2 padding;
+	uint transformID;
+	float padding;
 };
 sphere new_sphere(vec3 position, float radius, uint material_index) {
 	sphere s;
@@ -274,7 +275,7 @@ struct quad {
 	vec4 Q; // 16 bytes
 	vec4 u, v; // 32 bytes
 	vec4 w; // 16 bytes
-	vec4 normal; // 16 bytes
+	vec4 normal; // 16 bytes, transformID packed into normal.w
 	float D; // 4 bytes
 	float area; // 4 bytes
 	uint material_index; // 4 bytes
@@ -385,6 +386,14 @@ layout (std430, binding = 5) readonly buffer quadBuffer {
 	uint num_quads;
 	quad[] quad_hittables;
 };
+
+layout (std430, binding = 6) readonly buffer transformBuffer {
+	mat4[] transforms;
+};
+
+int get_quad_transform_ID(in int quadID) {
+	return int(quad_hittables[quadID].normal.w);
+}
 
 // Ray intersections
 // -----------------

@@ -478,8 +478,10 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Transform")) {
-					HittableTransform* transform = activeScene.GetSphereTransform(sphereID);
+					//HittableTransform* transform = activeScene.GetSphereTransform(sphereID);
+					glm::mat4* transform = activeScene.GetTransform(sphere->transformID);
 					
+					/*
 					if (transform) {
 						glm::vec3 translation = transform->translation;
 						glm::vec3 euler_rotation = transform->euler_rotation;
@@ -504,7 +506,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 						}
 						ImGui::EndDisabled();
 					}
-
+					*/
 					ImGui::TreePop();
 					ImGui::Separator();
 				}
@@ -569,8 +571,9 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Transform")) {
-					HittableTransform* transform = activeScene.GetQuadTransform(quadID);
-
+					//HittableTransform* transform = activeScene.GetQuadTransform(quadID);
+					glm::mat4* transform = activeScene.GetTransform(quad->GetTransformID());
+					/*
 					if (transform) {
 						glm::vec3 translation = transform->translation;
 						glm::vec3 euler_rotation = transform->euler_rotation;
@@ -595,6 +598,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 						}
 						ImGui::EndDisabled();
 					}
+					*/
 
 					ImGui::TreePop();
 					ImGui::Separator();

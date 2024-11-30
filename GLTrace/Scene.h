@@ -61,12 +61,12 @@ public:
 	Camera* GetSceneCamera() { return &sceneCamera; }
 	const std::vector<Sphere>& GetSpheres() const { return spheres; }
 	const std::vector<Quad>& GetQuads() const { return quads; }
+	const std::vector<glm::mat4>& GetTransforms() const { return transformBuffer; }
 	const std::string& GetSphereName(const unsigned int index) const { return sphere_names[index]; }
 	const std::string& GetQuadName(const unsigned int index) const { return quad_names[index]; }
 	Sphere* GetSphere(const unsigned int index) { if (index < spheres.size()) { return &spheres[index]; } else { Logger::LogError("Sphere index out of bounds"); return nullptr; } }
 	Quad* GetQuad(const unsigned int index) { if (index < quads.size()) { return &quads[index]; } else { Logger::LogError("Quad index out of bounds"); return nullptr; } }
-	HittableTransform* GetSphereTransform(const unsigned int index) { if (index < sphere_transforms.size()) { return &sphere_transforms[index]; } else { Logger::LogError("Transform index out of bounds"); return nullptr; } }
-	HittableTransform* GetQuadTransform(const unsigned int index) { if (index < quad_transforms.size()) { return &quad_transforms[index]; } else { Logger::LogError("Transform index out of bounds"); return nullptr; } }
+	glm::mat4* GetTransform(const unsigned int index) { if (index < transformBuffer.size()) { return &transformBuffer[index]; } else { Logger::LogError("Transform index out of bounds"); } }
 
 	const std::vector<Material>& GetMaterials() const { return materials; }
 	const std::string& GetMaterialName(const unsigned int index) const { return material_names[index]; }
@@ -81,8 +81,10 @@ public:
 	void BufferSceneHittables(ComputeShader& computeShader) const {
 		const ShaderStorageBuffer* sphereSSBO = computeShader.GetSSBO(4);
 		const ShaderStorageBuffer* quadSSBO = computeShader.GetSSBO(5);
-		unsigned int num_spheres = spheres.size();
-		unsigned int num_quads = quads.size();
+		const ShaderStorageBuffer* transformSSBO = computeShader.GetSSBO(6);
+		const unsigned int num_spheres = spheres.size();
+		const unsigned int num_quads = quads.size();
+		const unsigned int num_transforms = transformBuffer.size();
 
 		// Buffer spheres
 		// --------------
@@ -103,6 +105,15 @@ public:
 		if (num_quads > 0) {
 			quadSSBO->BufferSubData(&quads[0], sizeof(Quad) * num_quads, sizeof(unsigned int) * 4);
 		}
+
+		// Buffer transforms
+		// -----------------
+		// Initialise buffer
+		transformSSBO->BufferData(nullptr, (sizeof(glm::mat4) * num_transforms), GL_STATIC_DRAW);
+		// Buffer data
+		if (num_transforms > 0) {
+			transformSSBO->BufferData(&transformBuffer[0], sizeof(glm::mat4) * num_transforms, GL_STATIC_DRAW);
+		}
 	}
 
 	Sphere* AddSphere(const std::string& name, const glm::vec3& position, const float radius, const unsigned int material_index) {
@@ -111,7 +122,6 @@ public:
 				spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, material_index));
 				sphere_names.push_back(name);
 				sphere_map[name] = spheres.size() - 1;
-				sphere_transforms.push_back(HittableTransform());
 			}
 			else {
 				Logger::LogWarning("Maximum sphere count reached");
@@ -130,7 +140,6 @@ public:
 				quads.push_back(Quad(QUAD, Q, U, V, material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
-				quad_transforms.push_back(HittableTransform());
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
@@ -149,7 +158,6 @@ public:
 				quads.push_back(Quad(TRIANGLE, Q, U, V, material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
-				quad_transforms.push_back(HittableTransform());
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
@@ -168,7 +176,6 @@ public:
 				quads.push_back(Quad(DISK, Q, U, V, material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
-				quad_transforms.push_back(HittableTransform());
 			}
 			else {
 				Logger::LogWarning("Maximum quad count reached");
@@ -208,17 +215,14 @@ public:
 			sphere_names.erase(sphere_names.begin() + sphereIndex);
 			spheres.erase(spheres.begin() + sphereIndex);
 			sphere_map.erase(sphereName);
-			sphere_transforms.erase(sphere_transforms.begin() + sphereIndex);
 		}
 	}
-
 	void RemoveQuad(const unsigned int quadIndex) {
 		if (quadIndex < quads.size()) {
 			const std::string quadName = quad_names[quadIndex];
 			quad_names.erase(quad_names.begin() + quadIndex);
 			quads.erase(quads.begin() + quadIndex);
 			quad_map.erase(quadName);
-			quad_transforms.erase(quad_transforms.begin() + quadIndex);
 		}
 	}
 
@@ -237,7 +241,6 @@ public:
 			Logger::LogError("Quad name already exists");
 		}
 	}
-
 	void AddMaterialSet(const MaterialSet& mat_set) {
 		if (material_sets.size() < MAX_MATERIALS) {
 			material_sets.push_back(mat_set);
@@ -264,8 +267,7 @@ private:
 
 	std::vector<MaterialSet> material_sets;
 
-	std::vector<HittableTransform> sphere_transforms;
-	std::vector<HittableTransform> quad_transforms;
+	std::vector<glm::mat4> transformBuffer;
 
 	BVH bvh;
 };
