@@ -34,6 +34,9 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{9262a769-0c26-4ce7-a808-cf51cc28bc7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImGuizmo">
+      <UniqueIdentifier>{810c8df0-fa98-4bd4-b29d-5bb1ace2dc83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLTrace.cpp">
@@ -86,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="Logging.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Linking\include\imguizmo\ImGuizmo.cpp">
+      <Filter>ImGuizmo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="Logging.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Linking\include\imguizmo\ImGuizmo.h">
+      <Filter>ImGuizmo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

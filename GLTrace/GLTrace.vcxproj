@@ -71,11 +71,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)\Linking\include;$(IncludePath);$(SolutionDir)\Linking\include\imgui</IncludePath>
+    <IncludePath>$(SolutionDir)\Linking\include;$(IncludePath);$(SolutionDir)\Linking\include\imgui;$(SolutionDir)\Linking\include\imguizmo</IncludePath>
     <LibraryPath>$(SolutionDir)\Linking\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)\Linking\include;$(IncludePath);$(SolutionDir)\Linking\include\imgui</IncludePath>
+    <IncludePath>$(SolutionDir)\Linking\include;$(IncludePath);$(SolutionDir)\Linking\include\imgui;$(SolutionDir)\Linking\include\imguizmo</IncludePath>
     <LibraryPath>$(SolutionDir)\Linking\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -110,7 +110,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);IMGUI_DEFINE_MATH_OPERATORS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -125,7 +125,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);IMGUI_DEFINE_MATH_OPERATORS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Linking\include\imguizmo\ImGuizmo.cpp" />
     <ClCompile Include="..\Linking\include\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="..\Linking\include\imgui\backends\imgui_impl_opengl2.cpp" />
     <ClCompile Include="..\Linking\include\imgui\backends\imgui_impl_opengl3.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Linking\include\imguizmo\ImGuizmo.h" />
     <ClInclude Include="..\Linking\include\imgui\backends\imgui_impl_glfw.h" />
     <ClInclude Include="..\Linking\include\imgui\backends\imgui_impl_opengl2.h" />
     <ClInclude Include="..\Linking\include\imgui\backends\imgui_impl_opengl3.h" />
