@@ -50,3 +50,9 @@ inline glm::mat4 compose_transform(const glm::vec3& translation, const glm::vec3
 	transform = glm::scale(transform, scale);
 	return transform;
 }
+inline glm::mat4 compose_transform(const glm::vec3& translation, const glm::quat& rotation_quat, const glm::vec3& scale) {
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation);
+	transform *= glm::mat4_cast(rotation_quat);
+	transform = glm::scale(transform, scale);
+	return transform;
+}
