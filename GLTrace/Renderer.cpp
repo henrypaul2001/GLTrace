@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "GLTMath.h"
 bool Renderer::mouseIsFree = false;
 void Renderer::Render(Camera& activeCamera, Scene& activeScene, const float dt)
 {
@@ -478,35 +479,22 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Transform")) {
-					//HittableTransform* transform = activeScene.GetSphereTransform(sphereID);
 					glm::mat4* transform = activeScene.GetSphereTransform(sphereID);
-					
-					/*
-					if (transform) {
-						glm::vec3 translation = transform->translation;
-						glm::vec3 euler_rotation = transform->euler_rotation;
-						glm::vec3 scale = transform->scale;
 
-						// Find the difference between previous transform state and new one
-						if (ImGui::DragFloat3("Translation", &transform->translation[0])) {
-							translation = transform->translation - translation;
-							ResetAccumulation();
-							sphere->Transform(create_transform(translation, glm::vec3(0.0f), glm::vec3(1.0f)));
-						}
-						if (ImGui::DragFloat3("Rotation", &transform->euler_rotation[0])) {
-							euler_rotation = transform->euler_rotation - euler_rotation;
-							ResetAccumulation();
-							sphere->Transform(create_transform(glm::vec3(0.0f), euler_rotation, glm::vec3(1.0f)));
-						}
-						ImGui::BeginDisabled();
-						if (ImGui::InputFloat3("Scale", &transform->scale[0], "%.3f", ImGuiInputTextFlags_ReadOnly)) {
-							scale = (transform->scale - scale) + scale;
-							ResetAccumulation();
-							sphere->Transform(create_transform(glm::vec3(0.0f), glm::vec3(0.0f), scale));
-						}
-						ImGui::EndDisabled();
+					glm::vec3 translation, rotation, scale;
+					ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*transform), &translation[0], &rotation[0], &scale[0]);
+
+					if (ImGui::DragFloat3("Translation", &translation[0], 0.1f)) {
+						ResetAccumulation();
 					}
-					*/
+					if (ImGui::DragFloat3("Rotation", &rotation[0], 0.1f)) {
+						ResetAccumulation();
+					}
+					if (ImGui::DragFloat3("Scale", &scale[0], 0.01f, 0.001f, 10000.0f)) {
+						ResetAccumulation();
+					}
+					ImGuizmo::RecomposeMatrixFromComponents(&translation[0], &rotation[0], &scale[0], glm::value_ptr(*transform));
+
 					ImGui::TreePop();
 					ImGui::Separator();
 				}
@@ -571,34 +559,21 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Transform")) {
-					//HittableTransform* transform = activeScene.GetQuadTransform(quadID);
 					glm::mat4* transform = activeScene.GetQuadTransform(quadID);
-					/*
-					if (transform) {
-						glm::vec3 translation = transform->translation;
-						glm::vec3 euler_rotation = transform->euler_rotation;
-						glm::vec3 scale = transform->scale;
+					
+					glm::vec3 translation, rotation, scale;
+					ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*transform), &translation[0], &rotation[0], &scale[0]);
 
-						// Find the difference between previous transform state and new one
-						if (ImGui::DragFloat3("Translation", &transform->translation[0])) {
-							translation = transform->translation - translation;
-							ResetAccumulation();
-							quad->Transform(create_transform(translation, glm::vec3(0.0f), glm::vec3(1.0f)));
-						}
-						if (ImGui::DragFloat3("Rotation", &transform->euler_rotation[0])) {
-							euler_rotation = transform->euler_rotation - euler_rotation;
-							ResetAccumulation();
-							quad->Transform(create_transform(glm::vec3(0.0f), euler_rotation, glm::vec3(1.0f)));
-						}
-						ImGui::BeginDisabled();
-						if (ImGui::InputFloat3("Scale", &transform->scale[0], "%.3f", ImGuiInputTextFlags_ReadOnly)) {
-							scale = (transform->scale - scale) + scale;
-							ResetAccumulation();
-							quad->Transform(create_transform(glm::vec3(0.0f), glm::vec3(0.0f), scale));
-						}
-						ImGui::EndDisabled();
+					if (ImGui::DragFloat3("Translation", &translation[0], 0.1f)) {
+						ResetAccumulation();
 					}
-					*/
+					if (ImGui::DragFloat3("Rotation", &rotation[0], 0.1f)) {
+						ResetAccumulation();
+					}
+					if (ImGui::DragFloat3("Scale", &scale[0], 0.1f, 0.001f, 10000.0f)) {
+						ResetAccumulation();
+					}
+					ImGuizmo::RecomposeMatrixFromComponents(&translation[0], &rotation[0], &scale[0], glm::value_ptr(*transform));
 
 					ImGui::TreePop();
 					ImGui::Separator();

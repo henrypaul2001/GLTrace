@@ -10,9 +10,12 @@
 #include "InputManager.h"
 #include "Scene.h"
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui/imgui.h"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
+
+#include "imguizmo/imguizmo.h"
 
 #include "Logging.h"
 
