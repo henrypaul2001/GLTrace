@@ -80,11 +80,15 @@ public:
 		Recalculate();
 	}
 
-	glm::vec3 GetCentre() const {
-		glm::vec3 extent = U + V;
-		if (triangle_disk_id == 1) { return glm::vec3(Q) + (extent * 0.3333f); }
-		if (triangle_disk_id == 2) { return glm::vec3(Q); }
-		else { return glm::vec3(Q) + (extent * 0.5f); }
+	glm::vec4 GetCentre() const {
+		glm::vec4 result = glm::vec4(1.0f);
+		glm::vec4 extent = U + V;
+		extent.w = 1.0f;
+		if (triangle_disk_id == 1) { result = glm::vec4(Q) + (extent * 0.3333f); }
+		if (triangle_disk_id == 2) { result = glm::vec4(Q); }
+		else { result = glm::vec4(Q) + (extent * 0.5f); }
+		result.w = 1.0f;
+		return result;
 	}
 
 	void Transform(const glm::mat4& transform) {

@@ -87,8 +87,8 @@ public:
 		}
 	}
 
-	void BuildBVH() { bvh.BuildBVH(quads, spheres); }
-	void RefitBVH() { bvh.RefitBVH(quads, spheres); }
+	void BuildBVH() { bvh.BuildBVH(quads, spheres, transformBuffer); }
+	void RefitBVH() { bvh.RefitBVH(quads, spheres, transformBuffer); }
 	void BufferBVH(ComputeShader& computeShader) const { bvh.Buffer(computeShader); }
 	void BufferSceneHittables(ComputeShader& computeShader) const {
 		const ShaderStorageBuffer* sphereSSBO = computeShader.GetSSBO(4);
