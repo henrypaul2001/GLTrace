@@ -402,6 +402,13 @@ bool hit_sphere(in uint sphere_index, in ray r, in interval ray_t, inout hit_rec
 		float Radius = spheres[sphere_index].radius;
 		uint material_index = spheres[sphere_index].material_index;
 
+		// Transform ray
+		mat4 transform = transforms[sphere_index]; // model matrix
+		mat4 inverse_transform = inverse(transform);
+
+		r.origin = (inverse_transform * vec4(r.origin, 1.0)).xyz;
+		r.direction = normalize((inverse_transform * vec4(r.direction, 0.0)).xyz);
+
 		vec3 oc = Center - r.origin;
 
 		float a = length_squared(r.direction);
