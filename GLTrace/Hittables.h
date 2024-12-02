@@ -52,10 +52,6 @@ public:
 	Sphere(const glm::vec4& center, const float radius, const unsigned int material_index = 0) : Center(center), Radius(radius), padding(0.0f, 0.0f), material_index(material_index) {}
 	~Sphere() {}
 
-	void Transform(const glm::mat4& transform) {
-		Center = transform * Center;
-	}
-
 	glm::vec4 Center;
 	float Radius;
 	unsigned int material_index;
@@ -89,24 +85,6 @@ public:
 		else { result = glm::vec4(Q) + (extent * 0.5f); }
 		result.w = 1.0f;
 		return result;
-	}
-
-	void Transform(const glm::mat4& transform) {
-		// Get world space vertices
-		glm::vec4 worldQ = Q;
-		glm::vec4 worldU = glm::vec4(glm::vec3(worldQ + U), 1.0f);
-		glm::vec4 worldV = glm::vec4(glm::vec3(worldQ + V), 1.0f);
-
-		// Transform vertices
-		glm::vec4 transformedWorldQ = transform * worldQ;
-		glm::vec4 transformedWorldU = transform * worldU;
-		glm::vec4 transformedWorldV = transform * worldV;
-	
-		Q = transformedWorldQ;
-		U = transformedWorldU - transformedWorldQ;
-		V = transformedWorldV - transformedWorldQ;
-
-		//Recalculate();
 	}
 
 	void Recalculate(const glm::mat4& transform) {
