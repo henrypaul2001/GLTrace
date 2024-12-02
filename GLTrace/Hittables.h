@@ -77,7 +77,7 @@ public:
 			triangle_disk_id = 2u;
 			break;
 		}
-		Recalculate();
+		Recalculate(glm::mat4(1.0f));
 	}
 
 	glm::vec4 GetCentre() const {
@@ -106,13 +106,17 @@ public:
 		U = transformedWorldU - transformedWorldQ;
 		V = transformedWorldV - transformedWorldQ;
 
-		Recalculate();
+		//Recalculate();
 	}
 
-	void Recalculate() {
-		glm::vec4 n = glm::vec4(glm::cross(glm::vec3(U), glm::vec3(V)), 0.0f);
+	void Recalculate(const glm::mat4& transform) {
+		const glm::vec4 transformedQ = transform * Q;
+		const glm::vec4 transformedU = transform * U;
+		const glm::vec4 transformedV = transform * V;
+
+		glm::vec4 n = glm::vec4(glm::cross(glm::vec3(transformedU), glm::vec3(transformedV)), 0.0f);
 		Normal = glm::normalize(n);
-		D = glm::dot(Normal, Q);
+		D = glm::dot(Normal, transformedQ);
 		W = n / glm::dot(n, n);
 		Area = glm::length(n);
 	}
@@ -125,9 +129,9 @@ public:
 	const float GetD() const { return D; }
 	const float GetArea() const { return Area; }
 
-	void SetQ(const glm::vec3& q) { Q = glm::vec4(q, 1.0f); Recalculate(); }
-	void SetU(const glm::vec3& u) { U = glm::vec4(u, 1.0f); Recalculate(); }
-	void SetV(const glm::vec3& v) { V = glm::vec4(v, 1.0f); Recalculate(); }
+	void SetQ(const glm::vec3& q, const glm::mat4& quadTransform) { Q = glm::vec4(q, 1.0f); Recalculate(quadTransform); }
+	void SetU(const glm::vec3& u, const glm::mat4& quadTransform) { U = glm::vec4(u, 1.0f); Recalculate(quadTransform); }
+	void SetV(const glm::vec3& v, const glm::mat4& quadTransform) { V = glm::vec4(v, 1.0f); Recalculate(quadTransform); }
 
 	glm::vec4 Q;
 	glm::vec4 U, V;

@@ -121,10 +121,10 @@ public:
 		// Buffer transforms
 		// -----------------
 		// Initialise buffer
-		transformSSBO->BufferData(nullptr, (sizeof(glm::mat4) * num_transforms), GL_STATIC_DRAW);
+		transformSSBO->BufferData(nullptr, (sizeof(glm::mat4) * num_transforms), GL_STATIC_COPY);
 		// Buffer data
 		if (num_transforms > 0) {
-			transformSSBO->BufferData(&transformBuffer[0], sizeof(glm::mat4) * num_transforms, GL_STATIC_DRAW);
+			transformSSBO->BufferData(&transformBuffer[0], sizeof(glm::mat4) * num_transforms, GL_STATIC_COPY);
 		}
 	}
 

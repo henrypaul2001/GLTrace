@@ -564,16 +564,21 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 					glm::vec3 translation, rotation, scale;
 					ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*transform), &translation[0], &rotation[0], &scale[0]);
 
+					bool quad_has_changed = false;
 					if (ImGui::DragFloat3("Translation", &translation[0], 0.1f)) {
 						ResetAccumulation();
+						quad_has_changed = true;
 					}
 					if (ImGui::DragFloat3("Rotation", &rotation[0], 0.1f)) {
 						ResetAccumulation();
+						quad_has_changed = true;
 					}
 					if (ImGui::DragFloat3("Scale", &scale[0], 0.1f, 0.001f, 10000.0f)) {
 						ResetAccumulation();
+						quad_has_changed = true;
 					}
 					ImGuizmo::RecomposeMatrixFromComponents(&translation[0], &rotation[0], &scale[0], glm::value_ptr(*transform));
+					if (quad_has_changed) { quad->Recalculate(*transform); }
 
 					ImGui::TreePop();
 					ImGui::Separator();
@@ -586,7 +591,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 					ImGui::Spacing();
 					if (ImGui::DragFloat3("Vertical extent", &quad->V[0])) { quad_has_changed = true; }
 
-					if (quad_has_changed) { quad->Recalculate(); ResetAccumulation(); }
+					if (quad_has_changed) { quad->Recalculate(*activeScene.GetTransform(num_spheres + quadID)); ResetAccumulation(); }
 
 					selected_quad_type = quad->triangle_disk_id;
 					const char* quad_types[3] = { "Quad", "Triangle", "Disk" };
