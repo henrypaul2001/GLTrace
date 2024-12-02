@@ -167,12 +167,24 @@ private:
 			const glm::mat4& transform = transformBuffer[spheres.size() + quadID];
 
 			const glm::vec4& rawQ = leafQuad.GetQ(), rawU = leafQuad.GetU(), rawV = leafQuad.GetV();
-			const glm::vec4 QU = transform * (rawQ + rawU);
-			const glm::vec4 QV = transform * (rawQ + rawV);
-			const glm::vec4 QUV = transform * (rawQ + rawU + rawV);
-			const glm::vec4 Q = transform * rawQ;
-			const glm::vec4 U = transform * rawU;
-			const glm::vec4 V = transform * rawV;
+
+			// Get world space vertices
+			glm::vec4 worldQ = rawQ;
+			glm::vec4 worldU = glm::vec4(glm::vec3(worldQ + rawU), 1.0f);
+			glm::vec4 worldV = glm::vec4(glm::vec3(worldQ + rawV), 1.0f);
+
+			// Transform vertices
+			glm::vec4 transformedWorldQ = transform * worldQ;
+			glm::vec4 transformedWorldU = transform * worldU;
+			glm::vec4 transformedWorldV = transform * worldV;
+
+			const glm::vec4 Q = transformedWorldQ;
+			const glm::vec4 U = transformedWorldU - transformedWorldQ;
+			const glm::vec4 V = transformedWorldV - transformedWorldQ;
+
+			const glm::vec4 QU = Q + U;
+			const glm::vec4 QV = Q + V;
+			const glm::vec4 QUV = Q + U + V;
 
 			node.bbox.grow(Q);
 			node.bbox.grow(QU);
@@ -212,12 +224,23 @@ private:
 			const glm::mat4& transform = transformBuffer[quadIDs[node.firstQuadPrimitive + i] + spheres.size()];
 
 			const glm::vec4& rawQ = quad.GetQ(), rawU = quad.GetU(), rawV = quad.GetV();
-			const glm::vec4 QU = transform * (rawQ + rawU);
-			const glm::vec4 QV = transform * (rawQ + rawV);
-			const glm::vec4 QUV = transform * (rawQ + rawU + rawV);
-			const glm::vec4 Q = transform * rawQ;
-			const glm::vec4 U = transform * rawU;
-			const glm::vec4 V = transform * rawV;
+			// Get world space vertices
+			glm::vec4 worldQ = rawQ;
+			glm::vec4 worldU = glm::vec4(glm::vec3(worldQ + rawU), 1.0f);
+			glm::vec4 worldV = glm::vec4(glm::vec3(worldQ + rawV), 1.0f);
+
+			// Transform vertices
+			glm::vec4 transformedWorldQ = transform * worldQ;
+			glm::vec4 transformedWorldU = transform * worldU;
+			glm::vec4 transformedWorldV = transform * worldV;
+
+			const glm::vec4 Q = transformedWorldQ;
+			const glm::vec4 U = transformedWorldU - transformedWorldQ;
+			const glm::vec4 V = transformedWorldV - transformedWorldQ;
+
+			const glm::vec4 QU = Q + U;
+			const glm::vec4 QV = Q + V;
+			const glm::vec4 QUV = Q + U + V;
 
 			if ((transform * quad.GetCentre())[axis] < pos) {
 				leftCount++;
@@ -367,12 +390,23 @@ private:
 				bin[binID].quadCount++;
 
 				const glm::vec4& rawQ = quad.GetQ(), rawU = quad.GetU(), rawV = quad.GetV();
-				const glm::vec4 QU = transform * (rawQ + rawU);
-				const glm::vec4 QV = transform * (rawQ + rawV);
-				const glm::vec4 QUV = transform * (rawQ + rawU + rawV);
-				const glm::vec4 Q = transform * rawQ;
-				const glm::vec4 U = transform * rawU;
-				const glm::vec4 V = transform * rawV;
+				// Get world space vertices
+				glm::vec4 worldQ = rawQ;
+				glm::vec4 worldU = glm::vec4(glm::vec3(worldQ + rawU), 1.0f);
+				glm::vec4 worldV = glm::vec4(glm::vec3(worldQ + rawV), 1.0f);
+
+				// Transform vertices
+				glm::vec4 transformedWorldQ = transform * worldQ;
+				glm::vec4 transformedWorldU = transform * worldU;
+				glm::vec4 transformedWorldV = transform * worldV;
+
+				const glm::vec4 Q = transformedWorldQ;
+				const glm::vec4 U = transformedWorldU - transformedWorldQ;
+				const glm::vec4 V = transformedWorldV - transformedWorldQ;
+
+				const glm::vec4 QU = Q + U;
+				const glm::vec4 QV = Q + V;
+				const glm::vec4 QUV = Q + U + V;
 
 				bin[binID].bounds.grow(Q);
 				bin[binID].bounds.grow(QU);

@@ -110,9 +110,19 @@ public:
 	}
 
 	void Recalculate(const glm::mat4& transform) {
-		const glm::vec4 transformedQ = transform * Q;
-		const glm::vec4 transformedU = transform * U;
-		const glm::vec4 transformedV = transform * V;
+		// Get world space vertices
+		glm::vec4 worldQ = Q;
+		glm::vec4 worldU = glm::vec4(glm::vec3(worldQ + U), 1.0f);
+		glm::vec4 worldV = glm::vec4(glm::vec3(worldQ + V), 1.0f);
+
+		// Transform vertices
+		glm::vec4 transformedWorldQ = transform * worldQ;
+		glm::vec4 transformedWorldU = transform * worldU;
+		glm::vec4 transformedWorldV = transform * worldV;
+
+		const glm::vec4 transformedQ = transformedWorldQ;
+		const glm::vec4 transformedU = transformedWorldU - transformedWorldQ;
+		const glm::vec4 transformedV = transformedWorldV - transformedWorldQ;
 
 		glm::vec4 n = glm::vec4(glm::cross(glm::vec3(transformedU), glm::vec3(transformedV)), 0.0f);
 		Normal = glm::normalize(n);

@@ -531,6 +531,21 @@ bool hit_quad(in uint quad_index, in ray r, in interval ray_t, inout hit_record 
 		bool is_triangle = (quad_hittables[quad_index].triangle_disk_id == 1u);
 		bool is_disk = (quad_hittables[quad_index].triangle_disk_id == 2u);
 
+		// Get world space vertices
+		vec3 worldQ = Q;
+		vec3 worldU = worldQ + U;
+		vec3 worldV = worldQ + V;
+
+		// Transform vertices
+		mat4 transform = transforms[num_spheres + quad_index]; // model matrix
+		vec3 transformedWorldQ = (transform * vec4(worldQ, 1.0)).xyz;
+		vec3 transformedWorldU = (transform * vec4(worldU, 1.0)).xyz;
+		vec3 transformedWorldV = (transform * vec4(worldV, 1.0)).xyz;
+
+		Q = transformedWorldQ;
+		U = transformedWorldU - transformedWorldQ;
+		V = transformedWorldV - transformedWorldQ;
+
 		float denom = dot(Normal, r.direction);
 
 		// Not hit if ray is parallel to plane
