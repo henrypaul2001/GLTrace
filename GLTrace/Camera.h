@@ -99,6 +99,14 @@ public:
 	const unsigned int GetImageWidth() const { return image_width; }
 	const unsigned int GetImageHeight() const { return image_height; }
 	const float GetAspectRatio() const { return aspect_ratio; }
+
+	const glm::mat4 GetViewMatrix() const {
+		return glm::lookAt(lookfrom, lookfrom + w, v);
+	}
+
+	const glm::mat4 GetProjection() const {
+		return glm::perspectiveFov(vfov, (float)image_width, (float)image_height, 0.001f, 10000.0f);
+	}
 private:
 	unsigned int image_width, image_height;	// Rendered image width and height in pixel count
 	float aspect_ratio;						// Ratio of image width over height
