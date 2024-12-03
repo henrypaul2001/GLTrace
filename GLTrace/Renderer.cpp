@@ -62,6 +62,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 
 	// - Menu -
 	// --------
@@ -763,50 +764,58 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 	// Scene view
 	// ----------
-	ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoCollapse);
-	viewport_width = ImGui::GetContentRegionAvail().x;
-	viewport_height = ImGui::GetContentRegionAvail().y;
-	ImGui::Image((ImTextureID)(intptr_t)finalImage.ID(), ImVec2(viewport_width, viewport_height), ImVec2(0.0, 1.0), ImVec2(1.0, 0.0));
+	if (ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoCollapse)) {
+		viewport_width = ImGui::GetContentRegionAvail().x;
+		viewport_height = ImGui::GetContentRegionAvail().y;
+		ImGui::Image((ImTextureID)(intptr_t)finalImage.ID(), ImVec2(viewport_width, viewport_height), ImVec2(0.0, 1.0), ImVec2(1.0, 0.0));
 
-	if (selected > 0) {
-		// Show gizmo
-		ImGuizmo::SetOrthographic(false);
-		ImGuizmo::SetDrawlist();
+		if (selected > 0) {
+			// Show gizmo
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
 
-		float width = (float)ImGui::GetWindowWidth();
-		float height = (float)ImGui::GetWindowHeight();
-		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
+			const glm::mat4 view = activeCamera.GetViewMatrix();
+			const glm::mat4 projection = activeCamera.GetProjection();
 
-		const glm::mat4 view = activeCamera.GetViewMatrix();
-		const glm::mat4 projection = activeCamera.GetProjection();
+			int sphereID = selected - 1;
+			int quadID = selected - (num_spheres + 1);
 
-		int sphereID = selected - 1;
-		int quadID = selected - (num_spheres + 1);
+			glm::mat4* transform = nullptr;
+			glm::mat4 offsetTransform = glm::mat4(1.0f);
+			glm::mat4 inverseOffsetTransform = glm::mat4(1.0f);
+			bool isQuad = false;
+			if (sphereID < num_spheres) {
+				transform = activeScene.GetSphereTransform(sphereID);
+				const Sphere& sphere = activeScene.GetSpheres()[sphereID];
+				const glm::vec3& origin = sphere.Center;
+				offsetTransform = glm::translate(offsetTransform, origin);
+				inverseOffsetTransform = glm::translate(inverseOffsetTransform, -origin);
+			}
+			else if (quadID < num_quads) {
+				isQuad = true;
+				transform = activeScene.GetQuadTransform(quadID);
+				const Quad& quad = activeScene.GetQuads()[quadID];
+				const glm::vec3& origin = quad.Q;
+				offsetTransform = glm::translate(offsetTransform, origin);
+				inverseOffsetTransform = glm::translate(inverseOffsetTransform, -origin);
+			}
 
-		glm::mat4* transform = nullptr;
-		glm::mat4 offsetTransform = glm::mat4(1.0f);
-		glm::mat4 inverseOffsetTransform = glm::mat4(1.0f);
-		if (sphereID < num_spheres) {
-			transform = activeScene.GetSphereTransform(sphereID);
-			const Sphere& sphere = activeScene.GetSpheres()[sphereID];
-			const glm::vec3& origin = sphere.Center;
-			offsetTransform = glm::translate(offsetTransform, origin);
-			inverseOffsetTransform = glm::translate(inverseOffsetTransform, -origin);
-		}
-		else if (quadID < num_quads) {
-			transform = activeScene.GetQuadTransform(quadID);
-			const Quad& quad = activeScene.GetQuads()[quadID];
-			const glm::vec3& origin = quad.Q;
-			offsetTransform = glm::translate(offsetTransform, origin);
-			inverseOffsetTransform = glm::translate(inverseOffsetTransform, -origin);
-		}
+			if (transform) {
+				glm::mat4 transformedMatrix = offsetTransform * (*transform);
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, (float)ImGui::GetWindowWidth(), (float)ImGui::GetWindowHeight());
+				ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transformedMatrix));
 
-		if (transform) {
-			glm::mat4 transformedMatrix = offsetTransform * (*transform);
-			ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transformedMatrix));
+				if (ImGuizmo::IsUsing()) {
+					*transform = inverseOffsetTransform * (transformedMatrix);
+					ResetAccumulation();
+
+					if (isQuad) {
+						activeScene.GetQuad(quadID)->Recalculate(*transform);
+					}
+				}
+			}
 		}
 	}
-
 	ImGui::End();
 
 	viewport_width -= viewport_width % WORK_GROUP_SIZE;
