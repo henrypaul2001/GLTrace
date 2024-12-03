@@ -79,12 +79,14 @@ public:
 		if (sphereID < spheres.size()) {
 			return &transformBuffer[sphereID];
 		}
+		return nullptr;
 	}
 
 	glm::mat4* GetQuadTransform(const unsigned int quadID) {
 		if (quadID < quads.size()) {
 			return &transformBuffer[quadID + spheres.size()];
 		}
+		return nullptr;
 	}
 
 	void BuildBVH() { bvh.BuildBVH(quads, spheres, transformBuffer); }

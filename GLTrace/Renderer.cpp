@@ -553,7 +553,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 				if (ImGui::TreeNode("Transform")) {
 					glm::mat4* transform = activeScene.GetQuadTransform(quadID);
-					
+
 					glm::vec3 translation, rotation, scale;
 					ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*transform), &translation[0], &rotation[0], &scale[0]);
 
