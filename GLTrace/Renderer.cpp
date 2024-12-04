@@ -762,12 +762,40 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 
 	// Scene view
 	// ----------
-	if (ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoCollapse)) {
+	if (ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar)) {
+		static bool showGizmo = true;
+		static unsigned int localGizmo = 0u;
+		static unsigned int gizmoOperation = 7u;
+
+		ImGui::Text("Viewport");
+		ImGui::SameLine();
+		ImGui::Checkbox("Show Gizmo", &showGizmo);
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Local", localGizmo == 0u)) {
+			localGizmo = 0u;
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("World", localGizmo == 1u)) {
+			localGizmo = 1u;
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Translate", gizmoOperation == 7u)) {
+			gizmoOperation = 7u;
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Rotate", gizmoOperation == 120u)) {
+			gizmoOperation = 120u;
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Scale", gizmoOperation == 896u)) {
+			gizmoOperation = 896u;
+		}
+
 		viewport_width = ImGui::GetContentRegionAvail().x;
 		viewport_height = ImGui::GetContentRegionAvail().y;
 		ImGui::Image((ImTextureID)(intptr_t)finalImage.ID(), ImVec2(viewport_width, viewport_height), ImVec2(0.0, 1.0), ImVec2(1.0, 0.0));
 
-		if (selected > 0) {
+		if (selected > 0 && showGizmo) {
 			// Show gizmo
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
@@ -801,7 +829,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 			if (transform) {
 				glm::mat4 transformedMatrix = offsetTransform * (*transform);
 				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, (float)ImGui::GetWindowWidth(), (float)ImGui::GetWindowHeight());
-				ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transformedMatrix));
+				ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), (ImGuizmo::OPERATION)gizmoOperation, (ImGuizmo::MODE)localGizmo, glm::value_ptr(transformedMatrix));
 
 				if (ImGuizmo::IsUsing()) {
 					*transform = inverseOffsetTransform * (transformedMatrix);
