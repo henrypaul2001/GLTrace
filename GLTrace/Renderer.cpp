@@ -474,19 +474,22 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				if (ImGui::TreeNode("Transform")) {
 					glm::mat4* transform = nullptr;
 					transform = activeScene.GetSphereTransform(sphereID);
-					glm::vec3 translation, rotation, scale;
-					ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*transform), &translation[0], &rotation[0], &scale[0]);
 
-					if (ImGui::DragFloat3("Translation", &translation[0], 0.1f)) {
-						ResetAccumulation();
+					if (transform) {
+						glm::vec3 translation, rotation, scale;
+						ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*transform), &translation[0], &rotation[0], &scale[0]);
+
+						if (ImGui::DragFloat3("Translation", &translation[0], 0.1f)) {
+							ResetAccumulation();
+						}
+						if (ImGui::DragFloat3("Rotation", &rotation[0], 0.1f)) {
+							ResetAccumulation();
+						}
+						if (ImGui::DragFloat3("Scale", &scale[0], 0.01f, 0.001f, 10000.0f)) {
+							ResetAccumulation();
+						}
+						ImGuizmo::RecomposeMatrixFromComponents(&translation[0], &rotation[0], &scale[0], glm::value_ptr(*transform));
 					}
-					if (ImGui::DragFloat3("Rotation", &rotation[0], 0.1f)) {
-						ResetAccumulation();
-					}
-					if (ImGui::DragFloat3("Scale", &scale[0], 0.01f, 0.001f, 10000.0f)) {
-						ResetAccumulation();
-					}
-					ImGuizmo::RecomposeMatrixFromComponents(&translation[0], &rotation[0], &scale[0], glm::value_ptr(*transform));
 					ImGui::TreePop();
 					ImGui::Separator();
 				}
@@ -553,24 +556,26 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				if (ImGui::TreeNode("Transform")) {
 					glm::mat4* transform = activeScene.GetQuadTransform(quadID);
 
-					glm::vec3 translation, rotation, scale;
-					ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*transform), &translation[0], &rotation[0], &scale[0]);
+					if (transform) {
+						glm::vec3 translation, rotation, scale;
+						ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*transform), &translation[0], &rotation[0], &scale[0]);
 
-					bool quad_has_changed = false;
-					if (ImGui::DragFloat3("Translation", &translation[0], 0.1f)) {
-						ResetAccumulation();
-						quad_has_changed = true;
+						bool quad_has_changed = false;
+						if (ImGui::DragFloat3("Translation", &translation[0], 0.1f)) {
+							ResetAccumulation();
+							quad_has_changed = true;
+						}
+						if (ImGui::DragFloat3("Rotation", &rotation[0], 0.1f)) {
+							ResetAccumulation();
+							quad_has_changed = true;
+						}
+						if (ImGui::DragFloat3("Scale", &scale[0], 0.1f, 0.001f, 10000.0f)) {
+							ResetAccumulation();
+							quad_has_changed = true;
+						}
+						ImGuizmo::RecomposeMatrixFromComponents(&translation[0], &rotation[0], &scale[0], glm::value_ptr(*transform));
+						if (quad_has_changed) { quad->Recalculate(*transform); }
 					}
-					if (ImGui::DragFloat3("Rotation", &rotation[0], 0.1f)) {
-						ResetAccumulation();
-						quad_has_changed = true;
-					}
-					if (ImGui::DragFloat3("Scale", &scale[0], 0.1f, 0.001f, 10000.0f)) {
-						ResetAccumulation();
-						quad_has_changed = true;
-					}
-					ImGuizmo::RecomposeMatrixFromComponents(&translation[0], &rotation[0], &scale[0], glm::value_ptr(*transform));
-					if (quad_has_changed) { quad->Recalculate(*transform); }
 					ImGui::TreePop();
 					ImGui::Separator();
 				}
