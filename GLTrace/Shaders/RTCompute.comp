@@ -439,6 +439,7 @@ bool hit_sphere(in uint sphere_index, in ray r, in interval ray_t, inout hit_rec
 		set_face_normal(rec, r, outward_normal);
 		get_sphere_uv(outward_normal, rec.u, rec.v);
 		rec.material_index = material_index;
+		rec.p = (transform * vec4(rec.p, 1.0)).xyz;
 
 		// Check for normal map
 		int mat_set_index = materials[material_index].material_set_index;
