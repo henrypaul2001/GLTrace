@@ -235,20 +235,22 @@ public:
 
 	void RemoveSphere(const unsigned int sphereIndex) {
 		if (sphereIndex < spheres.size()) {
+			const unsigned int transformID = spheres[sphereIndex].GetTransformID();
 			const std::string sphereName = sphere_names[sphereIndex];
 			sphere_names.erase(sphere_names.begin() + sphereIndex);
 			spheres.erase(spheres.begin() + sphereIndex);
 			sphere_map.erase(sphereName);
-			transformBuffer.erase(transformBuffer.begin() + sphereIndex);
+			//transformBuffer.erase(transformBuffer.begin() + transformID);
 		}
 	}
 	void RemoveQuad(const unsigned int quadIndex) {
 		if (quadIndex < quads.size()) {
+			const unsigned int transformID = quads[quadIndex].Normal.w;
 			const std::string quadName = quad_names[quadIndex];
 			quad_names.erase(quad_names.begin() + quadIndex);
 			quads.erase(quads.begin() + quadIndex);
 			quad_map.erase(quadName);
-			transformBuffer.erase(transformBuffer.begin() + spheres.size() + quadIndex);
+			//transformBuffer.erase(transformBuffer.begin() + transformID);
 		}
 	}
 
