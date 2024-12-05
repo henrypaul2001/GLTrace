@@ -253,7 +253,8 @@ struct sphere {
 	vec4 center;
 	float radius;
 	uint material_index;
-	vec2 padding;
+	uint transform_ID;
+	uint padding;
 };
 sphere new_sphere(vec3 position, float radius, uint material_index) {
 	sphere s;
@@ -274,7 +275,7 @@ struct quad {
 	vec4 Q; // 16 bytes
 	vec4 u, v; // 32 bytes
 	vec4 w; // 16 bytes
-	vec4 normal; // 16 bytes
+	vec4 normal; // 16 bytes // normal.a == transform_ID
 	float D; // 4 bytes
 	float area; // 4 bytes
 	uint material_index; // 4 bytes
@@ -401,9 +402,10 @@ bool hit_sphere(in uint sphere_index, in ray r, in interval ray_t, inout hit_rec
 		vec3 Center = spheres[sphere_index].center.xyz;
 		float Radius = spheres[sphere_index].radius;
 		uint material_index = spheres[sphere_index].material_index;
+		uint transformID = spheres[sphere_index].transform_ID;
 
 		// Transform ray
-		mat4 transform = transforms[sphere_index]; // model matrix
+		mat4 transform = transforms[transformID]; // model matrix
 		mat4 inverse_transform = inverse(transform);
 
 		r.origin = (inverse_transform * vec4(r.origin, 1.0)).xyz;
@@ -530,6 +532,7 @@ bool hit_quad(in uint quad_index, in ray r, in interval ray_t, inout hit_record 
 		uint material_index = quad_hittables[quad_index].material_index;
 		bool is_triangle = (quad_hittables[quad_index].triangle_disk_id == 1u);
 		bool is_disk = (quad_hittables[quad_index].triangle_disk_id == 2u);
+		int transformID = get_quad_transform_ID(int(quad_index));
 
 		// Get world space vertices
 		vec3 worldQ = Q;
@@ -537,7 +540,7 @@ bool hit_quad(in uint quad_index, in ray r, in interval ray_t, inout hit_record 
 		vec3 worldV = worldQ + V;
 
 		// Transform vertices
-		mat4 transform = transforms[num_spheres + quad_index]; // model matrix
+		mat4 transform = transforms[transformID]; // model matrix
 		vec3 transformedWorldQ = (transform * vec4(worldQ, 1.0)).xyz;
 		vec3 transformedWorldU = (transform * vec4(worldU, 1.0)).xyz;
 		vec3 transformedWorldV = (transform * vec4(worldV, 1.0)).xyz;
@@ -809,13 +812,13 @@ bool TraverseBVHLoop(in ray r, in interval ray_t, inout hit_record rec, inout fl
 	return false;
 }
 
-ray bounce_ray(in ray current_ray, in vec3 hit_normal, in vec3 hit_point, in bool front_face, in float roughness, in float metal, in bool is_transparent, in float refractive_index, in bool is_constant_medium, in float neg_inv_density) {
+ray bounce_ray(in vec3 current_direction, in vec3 hit_normal, in vec3 hit_point, in bool front_face, in float roughness, in float metal, in bool is_transparent, in float refractive_index, in bool is_constant_medium, in float neg_inv_density) {
 	metal = clamp(metal, 0.0, 1.0);
 	roughness = clamp(roughness, 0.0, 1.0);
 	vec3 direction;
 
 	if (!is_constant_medium) {
-		vec3 unit_in_direction = normalize(current_ray.direction);
+		vec3 unit_in_direction = normalize(current_direction);
 		vec3 reflected = normalize(reflect(unit_in_direction, hit_normal));
 		vec3 specular_direction = reflected + (roughness * random_vector(-0.5, 0.5));
 		vec3 diffuse_direction = random_on_hemisphere(hit_normal);
@@ -930,7 +933,7 @@ vec3 ray_colour_iterative(in camera self, ray r) {
 				return current_attenuation * (colour_from_emission + material_colour);
 			}
 
-			current_ray = bounce_ray(current_ray, rec.normal, rec.p, rec.front_face, roughness, metal, is_transparent, refractive_index, is_constant_medium, neg_inv_density);
+			current_ray = bounce_ray(current_ray.direction, rec.normal, rec.p, rec.front_face, roughness, metal, is_transparent, refractive_index, is_constant_medium, neg_inv_density);
 
 			if (i == 0) { firstBounceDirection = current_ray.direction; firstBounceNormal = rec.normal; }
 

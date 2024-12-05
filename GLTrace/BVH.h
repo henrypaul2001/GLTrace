@@ -164,7 +164,7 @@ private:
 		for (unsigned int first = node.firstQuadPrimitive, i = 0; i < node.quadPrimitiveCount; i++) {
 			const unsigned int quadID = quadIDs[first + i];
 			const Quad& leafQuad = quads[quadID];
-			const glm::mat4& transform = transformBuffer[spheres.size() + quadID];
+			const glm::mat4& transform = transformBuffer[quads[quadID].Normal.a];
 
 			const glm::vec4& rawQ = leafQuad.GetQ(), rawU = leafQuad.GetU(), rawV = leafQuad.GetV();
 
@@ -204,7 +204,7 @@ private:
 		for (unsigned int first = node.firstSpherePrimitive, i = 0; i < node.spherePrimitiveCount; i++) {
 			const unsigned int sphereID = sphereIDs[first + i];
 			const Sphere& leafSphere = spheres[sphereID];
-			const glm::mat4& transform = transformBuffer[sphereID];
+			const glm::mat4& transform = transformBuffer[spheres[sphereID].GetTransformID()];
 
 			const glm::vec4& center = transform * leafSphere.Center;
 			const float sphereRadius = leafSphere.Radius;
@@ -221,7 +221,7 @@ private:
 		int leftCount = 0, rightCount = 0;
 		for (unsigned int i = 0; i < node.quadPrimitiveCount; i++) {
 			const Quad& quad = quads[quadIDs[node.firstQuadPrimitive + i]];
-			const glm::mat4& transform = transformBuffer[quadIDs[node.firstQuadPrimitive + i] + spheres.size()];
+			const glm::mat4& transform = transformBuffer[quads[quadIDs[node.firstQuadPrimitive + i]].Normal.a];
 
 			const glm::vec4& rawQ = quad.GetQ(), rawU = quad.GetU(), rawV = quad.GetV();
 			// Get world space vertices
@@ -281,7 +281,7 @@ private:
 		}
 		for (unsigned int i = 0; i < node.spherePrimitiveCount; i++) {
 			const Sphere& sphere = spheres[sphereIDs[node.firstSpherePrimitive + i]];
-			const glm::mat4& transform = transformBuffer[sphereIDs[node.firstSpherePrimitive + i]];
+			const glm::mat4& transform = transformBuffer[spheres[sphereIDs[node.firstSpherePrimitive + i]].GetTransformID()];
 
 			const glm::vec4& center = transform * sphere.Center;
 			const float sphereRadius = sphere.Radius;
@@ -366,13 +366,13 @@ private:
 			float boundsMin = 1e30f, boundsMax = -1e30f;
 			for (int i = 0; i < node.quadPrimitiveCount; i++) {
 				const Quad& quad = quads[quadIDs[node.firstQuadPrimitive + i]];
-				const glm::mat4& transform = transformBuffer[quadIDs[node.firstQuadPrimitive + i] + spheres.size()];
+				const glm::mat4& transform = transformBuffer[quads[quadIDs[node.firstQuadPrimitive + i]].Normal.a];
 				boundsMin = std::min(boundsMin, (transform * quad.GetCentre())[a]);
 				boundsMax = std::max(boundsMax, (transform * quad.GetCentre())[a]);
 			}
 			for (int i = 0; i < node.spherePrimitiveCount; i++) {
 				const Sphere& sphere = spheres[sphereIDs[node.firstSpherePrimitive + i]];
-				const glm::mat4& transform = transformBuffer[sphereIDs[node.firstSpherePrimitive + i]];
+				const glm::mat4& transform = transformBuffer[spheres[sphereIDs[node.firstSpherePrimitive + i]].GetTransformID()];
 				boundsMin = std::min(boundsMin, (transform * sphere.Center)[a]);
 				boundsMax = std::max(boundsMax, (transform * sphere.Center)[a]);
 			}
@@ -384,7 +384,7 @@ private:
 			// Quads
 			for (unsigned int i = 0; i < node.quadPrimitiveCount; i++) {
 				const Quad& quad = quads[quadIDs[node.firstQuadPrimitive + i]];
-				const glm::mat4& transform = transformBuffer[quadIDs[node.firstQuadPrimitive + i] + spheres.size()];
+				const glm::mat4& transform = transformBuffer[quads[quadIDs[node.firstQuadPrimitive + i]].Normal.a];
 
 				const int binID = std::min(BINS - 1, (int)(((transform * quad.GetCentre())[a] - boundsMin) * scale));
 				bin[binID].quadCount++;
@@ -426,7 +426,7 @@ private:
 			// Spheres
 			for (unsigned int i = 0; i < node.spherePrimitiveCount; i++) {
 				const Sphere& sphere = spheres[sphereIDs[node.firstSpherePrimitive + i]];
-				const glm::mat4& transform = transformBuffer[sphereIDs[node.firstSpherePrimitive + i]];
+				const glm::mat4& transform = transformBuffer[spheres[sphereIDs[node.firstSpherePrimitive + i]].GetTransformID()];
 
 				const int binID = std::min(BINS - 1, (int)(((transform * sphere.Center)[a] - boundsMin) * scale));
 				bin[binID].sphereCount++;
@@ -497,7 +497,7 @@ private:
 			//const int binID = std::min(BINS - 1, (int)((quads[quadIDs[quadI]].GetCentre()[axis] - node.bbox.aabbMin[axis]) * scale));
 			//if (binID < splitPos) { quadI++; }
 			//else { std::swap(quadIDs[quadI], quadIDs[quadJ--]); }
-			const glm::mat4& transform = transformBuffer[quadIDs[quadI] + spheres.size()];
+			const glm::mat4& transform = transformBuffer[quads[quadIDs[quadI]].Normal.a];
 			if ((transform * quads[quadIDs[quadI]].GetCentre())[axis] < splitPos) { quadI++; }
 			else { std::swap(quadIDs[quadI], quadIDs[quadJ--]); }
 		}
@@ -508,7 +508,7 @@ private:
 			//const int binID = std::min(BINS - 1, (int)((spheres[sphereIDs[sphereI]].Center[axis] - node.bbox.aabbMin[axis]) * scale));
 			//if (binID < splitPos) { sphereI++; }
 			//else { std::swap(sphereIDs[sphereI], sphereIDs[sphereJ--]); }
-			const glm::mat4& transform = transformBuffer[sphereIDs[sphereI]];
+			const glm::mat4& transform = transformBuffer[spheres[sphereIDs[sphereI]].GetTransformID()];
 			if ((transform * spheres[sphereIDs[sphereI]].Center)[axis] < splitPos) { sphereI++; }
 			else { std::swap(sphereIDs[sphereI], sphereIDs[sphereJ--]); }
 		}

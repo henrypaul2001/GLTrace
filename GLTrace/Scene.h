@@ -77,14 +77,20 @@ public:
 
 	glm::mat4* GetSphereTransform(const unsigned int sphereID) {
 		if (sphereID < spheres.size()) {
-			return &transformBuffer[sphereID];
+			const unsigned int transformID = spheres[sphereID].GetTransformID();
+			if (transformID < transformBuffer.size()) {
+				return &transformBuffer[transformID];
+			}
 		}
 		return nullptr;
 	}
 
 	glm::mat4* GetQuadTransform(const unsigned int quadID) {
 		if (quadID < quads.size()) {
-			return &transformBuffer[quadID + spheres.size()];
+			const unsigned int transformID = quads[quadID].Normal.a;
+			if (transformID < transformBuffer.size()) {
+				return &transformBuffer[transformID];
+			}
 		}
 		return nullptr;
 	}
@@ -133,7 +139,7 @@ public:
 	Sphere* AddSphere(const std::string& name, const glm::vec3& position, const float radius, const unsigned int material_index) {
 		if (sphere_map.find(name) == sphere_map.end()) {
 			if (spheres.size() < MAX_SPHERES) {
-				spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, material_index));
+				spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, transformBuffer.size(), material_index));
 				sphere_names.push_back(name);
 				sphere_map[name] = spheres.size() - 1;
 				transformBuffer.push_back(glm::mat4(1.0f));
@@ -152,7 +158,7 @@ public:
 	Quad* AddQuad(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
 		if (quad_map.find(name) == quad_map.end()) {
 			if (quads.size() < MAX_QUADS) {
-				quads.push_back(Quad(QUAD, Q, U, V, material_index));
+				quads.push_back(Quad(QUAD, Q, U, V, transformBuffer.size(), material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
 				transformBuffer.push_back(glm::mat4(1.0f));
@@ -171,7 +177,7 @@ public:
 	Quad* AddTriangle(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
 		if (quad_map.find(name) == quad_map.end()) {
 			if (quads.size() < MAX_QUADS) {
-				quads.push_back(Quad(TRIANGLE, Q, U, V, material_index));
+				quads.push_back(Quad(TRIANGLE, Q, U, V, transformBuffer.size(), material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
 				transformBuffer.push_back(glm::mat4(1.0f));
@@ -190,7 +196,7 @@ public:
 	Quad* AddDisk(const std::string& name, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index) {
 		if (quad_map.find(name) == quad_map.end()) {
 			if (quads.size() < MAX_QUADS) {
-				quads.push_back(Quad(DISK, Q, U, V, material_index));
+				quads.push_back(Quad(DISK, Q, U, V, transformBuffer.size(), material_index));
 				quad_names.push_back(name);
 				quad_map[name] = quads.size() - 1;
 				transformBuffer.push_back(glm::mat4(1.0f));

@@ -49,19 +49,22 @@ enum QUAD_TYPE {
 };
 class Sphere {
 public:
-	Sphere(const glm::vec4& center, const float radius, const unsigned int material_index = 0) : Center(center), Radius(radius), padding(0.0f, 0.0f), material_index(material_index) {}
+	Sphere(const glm::vec4& center, const float radius, const unsigned int transformID, const unsigned int material_index = 0) : Center(center), Radius(radius), transform_ID(transformID), padding(0.0f), material_index(material_index) {}
 	~Sphere() {}
+
+	const unsigned int GetTransformID() const { return transform_ID; }
 
 	glm::vec4 Center;
 	float Radius;
 	unsigned int material_index;
 
 private:
-	glm::vec2 padding;
+	unsigned int transform_ID;
+	unsigned int padding;
 };
 class Quad {
 public:
-	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int material_index = 0) : Q(Q, 1.0f), U(U, 1.0f), V(V, 1.0f), material_index(material_index) {
+	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int transformID, const unsigned int material_index = 0) : Q(Q, 1.0f), U(U, 1.0f), V(V, 1.0f), material_index(material_index) {
 		switch (quad_type) {
 		case QUAD:
 			triangle_disk_id = 0u;
@@ -73,6 +76,7 @@ public:
 			triangle_disk_id = 2u;
 			break;
 		}
+		Normal.a = transformID;
 		Recalculate(glm::mat4(1.0f));
 	}
 
@@ -102,11 +106,13 @@ public:
 		const glm::vec4 transformedU = transformedWorldU - transformedWorldQ;
 		const glm::vec4 transformedV = transformedWorldV - transformedWorldQ;
 
+		const unsigned int transformID = Normal.a;
 		glm::vec4 n = glm::vec4(glm::cross(glm::vec3(transformedU), glm::vec3(transformedV)), 0.0f);
 		Normal = glm::normalize(n);
 		D = glm::dot(Normal, transformedQ);
 		W = n / glm::dot(n, n);
 		Area = glm::length(n);
+		Normal.a = transformID;
 	}
 
 	const glm::vec4& GetQ() const { return Q; }
