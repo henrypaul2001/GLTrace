@@ -52,7 +52,8 @@ public:
 	Sphere(const glm::vec4& center, const float radius, const unsigned int transformID, const unsigned int material_index = 0) : Center(center), Radius(radius), transform_ID(transformID), padding(0.0f), material_index(material_index) {}
 	~Sphere() {}
 
-	const unsigned int GetTransformID() const { return transform_ID; }
+	inline const unsigned int GetTransformID() const { return transform_ID; }
+	inline void DecrementTransformID() { transform_ID--; }
 
 	glm::vec4 Center;
 	float Radius;

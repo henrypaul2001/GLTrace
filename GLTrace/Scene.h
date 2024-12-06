@@ -139,10 +139,16 @@ public:
 	Sphere* AddSphere(const std::string& name, const glm::vec3& position, const float radius, const unsigned int material_index) {
 		if (sphere_map.find(name) == sphere_map.end()) {
 			if (spheres.size() < MAX_SPHERES) {
-				spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, transformBuffer.size(), material_index));
+				const int num_spheres = spheres.size();
+				spheres.push_back(Sphere(glm::vec4(position, 1.0f), radius, num_spheres, material_index));
 				sphere_names.push_back(name);
-				sphere_map[name] = spheres.size() - 1;
-				transformBuffer.push_back(glm::mat4(1.0f));
+				sphere_map[name] = num_spheres;
+				transformBuffer.insert(transformBuffer.begin() + num_spheres, glm::mat4(1.0f));
+
+				// Increment quad transform pointers
+				for (Quad& quad : quads) {
+					quad.Normal.w++;
+				}
 			}
 			else {
 				Logger::LogWarning("Maximum sphere count reached");
@@ -240,7 +246,15 @@ public:
 			sphere_names.erase(sphere_names.begin() + sphereIndex);
 			spheres.erase(spheres.begin() + sphereIndex);
 			sphere_map.erase(sphereName);
-			//transformBuffer.erase(transformBuffer.begin() + transformID);
+			transformBuffer.erase(transformBuffer.begin() + transformID);
+
+			// decrement all quad transform pointers and following sphere transform pointers
+			for (int i = sphereIndex; i < spheres.size(); i++) {
+				spheres[i].DecrementTransformID();
+			}
+			for (Quad& quad : quads) {
+				quad.Normal.w--;
+			}
 		}
 	}
 	void RemoveQuad(const unsigned int quadIndex) {
@@ -250,7 +264,12 @@ public:
 			quad_names.erase(quad_names.begin() + quadIndex);
 			quads.erase(quads.begin() + quadIndex);
 			quad_map.erase(quadName);
-			//transformBuffer.erase(transformBuffer.begin() + transformID);
+			transformBuffer.erase(transformBuffer.begin() + transformID);
+
+			// decrement all following quad transform pointers
+			for (int i = quadIndex; i < quads.size(); i++) {
+				quads[i].Normal.w--;
+			}
 		}
 	}
 
