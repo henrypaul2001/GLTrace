@@ -93,9 +93,6 @@
     <ClCompile Include="..\Linking\include\imguizmo\ImGuizmo.cpp">
       <Filter>ImGuizmo</Filter>
     </ClCompile>
-    <ClCompile Include="ModelLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
