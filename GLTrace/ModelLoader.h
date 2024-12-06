@@ -38,8 +38,15 @@ private:
 		// Process node
 	}
 
-	static void ProcessNode(aiNode* node, std::vector<Mesh>& out_meshes) {
+	static void ProcessNode(const aiScene* scene, const aiNode* node, std::vector<Mesh>& out_meshes) {
+		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+			out_meshes.push_back(ProcessMesh(mesh));
+		}
 
+		for (unsigned int i = 0; i < node->mNumChildren; i++) {
+			ProcessNode(scene, node->mChildren[i], out_meshes);
+		}
 	}
 
 	static Mesh ProcessMesh(const aiMesh* mesh) {
