@@ -13,18 +13,26 @@ struct Mesh {
 class ModelLoader
 {
 public:
-	static bool LoadModelFromFile(std::vector<Sphere>& sceneSpheres, const char* filepath) {
-		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate);
+	static bool LoadModelFromFile(std::vector<Mesh>& out_meshes, const char* filepath) {
+		int numMeshes = ReadFile(out_meshes, filepath);
+		Logger::Log(std::string(std::to_string(numMeshes) + " meshes loaded from '" + filepath + "'").c_str());
+		return (numMeshes > 0);
+	}
 
+	static bool LoadModelFromFile(std::vector<Sphere>& sceneSpheres, const char* filepath) {
+		std::vector<Mesh> loadedMeshes;
+		int numMeshes = ReadFile(loadedMeshes, filepath);
+		Logger::Log(std::string(std::to_string(numMeshes) + " meshes loaded from '" + filepath + "'").c_str());
 	}
 
 	static bool LoadModelFromFile(std::vector<Quad>& sceneQuads, const char* filepath) {
-
+		std::vector<Mesh> loadedMeshes;
+		int numMeshes = ReadFile(loadedMeshes, filepath);
+		Logger::Log(std::string(std::to_string(numMeshes) + " meshes loaded from '" + filepath + "'").c_str());
 	}
 
 private:
-	// returns number of vertices
+	// returns number of meshes
 	static int ReadFile(std::vector<Mesh>& out_meshes, const char* filepath) {
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate);
@@ -35,7 +43,9 @@ private:
 			return 0;
 		}
 
-		// Process node
+		ProcessNode(scene, scene->mRootNode, out_meshes);
+
+		return out_meshes.size();
 	}
 
 	static void ProcessNode(const aiScene* scene, const aiNode* node, std::vector<Mesh>& out_meshes) {

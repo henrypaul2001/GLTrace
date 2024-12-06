@@ -5,7 +5,7 @@
 #include "Hittables.h"
 #include "BVH.h"
 #include <unordered_map>
-
+#include "ModelLoader.h"
 static const int MAX_SPHERES = 1000000;
 static const int MAX_QUADS = 1000000;
 static const int MAX_MATERIALS = 10;
@@ -237,6 +237,13 @@ public:
 		sides.push_back(AddQuad(name + "_bottom", glm::vec3(min.x, min.y, min.z), dx, dz, material_index)); // bottom
 
 		return sides;
+	}
+
+	void LoadModelAsTriangles(const char* filepath) {
+		std::vector<Mesh> meshes;
+		if (ModelLoader::LoadModelFromFile(meshes, filepath)) {
+			Logger::Log("Success");
+		}
 	}
 
 	void RemoveSphere(const unsigned int sphereIndex) {
