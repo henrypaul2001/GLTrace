@@ -54,6 +54,9 @@ public:
 	virtual void SetupScene() = 0;
 
 	virtual void UpdateScene(const float dt) {
+		for (Quad& quad : quads) {
+			quad.Recalculate(transformBuffer[quad.Normal.w]);
+		}
 		BuildBVH();
 		//RefitBVH();
 	}
@@ -239,11 +242,47 @@ public:
 		return sides;
 	}
 
-	void LoadModelAsTriangles(const char* filepath) {
+	const bool LoadModelAsTriangles(const char* filepath) {
 		std::vector<Mesh> meshes;
 		if (ModelLoader::LoadModelFromFile(meshes, filepath)) {
-			Logger::Log("Success");
+			unsigned int totalVertices = 0;
+			for (const Mesh& mesh : meshes) {
+				const std::vector<glm::vec4>& vertices = mesh.vertices;
+				const std::vector<unsigned int>& indices = mesh.indices;
+				totalVertices += indices.size();
+
+				transformBuffer.push_back(glm::mat4(1.0f));
+
+				unsigned triangle_index = 0;
+				for (int i = 0; i < indices.size() - 3; i += 3) {
+					triangle_index++;
+					const glm::vec4 Q = vertices[indices[i]];
+					const glm::vec4 U = vertices[indices[i + 1]] - Q;
+					const glm::vec4 V = vertices[indices[i + 2]] - Q;
+
+					std::string name = mesh.name + "/triangle" + std::to_string(triangle_index);
+					if (quad_map.find(name) == quad_map.end()) {
+						if (quads.size() < MAX_QUADS) {
+							quads.push_back(Quad(TRIANGLE, Q, U, V, transformBuffer.size() - 1, 0));
+							quad_names.push_back(name);
+							quad_map[name] = quads.size() - 1;
+						}
+						else {
+							Logger::LogWarning("Maximum quad count reached");
+							return false;
+						}
+					}
+					else {
+						Logger::LogError("Quad name already exists");
+						return false;
+					}
+				}
+			}
+			Logger::Log(std::string("Vertex count = " + std::to_string(totalVertices)).c_str());
+			Logger::Log(std::string("Triangle count = " + std::to_string(totalVertices / 3)).c_str());
+			return true;
 		}
+		return false;
 	}
 
 	void RemoveSphere(const unsigned int sphereIndex) {
