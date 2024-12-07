@@ -140,7 +140,7 @@ public:
 		AddQuad("Test Quad", glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(2.5f, 0.0f, 0.0f), glm::vec3(0.0f, 2.5f, 0.0f), 3);
 	
 		// Test model load
-		bool success = LoadModelAsTriangles("Models/rock/rock.obj");
+		bool success = LoadModelAsTriangles("Models/rock/rock.obj", 1);
 	}
 
 	void UpdateScene(const float dt) override {

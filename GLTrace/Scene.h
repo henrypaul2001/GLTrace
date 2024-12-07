@@ -242,7 +242,7 @@ public:
 		return sides;
 	}
 
-	const bool LoadModelAsTriangles(const char* filepath) {
+	const bool LoadModelAsTriangles(const char* filepath, const unsigned int material_index = 0) {
 		std::vector<Mesh> meshes;
 		if (ModelLoader::LoadModelFromFile(meshes, filepath)) {
 			unsigned int totalVertices = 0;
@@ -263,7 +263,7 @@ public:
 					std::string name = mesh.name + "/triangle" + std::to_string(triangle_index);
 					if (quad_map.find(name) == quad_map.end()) {
 						if (quads.size() < MAX_QUADS) {
-							quads.push_back(Quad(TRIANGLE, Q, U, V, transformBuffer.size() - 1, 0));
+							quads.push_back(Quad(TRIANGLE, Q, U, V, transformBuffer.size() - 1, material_index));
 							quad_names.push_back(name);
 							quad_map[name] = quads.size() - 1;
 						}
