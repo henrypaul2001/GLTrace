@@ -22,25 +22,8 @@ public:
 		//sceneCamera.sky_colour_max_y = glm::vec3(0.8f, 0.5f, 0.25f);
 
 		// Load material sets
-		stbi_set_flip_vertically_on_load(true);
-		Texture2DArray* earth_maps = TextureLoader::LoadTextureArrayFromFile({ "Textures/earth/albedo.jpg", "Textures/earth/specular.jpg", "Textures/earth/displacement.jpg" });
-		earth_maps->BindToSlot(7);
-
-		//Texture2D* windowTexture = TextureLoader::LoadTextureFromFile("Textures/window.png");
-
-		//Texture2D* marble_tile = TextureLoader::LoadTextureFromFile("Textures/marbleTile/albedo.png");
-		//Texture2D* marble_tile_normal = TextureLoader::LoadTextureFromFile("Textures/marbleTile/normal.png");
-		//Texture2D* marble_tile_metal = TextureLoader::LoadTextureFromFile("Textures/marbleTile/metal.png");
-		//Texture2D* marble_tile_rough = TextureLoader::LoadTextureFromFile("Textures/marbleTile/roughness.png");
-		//marble_tile->BindToSlot(1);
-		//marble_tile_normal->BindToSlot(2);
-		//marble_tile_metal->BindToSlot(3);
-		//marble_tile_rough->BindToSlot(4);
-
-		Texture2DArray* space_blanket_maps = TextureLoader::LoadTextureArrayFromFile({ "Textures/space_blanket/albedo.png", "Textures/space_blanket/metallic.png", "Textures/space_blanket/normal.png", "Textures/space_blanket/roughness.png" });
-		space_blanket_maps->BindToSlot(8);
-
-		//windowTexture->BindToSlot(6);
+		LoadTextureSet({ "Textures/earth/albedo.jpg", "Textures/earth/specular.jpg", "Textures/earth/displacement.jpg" }, 7);
+		LoadTextureSet({ "Textures/space_blanket/albedo.png", "Textures/space_blanket/metallic.png", "Textures/space_blanket/normal.png", "Textures/space_blanket/roughness.png" }, 8);
 
 		// Construct scene
 		// ---------------

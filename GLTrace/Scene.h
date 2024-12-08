@@ -11,6 +11,7 @@ static const int MAX_QUADS = 1000000;
 static const int MAX_MATERIALS = 10;
 
 class Scene {
+	friend class JSON;
 public:
 	Scene() {
 		spheres.reserve(MAX_SPHERES);
@@ -341,6 +342,17 @@ public:
 	}
 protected:
 
+	void LoadTextureSet(const std::vector<const char*>& filepaths, const unsigned int bindSlot) {
+		stbi_set_flip_vertically_on_load(true);
+		Texture2DArray* maps = TextureLoader::LoadTextureArrayFromFile(filepaths);
+		maps->BindToSlot(bindSlot);
+		std::vector<std::string> stringPaths;
+		for (int i = 0; i < filepaths.size(); i++) {
+			stringPaths.push_back(filepaths[i]);
+		}
+		texture_sets.push_back(std::make_pair(stringPaths, bindSlot));
+	}
+
 	void ClearQuadList() { quads.clear(); }
 	void SetQuadList(const std::vector<Quad>& newQuads) { this->quads = newQuads; }
 
@@ -358,6 +370,7 @@ private:
 	std::vector<std::string> material_names;
 	std::vector<Material> materials;
 
+	std::vector<std::pair<std::vector<std::string>, unsigned int>> texture_sets;
 	std::vector<MaterialSet> material_sets;
 
 	std::vector<glm::mat4> transformBuffer;
