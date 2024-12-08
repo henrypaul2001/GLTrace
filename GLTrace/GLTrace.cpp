@@ -8,6 +8,8 @@
 #include "BigBen.h"
 #include "CPURTDEBUG.h"
 
+#include "JSON.h"
+
 void TestBVH(const BVH_DEBUG_RAY ray, const Scene* scene) {
 	BVH_DEBUG_HIT_RECORD rec;
 	bool hit_anything = false;
