@@ -42,6 +42,9 @@ int main()
 	float currentFrame;
 	float dt = 0.0f;
 
+	// json test
+	JSON::WriteSceneToJSON("TestScene.json", *scene);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		currentFrame = static_cast<float>(glfwGetTime()) + 0.0001f;
