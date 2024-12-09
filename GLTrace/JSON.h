@@ -70,7 +70,8 @@ private:
 		assert(materials.size() == material_names.size());
 		for (int i = 0; i < materials.size(); i++) {
 			const Material& mat = materials[i];
-			j["materials"][material_names[i]] = {
+			j["materials"][std::to_string(i)] = {
+				{"name", material_names[i]},
 				{"albedo", {mat.Albedo[0], mat.Albedo[1], mat.Albedo[2]}},
 				{"roughness", mat.Roughness},
 				{"metal", mat.Metal},
