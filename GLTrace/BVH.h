@@ -131,7 +131,10 @@ public:
 		// Buffer data
 		bvhSSBO->BufferSubData(&totalElements, sizeof(unsigned int), 0);
 		bvhSSBO->BufferSubData(&nodesUsed, sizeof(unsigned int), sizeof(unsigned int));
-		bvhSSBO->BufferSubData(&tree[0], sizeof(BVHNode) * (nodesUsed + 1), sizeof(unsigned int) * 4);
+
+		if (nodesUsed > 0 && totalElements > 0) {
+			bvhSSBO->BufferSubData(&tree[0], sizeof(BVHNode) * (nodesUsed + 1), sizeof(unsigned int) * 4);
+		}
 
 		// Sphere ID buffer
 		// ----------------
