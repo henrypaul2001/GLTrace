@@ -22,7 +22,11 @@ int main()
 	Renderer renderer = Renderer(1920, 1080);
 	CameraController camControl;
 
-	Scene* scene = new TestScene();
+	Scene* scene = JSON::LoadSceneFromJSON("testScene.json");
+	//Scene* scene = new TestScene();
+	if (!scene) {
+		return 1;
+	}
 	scene->SetupScene();
 	scene->BuildBVH();
 	scene->BufferBVH(renderer.GetRTCompute());
@@ -43,7 +47,7 @@ int main()
 	float dt = 0.0f;
 
 	// json test
-	JSON::WriteSceneToJSON("TestScene.json", *scene);
+	//JSON::WriteSceneToJSON("TestScene.json", *scene);
 
 	while (!glfwWindowShouldClose(window))
 	{

@@ -50,67 +50,28 @@
         }
     },
     "materials": {
-        "Emissive Earth": {
+        "0": {
             "albedo": [
-                1.0,
-                1.0,
-                1.0
+                0.95686274766922,
+                0.501960813999176,
+                0.21568627655506134
             ],
             "emissive_colour": [
-                0.0,
-                0.0,
-                0.0
+                0.95686274766922,
+                0.501960813999176,
+                0.21568627655506134
             ],
             "emissive_power": 1.0,
             "is_constant_medium": false,
             "is_transparent": false,
-            "material_set_index": 0,
+            "material_set_index": -1,
             "metal": 0.0,
+            "name": "Sun",
             "neg_inv_density": 0.0,
             "refractive_index": 1.5,
-            "roughness": 0.0
+            "roughness": 1.0
         },
-        "Glass": {
-            "albedo": [
-                1.0,
-                0.0,
-                0.0
-            ],
-            "emissive_colour": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "emissive_power": 0.0,
-            "is_constant_medium": false,
-            "is_transparent": true,
-            "material_set_index": -1,
-            "metal": 1.0,
-            "neg_inv_density": 0.0,
-            "refractive_index": 1.5,
-            "roughness": 0.0
-        },
-        "Glass Bubble": {
-            "albedo": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "emissive_colour": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "emissive_power": 0.0,
-            "is_constant_medium": false,
-            "is_transparent": true,
-            "material_set_index": -1,
-            "metal": 1.0,
-            "neg_inv_density": 0.0,
-            "refractive_index": 0.6666666865348816,
-            "roughness": 0.0
-        },
-        "Ground": {
+        "1": {
             "albedo": [
                 1.0,
                 1.0,
@@ -126,11 +87,33 @@
             "is_transparent": false,
             "material_set_index": -1,
             "metal": 0.10000000149011612,
+            "name": "Ground",
             "neg_inv_density": 0.0,
             "refractive_index": 1.5,
             "roughness": 1.0
         },
-        "Space Blanket": {
+        "2": {
+            "albedo": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "emissive_colour": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "emissive_power": 1.0,
+            "is_constant_medium": false,
+            "is_transparent": false,
+            "material_set_index": 0,
+            "metal": 0.0,
+            "name": "Emissive Earth",
+            "neg_inv_density": 0.0,
+            "refractive_index": 1.5,
+            "roughness": 0.0
+        },
+        "3": {
             "albedo": [
                 1.0,
                 1.0,
@@ -146,31 +129,54 @@
             "is_transparent": false,
             "material_set_index": 1,
             "metal": 0.0,
+            "name": "Space Blanket",
             "neg_inv_density": 0.0,
             "refractive_index": 1.5,
             "roughness": 0.0
         },
-        "Sun": {
+        "4": {
             "albedo": [
-                0.95686274766922,
-                0.501960813999176,
-                0.21568627655506134
+                1.0,
+                0.0,
+                0.0
             ],
             "emissive_colour": [
-                0.95686274766922,
-                0.501960813999176,
-                0.21568627655506134
+                0.0,
+                0.0,
+                0.0
             ],
-            "emissive_power": 1.0,
+            "emissive_power": 0.0,
             "is_constant_medium": false,
-            "is_transparent": false,
+            "is_transparent": true,
             "material_set_index": -1,
-            "metal": 0.0,
+            "metal": 1.0,
+            "name": "Glass",
             "neg_inv_density": 0.0,
             "refractive_index": 1.5,
-            "roughness": 1.0
+            "roughness": 0.0
         },
-        "Volume": {
+        "5": {
+            "albedo": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "emissive_colour": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "emissive_power": 0.0,
+            "is_constant_medium": false,
+            "is_transparent": true,
+            "material_set_index": -1,
+            "metal": 1.0,
+            "name": "Glass Bubble",
+            "neg_inv_density": 0.0,
+            "refractive_index": 0.6666666865348816,
+            "roughness": 0.0
+        },
+        "6": {
             "albedo": [
                 0.15000000596046448,
                 0.15000000596046448,
@@ -186,6 +192,7 @@
             "is_transparent": false,
             "material_set_index": -1,
             "metal": 0.0,
+            "name": "Volume",
             "neg_inv_density": -2.0,
             "refractive_index": 1.5,
             "roughness": 0.0
@@ -268,22 +275,20 @@
     "texture_sets": [
         [
             [
-                [
-                    "Textures/earth/albedo.jpg",
-                    "Textures/earth/specular.jpg",
-                    "Textures/earth/displacement.jpg"
-                ],
-                7
+                "Textures/earth/albedo.jpg",
+                "Textures/earth/specular.jpg",
+                "Textures/earth/displacement.jpg"
             ],
+            7
+        ],
+        [
             [
-                [
-                    "Textures/space_blanket/albedo.png",
-                    "Textures/space_blanket/metallic.png",
-                    "Textures/space_blanket/normal.png",
-                    "Textures/space_blanket/roughness.png"
-                ],
-                8
-            ]
+                "Textures/space_blanket/albedo.png",
+                "Textures/space_blanket/metallic.png",
+                "Textures/space_blanket/normal.png",
+                "Textures/space_blanket/roughness.png"
+            ],
+            8
         ]
     ],
     "transformBuffer": {
