@@ -3,7 +3,7 @@
 
 class CornellBoxScene : public Scene {
 public:
-	CornellBoxScene() {}
+	CornellBoxScene() : Scene("Cornell Box Scene") {}
 	~CornellBoxScene() {}
 
 	void SetupScene() override {

@@ -13,7 +13,7 @@ static const int MAX_MATERIALS = 10;
 class Scene {
 	friend class JSON;
 public:
-	Scene() {
+	Scene(const std::string& name) : scene_name(name) {
 		spheres.reserve(MAX_SPHERES);
 		quads.reserve(MAX_QUADS);
 		materials.reserve(MAX_MATERIALS);
@@ -340,6 +340,9 @@ public:
 			material_sets.push_back(mat_set);
 		}
 	}
+
+	const std::string& GetName() const { return scene_name; }
+	void SetName(const std::string& new_name) { scene_name = new_name; }
 protected:
 
 	void LoadTextureSet(const std::vector<const char*>& filepaths, const unsigned int bindSlot) {
@@ -374,6 +377,9 @@ private:
 	std::vector<MaterialSet> material_sets;
 
 	std::vector<glm::mat4> transformBuffer;
+
+	std::string scene_name;
+	std::string scene_filepath;
 
 	BVH bvh;
 };

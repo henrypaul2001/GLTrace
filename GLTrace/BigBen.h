@@ -3,7 +3,7 @@
 
 class BigBenScene : public Scene {
 public:
-	BigBenScene() {}
+	BigBenScene() : Scene("Big Ben Scene") {}
 	~BigBenScene() {}
 
 	void SetupScene() override {

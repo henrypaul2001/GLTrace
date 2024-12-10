@@ -3,7 +3,7 @@
 
 class TestModelScene : public Scene {
 public:
-	TestModelScene() {}
+	TestModelScene() : Scene("TestModelScene") {}
 	~TestModelScene() {}
 
 	void SetupScene() override {

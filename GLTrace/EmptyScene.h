@@ -2,7 +2,7 @@
 #include "Scene.h"
 class EmptyScene : public Scene {
 public:
-	EmptyScene() {}
+	EmptyScene() : Scene("Empty Scene") {}
 	~EmptyScene() {}
 
 	void SetupScene() override {

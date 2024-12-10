@@ -3,7 +3,7 @@
 
 class StressTestScene : public Scene {
 public:
-	StressTestScene() {}
+	StressTestScene() : Scene("StressTestScene") {}
 	~StressTestScene() {}
 
 	void SetupScene() override {

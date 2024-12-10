@@ -286,7 +286,7 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 		ImGui::EndPopup();
 	}
 
-	ImGui::SeparatorText("SceneName");
+	ImGui::SeparatorText(activeScene.GetName().c_str());
 	if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 8));
 
