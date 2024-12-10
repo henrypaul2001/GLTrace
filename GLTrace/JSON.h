@@ -55,6 +55,14 @@ public:
 			for (int i = 0; i < materials.size(); i++) {
 				scene->AddMaterial(material_names[i], materials[i]);
 			}
+
+			JSONToSpheres(j, scene);
+			JSONToQuads(j, scene);
+
+			std::vector<glm::mat4> transformBuffer;
+			JSONToTransforms(j, transformBuffer);
+			scene->transformBuffer = transformBuffer;
+
 			return scene;
 		}
 		else {
@@ -244,6 +252,99 @@ private:
 
 			materials.push_back(newMat);
 			material_names.push_back(jsonMat.at("name").get<std::string>());
+		}
+	}
+	static void JSONToSpheres(const nlohmann::json& j, Scene* scene) {
+		auto& jsonSpheres = j.at("spheres");
+		const int num_spheres = jsonSpheres.size();
+		scene->spheres.clear();
+		scene->spheres.reserve(num_spheres);
+		for (int i = 0; i < num_spheres; i++) {
+			auto& jsonSphere = jsonSpheres.at(std::to_string(i));
+			std::vector<float> readCenter = jsonSphere.at("center").get<std::vector<float>>();
+			glm::vec3 sphereCenter = glm::vec3(readCenter[0], readCenter[1], readCenter[2]);
+			std::string sphereName = jsonSphere.at("name").get<std::string>();
+			unsigned int material_index = jsonSphere.at("material_index").get<unsigned int>();
+			float sphereRadius = jsonSphere.at("radius").get<float>();
+			unsigned int transformID = jsonSphere.at("transform_ID").get<unsigned int>();
+			Sphere* new_sphere = scene->AddSphere(sphereName, sphereCenter, sphereRadius, material_index);
+			new_sphere->transform_ID = transformID;
+		}
+	}
+	static void JSONToQuads(const nlohmann::json& j, Scene* scene) {
+		auto& jsonQuads = j.at("quads");
+		const int num_quads = jsonQuads.size();
+		scene->quads.clear();
+		scene->quads.reserve(num_quads);
+		for (int i = 0; i < num_quads; i++) {
+			auto& jsonQuad = jsonQuads.at(std::to_string(i));
+			
+			std::vector<float> readQ = jsonQuad.at("Q").get<std::vector<float>>();
+			glm::vec3 Q = glm::vec3(readQ[0], readQ[1], readQ[2]);
+
+			std::vector<float> readU = jsonQuad.at("U").get<std::vector<float>>();
+			glm::vec3 U = glm::vec3(readU[0], readU[1], readU[2]);
+
+			std::vector<float> readV = jsonQuad.at("V").get<std::vector<float>>();
+			glm::vec3 V = glm::vec3(readV[0], readV[1], readV[2]);
+
+			unsigned int material_index = jsonQuad.at("material_index").get<unsigned int>();
+			std::string quad_name = jsonQuad.at("name").get<std::string>();
+			unsigned int quad_type = jsonQuad.at("quad_type").get<unsigned int>();
+			unsigned int transform_ID = jsonQuad.at("transform_ID").get<unsigned int>();
+
+			Quad* new_quad = nullptr;
+			switch (quad_type) {
+			case QUAD:
+				new_quad = scene->AddQuad(quad_name, Q, U, V, material_index);
+				break;
+			case TRIANGLE:
+				new_quad = scene->AddTriangle(quad_name, Q, U, V, material_index);
+				break;
+			case DISK:
+				new_quad = scene->AddDisk(quad_name, Q, U, V, material_index);
+				break;
+			}
+			if (new_quad) {
+				new_quad->Normal.w = transform_ID;
+			}
+		}
+	}
+	static void JSONToTransforms(const nlohmann::json& j, std::vector<glm::mat4>& transforms) {
+		auto& jsonTransforms = j.at("transformBuffer");
+		const int num_transforms = jsonTransforms.size();
+		transforms.clear();
+		transforms.reserve(num_transforms);
+		for (int i = 0; i < num_transforms; i++) {
+			auto& jsonTransform = jsonTransforms.at(std::to_string(i));
+
+			std::vector<float> readM0 = jsonTransform.at("m0").get<std::vector<float>>();
+			std::vector<float> readM1 = jsonTransform.at("m1").get<std::vector<float>>();
+			std::vector<float> readM2 = jsonTransform.at("m2").get<std::vector<float>>();
+			std::vector<float> readM3 = jsonTransform.at("m3").get<std::vector<float>>();
+
+			glm::mat4 new_mat4 = glm::mat4(1.0f);
+			new_mat4[0][0] = readM0[0];
+			new_mat4[0][1] = readM0[1];
+			new_mat4[0][2] = readM0[2];
+			new_mat4[0][3] = readM0[3];
+
+			new_mat4[1][0] = readM1[0];
+			new_mat4[1][1] = readM1[1];
+			new_mat4[1][2] = readM1[2];
+			new_mat4[1][3] = readM1[3];
+
+			new_mat4[2][0] = readM2[0];
+			new_mat4[2][1] = readM2[1];
+			new_mat4[2][2] = readM2[2];
+			new_mat4[2][3] = readM2[3];
+
+			new_mat4[3][0] = readM3[0];
+			new_mat4[3][1] = readM3[1];
+			new_mat4[3][2] = readM3[2];
+			new_mat4[3][3] = readM3[3];
+
+			transforms.push_back(new_mat4);
 		}
 	}
 };

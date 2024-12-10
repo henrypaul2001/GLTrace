@@ -199,7 +199,7 @@
         }
     },
     "quads": {
-        "Test Quad": {
+        "0": {
             "Q": [
                 0.0,
                 5.0,
@@ -216,60 +216,66 @@
                 0.0
             ],
             "material_index": 3,
+            "name": "Test Quad",
             "quad_type": 0,
             "transform_ID": 5
         }
     },
     "spheres": {
-        "Glass Ball 1": {
-            "center": [
-                6.0,
-                1.5,
-                0.0
-            ],
-            "material_index": 4,
-            "radius": 2.0,
-            "transform_ID": 3
-        },
-        "Glass Ball 2": {
-            "center": [
-                6.0,
-                1.5,
-                0.0
-            ],
-            "material_index": 5,
-            "radius": 1.899999976158142,
-            "transform_ID": 4
-        },
-        "Ground": {
-            "center": [
-                0.0,
-                -100.5,
-                -1.0
-            ],
-            "material_index": 1,
-            "radius": 100.0,
-            "transform_ID": 1
-        },
-        "Smoke": {
-            "center": [
-                0.0,
-                1.5,
-                0.0
-            ],
-            "material_index": 6,
-            "radius": 2.0,
-            "transform_ID": 2
-        },
-        "Sun": {
+        "0": {
             "center": [
                 150.0,
                 30.0,
                 -55.0
             ],
             "material_index": 0,
+            "name": "Sun",
             "radius": 50.0,
             "transform_ID": 0
+        },
+        "1": {
+            "center": [
+                0.0,
+                -100.5,
+                -1.0
+            ],
+            "material_index": 1,
+            "name": "Ground",
+            "radius": 100.0,
+            "transform_ID": 1
+        },
+        "2": {
+            "center": [
+                0.0,
+                1.5,
+                0.0
+            ],
+            "material_index": 6,
+            "name": "Smoke",
+            "radius": 2.0,
+            "transform_ID": 2
+        },
+        "3": {
+            "center": [
+                6.0,
+                1.5,
+                0.0
+            ],
+            "material_index": 4,
+            "name": "Glass Ball 1",
+            "radius": 2.0,
+            "transform_ID": 3
+        },
+        "4": {
+            "center": [
+                6.0,
+                1.5,
+                0.0
+            ],
+            "material_index": 5,
+            "name": "Glass Ball 2",
+            "radius": 1.899999976158142,
+            "transform_ID": 4
         }
     },
     "texture_sets": [

@@ -48,6 +48,7 @@ enum QUAD_TYPE {
 	DISK
 };
 class Sphere {
+	friend class JSON;
 public:
 	Sphere(const glm::vec4& center, const float radius, const unsigned int transformID, const unsigned int material_index = 0) : Center(center), Radius(radius), transform_ID(transformID), padding(0.0f), material_index(material_index) {}
 	~Sphere() {}
@@ -64,6 +65,7 @@ private:
 	unsigned int padding;
 };
 class Quad {
+	friend class JSON;
 public:
 	Quad(const QUAD_TYPE quad_type, const glm::vec3& Q, const glm::vec3& U, const glm::vec3& V, const unsigned int transformID, const unsigned int material_index = 0) : Q(Q, 1.0f), U(U, 1.0f), V(V, 1.0f), material_index(material_index) {
 		switch (quad_type) {
