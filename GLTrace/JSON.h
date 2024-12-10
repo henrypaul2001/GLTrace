@@ -8,6 +8,9 @@ class JSON {
 public:
 	static void WriteSceneToJSON(const char* filepath, const Scene& scene) {
 		json j;
+		j["scene"] = {
+			{"name", scene.GetName()}
+		};
 		const Camera& camera = scene.sceneCamera;
 		CameraToJSON(j, camera);
 		TextureSetsToJSON(j, scene.texture_sets);
@@ -28,7 +31,8 @@ public:
 			json j;
 			in_file >> j;
 
-			Scene* scene = new EmptyScene();
+			std::string scene_name = j.at("scene").at("name").get<std::string>();
+			Scene* scene = new EmptyScene(scene_name);
 			JSONToCamera(j, scene->sceneCamera);
 
 			std::vector<std::pair<std::vector<std::string>, unsigned int>> texture_sets;

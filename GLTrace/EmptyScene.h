@@ -2,7 +2,7 @@
 #include "Scene.h"
 class EmptyScene : public Scene {
 public:
-	EmptyScene() : Scene("Empty Scene") {}
+	EmptyScene(const std::string& name = "Empty Scene") : Scene(name) {}
 	~EmptyScene() {}
 
 	void SetupScene() override {

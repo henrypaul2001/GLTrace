@@ -221,6 +221,9 @@
             "transform_ID": 5
         }
     },
+    "scene": {
+        "name": "TestScene"
+    },
     "spheres": {
         "0": {
             "center": [
