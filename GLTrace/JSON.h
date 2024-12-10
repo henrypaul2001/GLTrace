@@ -129,11 +129,12 @@ private:
 		assert(spheres.size() == sphere_names.size());
 		for (int i = 0; i < spheres.size(); i++) {
 			const Sphere& sphere = spheres[i];
-			j["spheres"][sphere_names[i]] = {
+			j["spheres"][std::to_string(i)] = {
 				{"center", {sphere.Center[0], sphere.Center[1], sphere.Center[2]}},
 				{"radius", sphere.Radius},
 				{"material_index", sphere.material_index},
-				{"transform_ID", sphere.GetTransformID()}
+				{"transform_ID", sphere.GetTransformID()},
+				{"name", sphere_names[i]}
 			};
 		}
 	}
@@ -141,13 +142,14 @@ private:
 		assert(quads.size() == quad_names.size());
 		for (int i = 0; i < quads.size(); i++) {
 			const Quad& quad = quads[i];
-			j["quads"][quad_names[i]] = {
+			j["quads"][std::to_string(i)] = {
 				{"quad_type", quad.triangle_disk_id},
 				{"Q", {quad.Q[0], quad.Q[1], quad.Q[2]}},
 				{"U", {quad.U[0], quad.U[1], quad.U[2]}},
 				{"V", {quad.V[0], quad.V[1], quad.V[2]}},
 				{"material_index", quad.material_index},
-				{"transform_ID", (int)quad.Normal.w}
+				{"transform_ID", (int)quad.Normal.w},
+				{"name", quad_names[i]}
 			};
 		}
 	}
