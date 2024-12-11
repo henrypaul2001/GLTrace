@@ -87,6 +87,9 @@ int main()
 			if (new_scene) {
 				delete scene;
 				scene = new_scene;
+				camControl.activeCamera = scene->GetSceneCamera();
+				camControl.Initialise();
+				renderer.ResetAccumulation();
 			}
 			JSON::changeSceneAtEndOfFrame = false;
 		}

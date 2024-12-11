@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include "GLTMath.h"
+#include "JSON.h"
 bool Renderer::mouseIsFree = false;
 void Renderer::Render(Camera& activeCamera, Scene& activeScene, const float dt)
 {
@@ -68,6 +69,22 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	// --------
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("Open")) {
+				std::string filepath;
+				std::string filename;
+				bool success = JSON::WindowsFileSelect(filename, filepath);
+				if (success) {
+					JSON::changeSceneAtEndOfFrame = true;
+					JSON::loadPath = filepath;
+				}
+			}
+			if (ImGui::MenuItem("Save")) {
+
+			}
+			if (ImGui::MenuItem("Save As")) {
+
+			}
+			ImGui::Separator();
 			if (ImGui::MenuItem("Close")) {
 				glfwSetWindowShouldClose(window, true);
 			}
