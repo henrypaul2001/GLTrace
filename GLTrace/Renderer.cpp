@@ -65,6 +65,16 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
 
+	static int selected = 0;
+	static int selected_material = 0;
+	static int selected_quad_type = 0;
+	static int selected_edit_material = 0;
+	static int selected_material_set = 0;
+	const int num_spheres = activeScene.GetSpheres().size();
+	const int num_quads = activeScene.GetQuads().size();
+	const int num_materials = activeScene.GetMaterials().size();
+	const int num_material_sets = activeScene.GetMaterialSets().size();
+
 	// - Menu -
 	// --------
 	if (ImGui::BeginMainMenuBar()) {
@@ -76,10 +86,15 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				if (success) {
 					JSON::changeSceneAtEndOfFrame = true;
 					JSON::loadPath = filepath;
+					selected = 0;
+					selected_material = 0;
+					selected_quad_type = 0;
+					selected_edit_material = 0;
+					selected_material_set = 0;
 				}
 			}
 			if (ImGui::MenuItem("Save")) {
-
+				JSON::WriteSceneToJSON(JSON::loadPath.c_str(), activeScene);
 			}
 			if (ImGui::MenuItem("Save As")) {
 
@@ -161,16 +176,6 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	}
 	ImGui::EndChild();
 	ImGui::End();
-
-	static int selected = 0;
-	static int selected_material = 0;
-	static int selected_quad_type = 0;
-	static int selected_edit_material = 0;
-	static int selected_material_set = 0;
-	const int num_spheres = activeScene.GetSpheres().size();
-	const int num_quads = activeScene.GetQuads().size();
-	const int num_materials = activeScene.GetMaterials().size();
-	const int num_material_sets = activeScene.GetMaterialSets().size();
 
 	// Scene details
 	// -------------

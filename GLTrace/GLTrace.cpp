@@ -10,7 +10,7 @@
 
 #include "JSON.h"
 bool JSON::changeSceneAtEndOfFrame = false;
-std::string JSON::loadPath = std::string("");
+std::string JSON::loadPath = std::string("Scenes/TestScene.json");
 
 
 void TestBVH(const BVH_DEBUG_RAY ray, const Scene* scene) {
@@ -25,8 +25,8 @@ int main()
 	Renderer renderer = Renderer(1920, 1080);
 	CameraController camControl;
 
-	Scene* scene = JSON::LoadSceneFromJSON("testScene.json");
-	//Scene* scene = new TestScene();
+	Scene* scene = JSON::LoadSceneFromJSON(JSON::loadPath.c_str());
+	//Scene* scene = new TestModelScene();
 	if (!scene) {
 		return 1;
 	}
@@ -50,7 +50,7 @@ int main()
 	float dt = 0.0f;
 
 	// json test
-	//JSON::WriteSceneToJSON("TestScene.json", *scene);
+	//JSON::WriteSceneToJSON("Scenes/TestModelScene.json", *scene);
 
 	while (!glfwWindowShouldClose(window))
 	{

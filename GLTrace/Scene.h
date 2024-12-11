@@ -379,7 +379,6 @@ private:
 	std::vector<glm::mat4> transformBuffer;
 
 	std::string scene_name;
-	std::string scene_filepath;
 
 	BVH bvh;
 };
