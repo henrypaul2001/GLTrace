@@ -9,6 +9,9 @@
 #include "CPURTDEBUG.h"
 
 #include "JSON.h"
+bool JSON::changeSceneAtEndOfFrame = false;
+std::string JSON::loadPath = std::string("");
+
 
 void TestBVH(const BVH_DEBUG_RAY ray, const Scene* scene) {
 	BVH_DEBUG_HIT_RECORD rec;
@@ -77,6 +80,16 @@ int main()
 		glfwSwapBuffers(window);
 
 		glfwPollEvents();
+
+		if (JSON::changeSceneAtEndOfFrame) {
+			Scene* new_scene = JSON::LoadSceneFromJSON(JSON::loadPath.c_str());
+
+			if (new_scene) {
+				delete scene;
+				scene = new_scene;
+			}
+			JSON::changeSceneAtEndOfFrame = false;
+		}
 	}
 
 	delete scene;

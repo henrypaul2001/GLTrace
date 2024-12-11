@@ -3,9 +3,75 @@
 #include "Scene.h"
 #include "EmptyScene.h"
 
+#include "Windows.h"
+#include "shobjidl.h"
+
 using namespace nlohmann;
 class JSON {
 public:
+	static bool changeSceneAtEndOfFrame;
+	static std::string loadPath;
+
+	// xCENTx answered the following StackOverflow question with this implementation: https://stackoverflow.com/questions/68601080/how-do-you-open-a-file-explorer-dialogue-in-c
+	static bool WindowsFileSelect(std::string& sSelectedFile, std::string& sFilePath) {
+		// Create file object instance
+		HRESULT f_SysHr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+		if (FAILED(f_SysHr)) {
+			return false;
+		}
+
+		// Create FileOpenDialog object
+		IFileOpenDialog* f_FileSystem;
+		f_SysHr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&f_FileSystem));
+		if (FAILED(f_SysHr)) {
+			CoUninitialize();
+			return false;
+		}
+
+		// Show file dialog window
+		f_SysHr = f_FileSystem->Show(NULL);
+		if (FAILED(f_SysHr)) {
+			f_FileSystem->Release();
+			CoUninitialize();
+			return false;
+		}
+
+		// Retrieve file name from selected item
+		IShellItem* f_Files;
+		f_SysHr = f_FileSystem->GetResult(&f_Files);
+		if (FAILED(f_SysHr)) {
+			f_FileSystem->Release();
+			CoUninitialize();
+			return false;
+		}
+
+		// Store and convert file name
+		PWSTR f_Path;
+		f_SysHr = f_Files->GetDisplayName(SIGDN_FILESYSPATH, &f_Path);
+		if (FAILED(f_SysHr)) {
+			f_Files->Release();
+			f_FileSystem->Release();
+			CoUninitialize();
+			return false;
+		}
+
+		// Format and store file path
+		std::wstring path(f_Path);
+		std::string c(path.begin(), path.end());
+		sFilePath = c;
+
+		// Format string for executable name
+		const size_t slash = sFilePath.find_last_of("/\\");
+		sSelectedFile = sFilePath.substr(slash + 1);
+
+		// Success, clean up
+		CoTaskMemFree(f_Path);
+		f_Files->Release();
+		f_FileSystem->Release();
+		CoUninitialize();
+		return true;
+	}
+
 	static void WriteSceneToJSON(const char* filepath, const Scene& scene) {
 		json j;
 		j["scene"] = {
