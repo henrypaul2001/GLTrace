@@ -72,6 +72,64 @@ public:
 		return true;
 	}
 
+	static bool WindowsSaveFileDialog(std::string& sSelectedFile, std::string& sFilePath) {
+		HRESULT f_SysHr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+		if (FAILED(f_SysHr)) {
+			return false;
+		}
+
+		// Create FileSaveDialog object
+		IFileSaveDialog* f_FileSystem;
+		f_SysHr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&f_FileSystem));
+		if (FAILED(f_SysHr)) {
+			CoUninitialize();
+			return false;
+		}
+
+		// Show the Save As dialog window
+		f_SysHr = f_FileSystem->Show(NULL);
+		if (FAILED(f_SysHr)) {
+			f_FileSystem->Release();
+			CoUninitialize();
+			return false;
+		}
+
+		// Retrieve the file name from the selected item
+		IShellItem* f_Files;
+		f_SysHr = f_FileSystem->GetResult(&f_Files);
+		if (FAILED(f_SysHr)) {
+			f_FileSystem->Release();
+			CoUninitialize();
+			return false;
+		}
+
+		// Get the file path
+		PWSTR f_Path;
+		f_SysHr = f_Files->GetDisplayName(SIGDN_FILESYSPATH, &f_Path);
+		if (FAILED(f_SysHr)) {
+			f_Files->Release();
+			f_FileSystem->Release();
+			CoUninitialize();
+			return false;
+		}
+
+		// Convert the file path from wide string to std::string
+		std::wstring path(f_Path);
+		std::string c(path.begin(), path.end());
+		sFilePath = c;
+
+		// Extract and store the file name
+		const size_t slash = sFilePath.find_last_of("/\\");
+		sSelectedFile = sFilePath.substr(slash + 1);
+
+		// Clean up and return success
+		CoTaskMemFree(f_Path);
+		f_Files->Release();
+		f_FileSystem->Release();
+		CoUninitialize();
+		return true;
+	}
+
 	static void WriteSceneToJSON(const char* filepath, const Scene& scene) {
 		json j;
 		j["scene"] = {

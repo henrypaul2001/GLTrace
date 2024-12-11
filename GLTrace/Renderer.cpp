@@ -97,7 +97,13 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				JSON::WriteSceneToJSON(JSON::loadPath.c_str(), activeScene);
 			}
 			if (ImGui::MenuItem("Save As")) {
-
+				std::string filepath;
+				std::string filename;
+				bool success = JSON::WindowsSaveFileDialog(filename, filepath);
+				if (success) {
+					JSON::loadPath = filepath;
+					JSON::WriteSceneToJSON(JSON::loadPath.c_str(), activeScene);
+				}
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Close")) {
