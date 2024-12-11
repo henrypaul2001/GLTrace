@@ -172,6 +172,7 @@ private:
 		}
 	}
 	static void MaterialSetsToJSON(nlohmann::json& j, const std::vector<MaterialSet>& material_sets) {
+		j["material_sets"] = json::array();
 		for (int i = 0; i < material_sets.size(); i++) {
 			const MaterialSet& mat = material_sets[i];
 			j["material_sets"][std::to_string(i)] = {
