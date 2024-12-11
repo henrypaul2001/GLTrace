@@ -28,6 +28,12 @@ public:
 			return false;
 		}
 
+		// Set file type filters to JSON
+		COMDLG_FILTERSPEC fileTypes[] = {
+			{L"JSON File (*.json)", L"*.json"}
+		};
+		f_FileSystem->SetFileTypes(ARRAYSIZE(fileTypes), fileTypes);
+
 		// Show file dialog window
 		f_SysHr = f_FileSystem->Show(NULL);
 		if (FAILED(f_SysHr)) {
@@ -64,6 +70,17 @@ public:
 		const size_t slash = sFilePath.find_last_of("/\\");
 		sSelectedFile = sFilePath.substr(slash + 1);
 
+		// Validate extension
+		const size_t dot = sFilePath.find_last_of(".");
+		if (dot == std::string::npos || sFilePath.substr(dot) != ".json") {
+			// Invalid extension
+			CoTaskMemFree(f_Path);
+			f_Files->Release();
+			f_FileSystem->Release();
+			CoUninitialize();
+			return false;
+		}
+
 		// Success, clean up
 		CoTaskMemFree(f_Path);
 		f_Files->Release();
@@ -85,6 +102,16 @@ public:
 			CoUninitialize();
 			return false;
 		}
+
+		// Set file type filter to JSON
+		COMDLG_FILTERSPEC fileTypes[] = {
+			{L"JSON File (*.json)", L"*.json"}
+		};
+		f_FileSystem->SetFileTypes(ARRAYSIZE(fileTypes), fileTypes);
+
+		// Set default extension to .json
+		f_FileSystem->SetFileName(L"scene.json");
+		f_FileSystem->SetDefaultExtension(L".json");
 
 		// Show the Save As dialog window
 		f_SysHr = f_FileSystem->Show(NULL);
@@ -121,6 +148,17 @@ public:
 		// Extract and store the file name
 		const size_t slash = sFilePath.find_last_of("/\\");
 		sSelectedFile = sFilePath.substr(slash + 1);
+
+		// Validate extension
+		const size_t dot = sFilePath.find_last_of(".");
+		if (dot == std::string::npos || sFilePath.substr(dot) != ".json") {
+			// Invalid extension
+			CoTaskMemFree(f_Path);
+			f_Files->Release();
+			f_FileSystem->Release();
+			CoUninitialize();
+			return false;
+		}
 
 		// Clean up and return success
 		CoTaskMemFree(f_Path);
