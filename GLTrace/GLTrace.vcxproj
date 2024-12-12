@@ -178,6 +178,7 @@
     <ClInclude Include="CornellBox.h" />
     <ClInclude Include="CornellMirror.h" />
     <ClInclude Include="CPURTDEBUG.h" />
+    <ClInclude Include="DefaultScene.h" />
     <ClInclude Include="GLTMath.h" />
     <ClInclude Include="Hittables.h" />
     <ClInclude Include="InputManager.h" />

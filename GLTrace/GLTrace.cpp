@@ -82,14 +82,19 @@ int main()
 		glfwPollEvents();
 
 		if (JSON::changeSceneAtEndOfFrame) {
+			TextureLoader::ClearResources();
 			Scene* new_scene = JSON::LoadSceneFromJSON(JSON::loadPath.c_str());
 
 			if (new_scene) {
+				scene->ClearBuffers(renderer.GetRTCompute());
+				scene->GetBVH().ClearBuffer(renderer.GetRTCompute());
 				delete scene;
 				scene = new_scene;
 				camControl.activeCamera = scene->GetSceneCamera();
 				camControl.Initialise();
 				renderer.ResetAccumulation();
+				scene->SetupScene();
+				scene->BuildBVH();
 			}
 			JSON::changeSceneAtEndOfFrame = false;
 		}
