@@ -2,6 +2,7 @@
 #include "json.hpp"
 #include "Scene.h"
 #include "EmptyScene.h"
+#include "DefaultScene.h"
 
 #include "Windows.h"
 #include "shobjidl.h"
@@ -189,7 +190,8 @@ public:
 
 	static Scene* LoadSceneFromJSON(const char* filepath) {
 		if (strcmp(filepath, "") == 0) {
-			return new EmptyScene();
+			Scene* new_scene = new DefaultScene();
+			return new_scene;
 		}
 
 		std::ifstream in_file = std::ifstream(filepath);

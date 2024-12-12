@@ -156,6 +156,15 @@ public:
 			quadSSBO->BufferData(&quadIDs[0], sizeof(unsigned int) * quadIDs.size(), GL_STATIC_DRAW);
 		}
 	}
+	void ClearBuffer(ComputeShader& computeShader) const {
+		const ShaderStorageBuffer* bvhSSBO = computeShader.GetSSBO(1);
+		const ShaderStorageBuffer* sphereSSBO = computeShader.GetSSBO(2);
+		const ShaderStorageBuffer* quadSSBO = computeShader.GetSSBO(3);
+	
+		bvhSSBO->BufferData(nullptr, (sizeof(BVHNode) * (nodesUsed + 1)) + (sizeof(unsigned int) * 4), GL_STREAM_COPY);
+		sphereSSBO->BufferData(nullptr, sizeof(unsigned int) * sphereIDs.size(), GL_STREAM_COPY);
+		quadSSBO->BufferData(nullptr, sizeof(unsigned int) * quadIDs.size(), GL_STREAM_COPY);
+	}
 
 	const std::vector<BVHNode>& GetTree() const { return tree; }
 	const std::vector<unsigned int>& GetQuadIDs() const { return quadIDs; }

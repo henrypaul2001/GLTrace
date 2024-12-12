@@ -79,6 +79,15 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	// --------
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("New")) {
+				JSON::loadPath = std::string("");
+				JSON::changeSceneAtEndOfFrame = true;
+				selected = 0;
+				selected_material = 0;
+				selected_quad_type = 0;
+				selected_edit_material = 0;
+				selected_material_set = 0;
+			}
 			if (ImGui::MenuItem("Open")) {
 				std::string filepath;
 				std::string filename;
@@ -329,7 +338,6 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	ImGui::SeparatorText(activeScene.GetName().c_str());
 	if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 8));
-
 		if (ImGui::Selectable("Camera", selected == 0)) {
 			selected = 0;
 		}
@@ -383,7 +391,6 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	// Properties
 	// ----------
 	ImGui::Begin("Properties");
-	
 	if (selected == 0) {
 		// Camera
 		// ------

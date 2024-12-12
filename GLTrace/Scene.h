@@ -140,6 +140,21 @@ public:
 		}
 	}
 
+	void ClearBuffers(ComputeShader& computeShader) const {
+		const ShaderStorageBuffer* sphereSSBO = computeShader.GetSSBO(4);
+		const ShaderStorageBuffer* quadSSBO = computeShader.GetSSBO(5);
+		const ShaderStorageBuffer* transformSSBO = computeShader.GetSSBO(6);
+		const unsigned int num_spheres = spheres.size();
+		const unsigned int num_quads = quads.size();
+		const unsigned int num_transforms = transformBuffer.size();
+
+		sphereSSBO->BufferData(nullptr, (sizeof(unsigned int) * 4) + (sizeof(Sphere) * spheres.size()), GL_STATIC_DRAW);
+		quadSSBO->BufferData(nullptr, (sizeof(unsigned int) * 4) + (sizeof(Quad) * quads.size()), GL_STATIC_DRAW);
+		transformSSBO->BufferData(nullptr, (sizeof(glm::mat4) * num_transforms), GL_STATIC_COPY);
+
+		bvh.ClearBuffer(computeShader);
+	}
+
 	Sphere* AddSphere(const std::string& name, const glm::vec3& position, const float radius, const unsigned int material_index) {
 		if (sphere_map.find(name) == sphere_map.end()) {
 			if (spheres.size() < MAX_SPHERES) {
