@@ -10,7 +10,7 @@
 
 #include "JSON.h"
 bool JSON::changeSceneAtEndOfFrame = false;
-std::string JSON::loadPath = std::string("Scenes/TestScene.json");
+std::string JSON::loadPath = std::string("");
 
 
 void TestBVH(const BVH_DEBUG_RAY ray, const Scene* scene) {

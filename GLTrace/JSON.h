@@ -188,6 +188,10 @@ public:
 	}
 
 	static Scene* LoadSceneFromJSON(const char* filepath) {
+		if (strcmp(filepath, "") == 0) {
+			return new EmptyScene();
+		}
+
 		std::ifstream in_file = std::ifstream(filepath);
 		if (in_file.is_open()) {
 			json j;

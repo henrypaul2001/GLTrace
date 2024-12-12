@@ -94,7 +94,19 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 				}
 			}
 			if (ImGui::MenuItem("Save")) {
-				JSON::WriteSceneToJSON(JSON::loadPath.c_str(), activeScene);
+				if (JSON::loadPath == "") {
+					// Save As
+					std::string filepath;
+					std::string filename;
+					bool success = JSON::WindowsSaveFileDialog(filename, filepath);
+					if (success) {
+						JSON::loadPath = filepath;
+						JSON::WriteSceneToJSON(JSON::loadPath.c_str(), activeScene);
+					}
+				}
+				else {
+					JSON::WriteSceneToJSON(JSON::loadPath.c_str(), activeScene);
+				}
 			}
 			if (ImGui::MenuItem("Save As")) {
 				std::string filepath;
