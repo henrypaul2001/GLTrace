@@ -1,0 +1,545 @@
+{
+    "camera": {
+        "defocus_angle": 0.0,
+        "focus_dist": 1.0,
+        "lookat": [
+            -5.228928565979004,
+            0.5971804857254028,
+            -3.123354434967041
+        ],
+        "lookfrom": [
+            -6.166360855102539,
+            0.41322898864746094,
+            -3.418959856033325
+        ],
+        "max_bounces": 15,
+        "samples_per_pixel": 5,
+        "sky_colour_max_y": [
+            0.5814843773841858,
+            0.4573241174221039,
+            0.5980392098426819
+        ],
+        "sky_colour_min_y": [
+            0.16891109943389893,
+            0.009611687622964382,
+            0.2450980544090271
+        ],
+        "vfov": 68.0,
+        "vup": [
+            -0.17543582618236542,
+            0.9829353094100952,
+            -0.055321089923381805
+        ]
+    },
+    "material_sets": {
+        "0": {
+            "albedo_index": 0,
+            "emission_index": 0,
+            "metal_index": 1,
+            "normal_index": -1,
+            "opacity_index": -1,
+            "roughness_index": 2
+        },
+        "1": {
+            "albedo_index": 0,
+            "emission_index": -1,
+            "metal_index": 1,
+            "normal_index": 2,
+            "opacity_index": -1,
+            "roughness_index": 3
+        }
+    },
+    "materials": {
+        "0": {
+            "albedo": [
+                0.95686274766922,
+                0.501960813999176,
+                0.21568627655506134
+            ],
+            "emissive_colour": [
+                0.95686274766922,
+                0.501960813999176,
+                0.21568627655506134
+            ],
+            "emissive_power": 1.0,
+            "is_constant_medium": false,
+            "is_transparent": false,
+            "material_set_index": -1,
+            "metal": 0.0,
+            "name": "Sun",
+            "neg_inv_density": 0.0,
+            "refractive_index": 1.5,
+            "roughness": 1.0
+        },
+        "1": {
+            "albedo": [
+                0.7303921580314636,
+                0.7303921580314636,
+                0.7303921580314636
+            ],
+            "emissive_colour": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "emissive_power": 0.0,
+            "is_constant_medium": false,
+            "is_transparent": false,
+            "material_set_index": -1,
+            "metal": 0.10000000149011612,
+            "name": "Ground",
+            "neg_inv_density": 0.0,
+            "refractive_index": 1.5,
+            "roughness": 0.0
+        },
+        "2": {
+            "albedo": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "emissive_colour": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "emissive_power": 1.0,
+            "is_constant_medium": false,
+            "is_transparent": false,
+            "material_set_index": 0,
+            "metal": 0.0,
+            "name": "Emissive Earth",
+            "neg_inv_density": 0.0,
+            "refractive_index": 1.5,
+            "roughness": 0.0
+        },
+        "3": {
+            "albedo": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "emissive_colour": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "emissive_power": 1.0,
+            "is_constant_medium": false,
+            "is_transparent": false,
+            "material_set_index": 1,
+            "metal": 0.0,
+            "name": "Space Blanket",
+            "neg_inv_density": 0.0,
+            "refractive_index": 1.5,
+            "roughness": 0.0
+        },
+        "4": {
+            "albedo": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "emissive_colour": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "emissive_power": 0.0,
+            "is_constant_medium": false,
+            "is_transparent": true,
+            "material_set_index": -1,
+            "metal": 1.0,
+            "name": "Glass",
+            "neg_inv_density": 0.0,
+            "refractive_index": 1.5,
+            "roughness": 0.0
+        },
+        "5": {
+            "albedo": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "emissive_colour": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "emissive_power": 0.0,
+            "is_constant_medium": false,
+            "is_transparent": true,
+            "material_set_index": -1,
+            "metal": 1.0,
+            "name": "Glass Bubble",
+            "neg_inv_density": 0.0,
+            "refractive_index": 0.6666666865348816,
+            "roughness": 0.0
+        },
+        "6": {
+            "albedo": [
+                0.6911764740943909,
+                0.6911764740943909,
+                0.6911764740943909
+            ],
+            "emissive_colour": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "emissive_power": 0.0,
+            "is_constant_medium": true,
+            "is_transparent": false,
+            "material_set_index": -1,
+            "metal": 0.0,
+            "name": "Volume",
+            "neg_inv_density": -12.98701286315918,
+            "refractive_index": 1.5,
+            "roughness": 1.0
+        }
+    },
+    "quads": {
+        "0": {
+            "Q": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "U": [
+                25.0,
+                0.0,
+                0.0
+            ],
+            "V": [
+                0.0,
+                5.0,
+                0.0
+            ],
+            "material_index": 3,
+            "name": "Wall",
+            "quad_type": 0,
+            "transform_ID": 6
+        },
+        "1": {
+            "Q": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "U": [
+                25.0,
+                0.0,
+                0.0
+            ],
+            "V": [
+                0.0,
+                5.0,
+                0.0
+            ],
+            "material_index": 3,
+            "name": "Wall 2",
+            "quad_type": 0,
+            "transform_ID": 7
+        }
+    },
+    "scene": {
+        "name": "Alien Hallway"
+    },
+    "spheres": {
+        "0": {
+            "center": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "material_index": 1,
+            "name": "Ground",
+            "radius": 1000.0,
+            "transform_ID": 0
+        },
+        "1": {
+            "center": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "material_index": 0,
+            "name": "Test",
+            "radius": 20.0,
+            "transform_ID": 1
+        },
+        "2": {
+            "center": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "material_index": 4,
+            "name": "Glass Ball",
+            "radius": 1.0,
+            "transform_ID": 2
+        },
+        "3": {
+            "center": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "material_index": 5,
+            "name": "Glass Ball Inner",
+            "radius": 1.5499999523162842,
+            "transform_ID": 3
+        },
+        "4": {
+            "center": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "material_index": 2,
+            "name": "Earth",
+            "radius": 3.0,
+            "transform_ID": 4
+        },
+        "5": {
+            "center": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "material_index": 6,
+            "name": "Volume",
+            "radius": 12.0,
+            "transform_ID": 5
+        }
+    },
+    "texture_sets": [
+        [
+            [
+                "Textures/earth/albedo.jpg",
+                "Textures/earth/specular.jpg",
+                "Textures/earth/displacement.jpg"
+            ],
+            7
+        ],
+        [
+            [
+                "Textures/space_blanket/albedo.png",
+                "Textures/space_blanket/metallic.png",
+                "Textures/space_blanket/normal.png",
+                "Textures/space_blanket/roughness.png"
+            ],
+            8
+        ]
+    ],
+    "transformBuffer": {
+        "0": {
+            "m0": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "m1": [
+                0.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "m2": [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            "m3": [
+                0.0,
+                -1000.5,
+                0.0,
+                1.0
+            ]
+        },
+        "1": {
+            "m0": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "m1": [
+                0.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "m2": [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            "m3": [
+                9.65999984741211,
+                31.881999969482422,
+                13.480999946594238,
+                1.0
+            ]
+        },
+        "2": {
+            "m0": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "m1": [
+                0.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "m2": [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            "m3": [
+                0.0,
+                0.7942559719085693,
+                -2.100795030593872,
+                1.0
+            ]
+        },
+        "3": {
+            "m0": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "m1": [
+                0.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "m2": [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            "m3": [
+                0.0,
+                0.7940000295639038,
+                -2.1010000705718994,
+                1.0
+            ]
+        },
+        "4": {
+            "m0": [
+                -0.9976785778999329,
+                -1.8157011254515965e-06,
+                0.06801490485668182,
+                0.0
+            ],
+            "m1": [
+                -1.9437079572526272e-06,
+                0.9999996423721313,
+                -1.8157107888328028e-06,
+                0.0
+            ],
+            "m2": [
+                -0.06801490485668182,
+                -1.943697498063557e-06,
+                -0.9976785778999329,
+                0.0
+            ],
+            "m3": [
+                52.422725677490234,
+                15.827033996582031,
+                0.4192594289779663,
+                1.0
+            ]
+        },
+        "5": {
+            "m0": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "m1": [
+                0.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "m2": [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            "m3": [
+                0.0,
+                1.024863839149475,
+                0.0,
+                1.0
+            ]
+        },
+        "6": {
+            "m0": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "m1": [
+                0.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "m2": [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            "m3": [
+                -5.418035984039307,
+                -0.5133025050163269,
+                0.0,
+                1.0
+            ]
+        },
+        "7": {
+            "m0": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "m1": [
+                0.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "m2": [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            "m3": [
+                -5.395883560180664,
+                -0.5114173293113708,
+                -4.191793441772461,
+                1.0
+            ]
+        }
+    }
+}
