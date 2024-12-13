@@ -335,7 +335,14 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 		ImGui::EndPopup();
 	}
 
-	ImGui::SeparatorText(activeScene.GetName().c_str());
+	std::string sceneString = activeScene.GetName();
+	char sceneName[1000];
+	strncpy_s(sceneName, sceneString.c_str(), sizeof(sceneName));
+	sceneName[sizeof(sceneName) - 1] = '\0';
+	if (ImGui::InputText("Scene", sceneName, sizeof(sceneName))) {
+		activeScene.SetName(std::string(sceneName));
+	}
+	ImGui::Separator();
 	if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 8));
 		if (ImGui::Selectable("Camera", selected == 0)) {
