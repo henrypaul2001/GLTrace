@@ -335,19 +335,22 @@ public:
 		}
 	}
 
-	void AddMaterial(const std::string& name, const Material& mat) {
+	bool AddMaterial(const std::string& name, const Material& mat) {
 		if (material_map.find(name) == material_map.end()) {
 			if (materials.size() < MAX_MATERIALS) {
 				materials.push_back(mat);
 				material_names.push_back(name);
 				material_map[name] = materials.size() - 1;
+				return true;
 			}
 			else {
-				Logger::LogWarning("Maximum quad count reached");
+				Logger::LogWarning("Maximum material count reached");
+				return false;
 			}
 		}
 		else {
-			Logger::LogError("Quad name already exists");
+			Logger::LogError("Material name already exists");
+			return false;
 		}
 	}
 	void AddMaterialSet(const MaterialSet& mat_set) {
