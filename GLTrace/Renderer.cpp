@@ -710,6 +710,95 @@ void Renderer::SetupUI(Camera& activeCamera, Scene& activeScene, const float dt)
 	// Material browser
 	// ----------------
 	ImGui::Begin("Materials");
+
+	// Add material button
+	// -------------------
+	if (ImGui::Button("Add Material")) {
+		ImGui::OpenPopup("Create Material");
+	}
+
+	// Create material menu
+	// --------------------
+	center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	if (ImGui::BeginPopupModal("Create Material", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::SeparatorText("Material properties");
+
+		static char materialName;
+		static glm::vec3 albedo = glm::vec3(1.0f);
+		static float roughness = 0.0f;
+		static float metal = 0.0f;
+		static glm::vec3 emissiveColour = glm::vec3(0.0f);
+		static float emissivePower = 0.0f;
+		static bool is_transparent = false;
+		static float refractive_index = 1.5f;
+		static int material_set_index = -1;
+		static bool is_constant_medium = false;
+		static float density = 0.0f;
+
+		ImGui::Spacing();
+		ImGui::InputText("Material name", &materialName, sizeof(char) * 100);
+
+		ImGui::Spacing();
+		ImGui::ColorEdit3("Albedo", &albedo[0], ImGuiColorEditFlags_Float);
+		ImGui::DragFloat("Roughness", &roughness, 0.01f, 0.0f, 1.0f, "%.3f");
+		ImGui::DragFloat("Metal", &metal, 0.01f, 0.0f, 1.0f, "%.3f");
+		
+		// Texture set
+		ImGui::Spacing();
+		if (ImGui::BeginCombo("Texture set", std::to_string(material_set_index).c_str())) {
+			for (int i = -1; i < num_material_sets; i++) {
+				if (ImGui::Selectable(std::to_string(i).c_str(), material_set_index == i)) {
+					material_set_index = i;
+				}
+
+				if (material_set_index == i) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		// Transparency
+		ImGui::Spacing();
+		ImGui::Checkbox("Transparent", &is_transparent);
+		ImGui::DragFloat("Refractive Index", &refractive_index, 0.01f, 0.0f, 1000.0f, "%.3f");
+
+		// Emission
+		ImGui::Spacing();
+		ImGui::ColorEdit3("Emissive Colour", &emissiveColour[0], ImGuiColorEditFlags_Float);
+		ImGui::DragFloat("Emissive Power", &emissivePower, 0.01f, 0.0f, 1000.0f, "%.3f");
+
+		// Volumetric
+		ImGui::Spacing();
+		ImGui::Checkbox("Volumetric", &is_constant_medium);
+		ImGui::DragFloat("Density", &density, 0.01f);
+
+		if (ImGui::Button("Confirm")) {
+			Material material;
+			material.Albedo = albedo;
+			material.Roughness = roughness;
+			material.Metal = metal;
+			material.EmissiveColour = emissiveColour;
+			material.EmissivePower = emissivePower;
+			material.is_transparent = is_transparent;
+			material.refractive_index = refractive_index;
+			material.material_set_index = material_set_index;
+			material.is_constant_medium = is_constant_medium;
+			material.neg_inv_density = -1.0f / density;
+			bool success = activeScene.AddMaterial(std::string(&materialName), material);
+			if (success) {
+				ImGui::CloseCurrentPopup();
+			}
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
 	ImGui::Text("Material count: %d", num_materials);
 	ImGui::Text("Maximum materials: %d", MAX_MATERIALS);
 	ImGui::Separator();
